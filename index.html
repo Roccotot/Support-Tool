@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIGRA FILM — Dashboard & Map</title>
+<title>SIGRA FILM — Dashboard Cinema</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
@@ -26,7 +25,10 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:'Rajdhani',sans-serif;
-  padding:15px;
+  padding:15px; /* Ridotto per mobile */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 header{
@@ -37,17 +39,6 @@ header{
   text-transform:uppercase;
   font-weight: 700;
   text-align: center;
-}
-
-/* Container Mappa */
-#map {
-  height: 350px;
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  margin-bottom: 25px;
-  background: var(--panel);
-  z-index: 1;
 }
 
 .stats{
@@ -79,13 +70,18 @@ header{
 
 .cinemas-grid{
   display:grid;
+  /* Auto-fit per desktop, 100% per mobile */
   grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
   gap:15px;
+  flex: 1;
 }
 
+/* Query per schermi più grandi (Tablet/PC) */
 @media (min-width: 768px) {
-  .cinemas-grid { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
-  #map { height: 450px; }
+  .cinemas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+  header { text-align: left; }
 }
 
 .cinema-card{
@@ -98,7 +94,7 @@ header{
 
 .cinema-header{
   background:var(--panel2);
-  padding:12px 15px;
+  padding:10px 15px;
   border-bottom:1px solid var(--border);
 }
 
@@ -109,7 +105,9 @@ header{
   text-transform: uppercase;
 }
 
-.devices{ padding:5px 12px 12px 12px; }
+.devices{
+  padding:5px 12px 12px 12px;
+}
 
 .room-divider {
   background: var(--room-bg);
@@ -127,9 +125,21 @@ header{
   display:flex;
   justify-content:space-between;
   align-items: center;
-  padding:6px 0;
+  padding:5px 0;
   font-size:13px; 
   border-bottom:1px solid rgba(255,255,255,0.05);
+  gap: 8px;
+}
+
+.device-row:last-child{
+  border-bottom:none;
+}
+
+.device-info{
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .device-ip{
@@ -140,6 +150,7 @@ header{
   padding: 2px 6px;
   border-radius: 4px;
   background: rgba(0,212,255,0.08);
+  white-space: nowrap;
 }
 
 footer {
@@ -152,20 +163,14 @@ footer {
   color: var(--text2);
 }
 
-/* Stile Popup Mappa */
-.leaflet-popup-content-wrapper {
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--accent);
+footer span {
+  color: var(--accent);
 }
-.leaflet-popup-tip { background: var(--accent); }
 </style>
 </head>
 <body>
 
-<header>SIGRA FILM — Network Monitor</header>
-
-<div id="map"></div>
+<header>SIGRA FILM — Mobile Dashboard</header>
 
 <div class="stats">
   <div class="stat-card">
@@ -184,41 +189,106 @@ footer {
   Creato da: <span>Rocco Totaro</span>
 </footer>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
+// I dati RAW rimangono invariati
 const RAW_ZABBIX_DATA = `
 Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP	10.57.91.12:161	SNMP	
 Abilitato	Ultimi dati 21	1	Grafici	Dashboard	Web
+Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP	10.57.91.22:161	SNMP	
+Abilitato	Ultimi dati 24	1	Grafici	Dashboard	Web
+Aurelia Antica - Grosseto - Sala 3 - Proiettore e ICMP	10.57.91.32:161	SNMP	
+Abilitato	Ultimi dati 21	Problemi	Grafici	Dashboard	Web
+Aurelia Antica - Grosseto - Sala 4 - Proiettore e ICMP	10.57.91.42:161	SNMP	
+Abilitato	Ultimi dati 21	Problemi	Grafici	Dashboard	Web
 Clev Village - Chiusi -SI - Screen 01 - Proiettore	10.56.70.12:161	SNMP	
 Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 01 - Server	10.56.70.10:161	SNMP	
+Abilitato	Ultimi dati 21	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 02 - Proiettore	10.56.70.22:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 02 - Server	10.56.70.20:161	SNMP	
+Abilitato	Ultimi dati 70	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 03 - Proiettore	10.56.70.32:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 03 - Server	10.56.70.30:161	SNMP	
+Abilitato	Ultimi dati 70	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 04 - Proiettore	10.56.70.42:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 04 - Server	10.56.70.40:161	SNMP	
+Abilitato	Ultimi dati 69	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 05 - Proiettore	10.56.70.52:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 05 - Server	10.56.70.50:161	SNMP	
+Abilitato	Ultimi dati 79	1	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 06 - Proiettore	10.56.70.62:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Clev Village - Chiusi -SI - Screen 06 - Server	10.56.70.60:161	SNMP	
+Abilitato	Ultimi dati 79	Problemi	Grafici	Dashboard	Web
 Imperiale - Montecatini Terme - Sala 1 - Proiettore	10.57.97.12:161	SNMP	
 Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
+Imperiale - Montecatini Terme - Sala 1 - Server - IMS3000	10.57.97.10:161	SNMP	
+Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
+Imperiale - Montecatini Terme - Sala 2 - Proiettore	10.57.97.22:161	SNMP	
+Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
+Imperiale - Montecatini Terme - Sala 2 - Server - IMS3000	10.57.97.20:161	SNMP	
+Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
+Imperiale - Montecatini Terme - Sala 3 - Proiettore e Server	10.57.97.32:161	SNMP	
+Abilitato	Ultimi dati 28	Problemi	Grafici	Dashboard	Web
+Imperiale - Montecatini Terme - Sala 4 - Proiettore e Server	10.57.97.42:161	SNMP	
+Abilitato	Ultimi dati 28	Problemi	Grafici	Dashboard	Web
 Isola Verde - Pisa - Screen 01 - Proiettore	10.58.70.12:161	SNMP	
 Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Isola Verde - Pisa - Screen 01 - Server	10.58.70.10:161	SNMP	
+Abilitato	Ultimi dati 70	Problemi	Grafici	Dashboard	Web
+Isola Verde - Pisa - Screen 02 - Proiettore	10.58.70.22:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Isola Verde - Pisa - Screen 02 - Server	10.58.70.20:161	SNMP	
+Abilitato	Ultimi dati 69	1	Grafici	Dashboard	Web
+Isola Verde - Pisa - Screen 03 - Proiettore	10.58.70.32:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Isola Verde - Pisa - Screen 03 - Server	10.58.70.30:161	SNMP	
+Abilitato	Ultimi dati 72	Problemi	Grafici	Dashboard	Web
 Multisala Odeon - Pisa - Sala 1 Venezia - Proiettore	10.55.76.12:161	SNMP	
 Abilitato	Ultimi dati 24	3	Grafici	Dashboard	Web
+Multisala Odeon - Pisa - Sala 2 Amalfi - Proiettore	10.55.76.22:161	SNMP	
+Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
+Multisala Odeon - Pisa - Sala 3 Pisa - Proiettore	10.55.76.32:161	SNMP	
+Abilitato	Ultimi dati 15	1	Grafici	Dashboard	Web
+Multisala Odeon - Pisa - Sala 3 Pisa - Server IMS3000	10.55.76.33:161	SNMP	
+Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
+Multisala Odeon - Pisa - Sala 4 Genova - Proiettore	10.55.76.42:161	SNMP	
+Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
+Multisala Odeon - Pisa - Sala 5 Kinzica - Proiettore	10.55.76.52:161	SNMP	
+Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
 Nuova Aurora - San Sepolcro - Sala 1 - Proiettore Barco	10.58.78.12:161	SNMP	
 Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
+Nuova Aurora - San Sepolcro - Sala 1 - Server Doremi	10.58.78.10:161	SNMP	
+Abilitato	Ultimi dati 79	Problemi	Grafici	Dashboard	Web
 Splendor - Massa - Screen 01 - Proiettore	10.58.71.12:161	SNMP	
 Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 01 - Server	10.58.71.10:161	SNMP	
+Abilitato	Ultimi dati 71	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 02 - Proiettore	10.58.71.22:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 03 - Server	10.58.71.30:161	SNMP	
+Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 04 - Proiettore	10.58.71.42:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 05 - Proiettore	10.58.71.52:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 05 - Server	10.58.71.50:161	SNMP	
+Abilitato	Ultimi dati 71	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 06 - Proiettore	10.58.71.62:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 06 - Server	10.58.71.60:161	SNMP	
+Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 07 - Proiettore	10.58.71.72:161	SNMP	
+Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
+Splendor - Massa - Screen 07 - Server	10.58.71.70:161	SNMP	
+Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
 `;
 
-// Inizializza Mappa centrata sull'Italia (Toscana)
-const map = L.map('map').setView([43.46, 11.12], 8);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-async function getCoordinates(query) {
-    try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
-        const data = await response.json();
-        return data.length > 0 ? [data[0].lat, data[0].lon] : null;
-    } catch (e) { return null; }
-}
-
-async function buildDashboard(){
+function buildDashboard(){
   const lines = RAW_ZABBIX_DATA.split("\n");
   let cinemas = {};
 
@@ -235,13 +305,12 @@ async function buildDashboard(){
       const cinemaRaw = nameParts[0].trim();
       const cityRaw = nameParts[1].trim();
       const cardTitle = `${cityRaw} — ${cinemaRaw}`;
+      
       const roomName = nameParts[2] ? nameParts[2].trim() : "Altro";
       const deviceClean = nameParts.slice(3).join(" - ").trim() || "Unit";
 
-      if(!cinemas[cardTitle]) {
-          cinemas[cardTitle] = { details: [], name: cinemaRaw, city: cityRaw };
-      }
-      cinemas[cardTitle].details.push({ room: roomName, device: deviceClean, ip: ip });
+      if(!cinemas[cardTitle]) cinemas[cardTitle] = [];
+      cinemas[cardTitle].push({ room: roomName, device: deviceClean, ip: ip });
     }
   });
 
@@ -249,33 +318,29 @@ async function buildDashboard(){
   grid.innerHTML="";
   let totalDevs = 0;
 
-  for (const title of Object.keys(cinemas).sort()) {
-    const c = cinemas[title];
+  Object.keys(cinemas).sort().forEach(title => {
     let devicesHTML = "";
     let currentRoom = "";
     
-    c.details.forEach(d => {
+    cinemas[title].forEach(d => {
       totalDevs++;
       if(d.room !== currentRoom){
         devicesHTML += `<div class="room-divider">${d.room}</div>`;
         currentRoom = d.room;
       }
-      devicesHTML += `<div class="device-row"><span>${d.device}</span><a class="device-ip" href="http://${d.ip}" target="_blank">${d.ip}</a></div>`;
+      devicesHTML += `
+        <div class="device-row">
+          <div class="device-info">${d.device}</div>
+          <a class="device-ip" href="http://${d.ip}" target="_blank">${d.ip}</a>
+        </div>`;
     });
 
     grid.innerHTML += `
-      <div class="cinema-card" id="card-${c.name.replace(/\s+/g, '')}">
+      <div class="cinema-card">
         <div class="cinema-header"><div class="cinema-name">${title}</div></div>
         <div class="devices">${devicesHTML}</div>
       </div>`;
-
-    // Aggiungi Marker sulla Mappa
-    const coords = await getCoordinates(`${c.name} ${c.city}`);
-    if(coords) {
-        L.marker(coords).addTo(map)
-         .bindPopup(`<b>${c.name}</b><br>${c.city}<br><small>Dispositivi: ${c.details.length}</small>`);
-    }
-  }
+  });
 
   document.getElementById("totalCinema").innerText = Object.keys(cinemas).length;
   document.getElementById("totalDevices").innerText = totalDevs;
