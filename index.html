@@ -727,7 +727,7 @@ header {
 
 <!-- ── ZABBIX PASTE MODAL ── -->
 <div class="modal-backdrop" id="zabbixModal" style="display:none" onclick="if(event.target===this)closeZabbixLogin()">
-  <div class="modal-box" style="width:600px;max-width:96vw">
+  <div class="modal-box" style="width:560px;max-width:96vw">
     <div class="modal-rainbow"></div>
     <div class="modal-hdr">
       <div class="modal-ico">
@@ -739,52 +739,63 @@ header {
       </div>
       <div>
         <div class="modal-title">Importa da Zabbix</div>
-        <div class="modal-sub">Incolla il sorgente della pagina host list</div>
+        <div class="modal-sub">Copia e incolla la pagina host list</div>
       </div>
     </div>
     <div class="modal-body">
 
-      <!-- Istruzioni step -->
-      <div style="display:flex;gap:8px;margin-bottom:16px">
-        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px">
-          <div style="width:18px;height:18px;border-radius:50%;background:#e8192c;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;margin-top:1px">1</div>
-          <div style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text);line-height:1.6">
-            Apri <a href="http://162.19.84.22/zabbix.php?action=host.view&sort=name&sortorder=ASC" target="_blank" style="color:var(--accent);border-bottom:1px dashed rgba(41,121,255,0.4)">questa pagina</a> su Zabbix (già loggato)
+      <!-- Steps -->
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+            <div style="width:17px;height:17px;border-radius:50%;background:#e8192c;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;flex-shrink:0">1</div>
+            <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text2);letter-spacing:1px">APRI ZABBIX</span>
           </div>
+          <a href="http://162.19.84.22/zabbix.php?action=host.view&sort=name&sortorder=ASC" target="_blank"
+             style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--accent);text-decoration:none;border-bottom:1px dashed rgba(41,121,255,0.4)">
+            Vai alla pagina host ↗
+          </a>
         </div>
-        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px">
-          <div style="width:18px;height:18px;border-radius:50%;background:#1db954;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;margin-top:1px">2</div>
-          <div style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text);line-height:1.6">
-            Premi <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:9px">Ctrl+A</kbd> poi <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:9px">Ctrl+C</kbd> per copiare tutto
+        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+            <div style="width:17px;height:17px;border-radius:50%;background:#1db954;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;flex-shrink:0">2</div>
+            <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text2);letter-spacing:1px">COPIA TUTTO</span>
           </div>
+          <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text)">
+            <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px">Ctrl+A</kbd>
+            poi
+            <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px">Ctrl+C</kbd>
+          </span>
         </div>
-        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px">
-          <div style="width:18px;height:18px;border-radius:50%;background:#1565c0;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;margin-top:1px">3</div>
-          <div style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text);line-height:1.6">
-            Incolla qui sotto con <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:9px">Ctrl+V</kbd> e premi <strong style="color:var(--accent)">Importa</strong>
+        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+            <div style="width:17px;height:17px;border-radius:50%;background:#1565c0;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;flex-shrink:0">3</div>
+            <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text2);letter-spacing:1px">INCOLLA QUI</span>
           </div>
+          <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text)">
+            <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px">Ctrl+V</kbd>
+            nella box sotto
+          </span>
         </div>
       </div>
 
       <!-- Area incolla -->
       <textarea id="zbPasteArea"
-        placeholder="Incolla qui il sorgente HTML della pagina host list di Zabbix (Ctrl+A → Ctrl+C sulla pagina Zabbix, poi Ctrl+V qui)..."
-        style="width:100%;height:160px;background:var(--panel2);border:1px solid rgba(41,121,255,0.2);border-radius:8px;color:var(--accent);font-family:Share Tech Mono,monospace;font-size:11px;padding:12px;resize:vertical;outline:none;line-height:1.6;transition:border-color 0.2s"
+        placeholder="Incolla qui con Ctrl+V..."
+        style="width:100%;height:140px;background:var(--panel2);border:1px solid rgba(41,121,255,0.2);border-radius:8px;color:var(--accent);font-family:Share Tech Mono,monospace;font-size:11px;padding:11px 13px;resize:none;outline:none;line-height:1.6;transition:border-color 0.2s;display:block"
         onfocus="this.style.borderColor='var(--accent)'"
         onblur="this.style.borderColor='rgba(41,121,255,0.2)'"
         oninput="updatePastePreview(this.value)"
+        onpaste="setTimeout(()=>updatePastePreview(this.value),50)"
       ></textarea>
 
-      <!-- Preview conteggio -->
-      <div id="pastePreview" style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text2);margin-top:6px;min-height:16px;letter-spacing:1px"></div>
-
-      <div class="modal-error" id="modalError" style="margin-top:10px"></div>
+      <div id="pastePreview" style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--text2);margin-top:6px;min-height:14px;letter-spacing:1px;transition:color 0.2s"></div>
+      <div class="modal-error" id="modalError" style="margin-top:8px"></div>
     </div>
+
     <div class="modal-footer">
       <button class="btn-modal-cancel" onclick="closeZabbixLogin()">Annulla</button>
-      <a href="http://162.19.84.22/zabbix.php?action=host.view&sort=name&sortorder=ASC" target="_blank"
-         class="btn-modal-cancel" style="text-decoration:none;text-align:center">Apri Zabbix ↗</a>
-      <button class="btn-modal-ok" id="btnModalOk" onclick="doZabbixSync()">
+      <button class="btn-modal-ok" id="btnModalOk" onclick="doZabbixSync()" disabled>
         <span id="btnModalLabel">Importa</span>
       </button>
     </div>
@@ -964,166 +975,219 @@ async function checkVPNStatus() {
     reachable ? 'Rete interna raggiungibile.' : 'Rete interna non raggiungibile (normale se non connesso alla LAN).');
 }
 
-// ── ZABBIX — LETTURA VIA SESSIONE BROWSER ─────────────────────
-// Non servono credenziali: usa i cookie della sessione Zabbix già aperta
-// nel browser. fetch con credentials:'include' manda i cookie automaticamente.
+// ── ZABBIX — INCOLLA TESTO O HTML ────────────────────────────
 let dataLoaded = false;
 
-const ZB_HOST_URL = 'http://162.19.84.22/zabbix.php?action=host.view&sort=name&sortorder=ASC&show_suppressed=0&status=-1&maintenance_status=1';
-
+// ── MODAL ──────────────────────────────────────────────────────
 function openZabbixLogin() {
-  const modal = document.getElementById('zabbixModal');
-  modal.style.display = 'flex';
+  document.getElementById('modalError').classList.remove('show');
+  document.getElementById('pastePreview').textContent = '';
+  document.getElementById('zbPasteArea').value = '';
+  document.getElementById('zabbixModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('zbPasteArea').focus(), 80);
 }
 function closeZabbixLogin() {
   document.getElementById('zabbixModal').style.display = 'none';
 }
 
-// Aggiorna preview conteggio mentre si incolla
+// Preview in tempo reale mentre si incolla
 function updatePastePreview(text) {
-  const preview = document.getElementById('pastePreview');
-  if (!text.trim()) { preview.textContent = ''; return; }
-  // Stima veloce quanti host ci sono
-  const matches = text.match(/hostid[=\[]["']?\d+/g) || [];
-  const unique   = new Set(matches.map(m => m.replace(/\D/g,''))).size;
-  preview.textContent = unique > 0
-    ? '✓ Rilevati circa ' + unique + ' host nel testo incollato'
-    : '⚠ Nessun host rilevato — assicurati di aver copiato la pagina giusta';
-  preview.style.color = unique > 0 ? 'var(--green)' : 'var(--orange)';
+  const prev = document.getElementById('pastePreview');
+  if (!text.trim()) { prev.textContent = ''; return; }
+  const result = parseZabbixContent(text);
+  const tot = result.reduce((s,c) => s + c.devices.length, 0);
+  if (tot > 0) {
+    prev.textContent = '✓ Trovati ' + tot + ' host in ' + result.length + ' gruppi — premi Importa';
+    prev.style.color = 'var(--green)';
+    document.getElementById('btnModalOk').disabled = false;
+  } else {
+    prev.textContent = '⚠ Nessun host riconosciuto — assicurati di copiare dalla pagina host.view';
+    prev.style.color = 'var(--orange)';
+    document.getElementById('btnModalOk').disabled = true;
+  }
 }
 
-async function doZabbixSync() {
-  const pasteArea = document.getElementById('zbPasteArea');
-  const errEl     = document.getElementById('modalError');
-  const btnOk     = document.getElementById('btnModalOk');
-  const lbl       = document.getElementById('btnModalLabel');
-
-  const pastedText = pasteArea.value.trim();
+function doZabbixSync() {
+  const text   = document.getElementById('zbPasteArea').value.trim();
+  const errEl  = document.getElementById('modalError');
   errEl.classList.remove('show');
 
-  if (!pastedText) {
-    errEl.textContent = '⚠ Incolla prima il sorgente della pagina Zabbix.';
-    errEl.classList.add('show');
-    return;
+  if (!text) {
+    errEl.textContent = '⚠ Incolla prima il contenuto della pagina Zabbix.';
+    errEl.classList.add('show'); return;
   }
 
-  btnOk.disabled = true;
-  lbl.innerHTML  = '<span class="loader"></span>Analisi...';
+  const cinemas = parseZabbixContent(text);
+  if (cinemas.length === 0) {
+    errEl.textContent = '⚠ Nessun host trovato. Copia dalla pagina: ' +
+      'http://162.19.84.22/zabbix.php?action=host.view';
+    errEl.classList.add('show'); return;
+  }
 
-  try {
-    const cinemas = parseZabbixHostPage(pastedText);
+  CINEMAS.length = 0;
+  cinemas.forEach(c => CINEMAS.push(c));
+  dataLoaded = true;
 
-    if (cinemas.length === 0) {
-      throw new Error('Nessun host trovato. Hai copiato la pagina corretta? (host.view)');
-    }
+  closeZabbixLogin();
+  buildDashboardCards();
+  document.getElementById('emptyState').style.display  = 'none';
+  document.getElementById('cinemasGrid').style.display = 'grid';
+  document.getElementById('btnZabbixLabel').textContent = '✓ Aggiorna';
 
-    // Aggiorna struttura dati globale
-    CINEMAS.length = 0;
-    cinemas.forEach(c => CINEMAS.push(c));
+  const tot = CINEMAS.reduce((s,c) => s + c.devices.length, 0);
+  showToast('ZABBIX IMPORT', CINEMAS.length + ' gruppi · ' + tot + ' host caricati.', 'ok');
+  populateMapMarkers();
+}
 
-    closeZabbixLogin();
-    pasteArea.value = '';
-    dataLoaded = true;
+// ── PARSER UNIVERSALE ──────────────────────────────────────────
+// Gestisce sia testo puro (Ctrl+A Ctrl+C) sia HTML grezzo (Ctrl+U / Salva pagina)
+function parseZabbixContent(raw) {
+  const trimmed = raw.trim();
 
-    buildDashboardCards();
-    document.getElementById('emptyState').style.display  = 'none';
-    document.getElementById('cinemasGrid').style.display = 'grid';
-    document.getElementById('btnZabbixLabel').textContent = '✓ Sincronizzato';
-
-    const tot = CINEMAS.reduce((s,c) => s + c.devices.length, 0);
-    showToast('ZABBIX IMPORT', CINEMAS.length + ' cinema · ' + tot + ' host caricati.', 'ok');
-    populateMapMarkers();
-
-  } catch(e) {
-    console.error('Parse error:', e);
-    errEl.textContent = '⚠ ' + (e.message || 'Errore durante il parsing.');
-    errEl.classList.add('show');
-    btnOk.disabled = false;
-    lbl.textContent = 'Importa';
+  // Rileva se è HTML o testo puro
+  if (trimmed.startsWith('<') && (trimmed.includes('<html') || trimmed.includes('<table') || trimmed.includes('<tr'))) {
+    return parseZabbixHtml(trimmed);
+  } else {
+    return parseZabbixText(trimmed);
   }
 }
 
-// ── PARSER HTML pagina host.view di Zabbix ────────────────────
-// Supporta sia l'HTML nativo (Ctrl+A dalla pagina) sia il sorgente grezzo
-function parseZabbixHostPage(htmlStr) {
-  const parser = new DOMParser();
-  const doc    = parser.parseFromString(htmlStr, 'text/html');
-
-  // Zabbix host.view: ogni riga è un <tr> con data-hostid oppure un link con hostid
+// ── PARSER TESTO PURO (Ctrl+A Ctrl+C dalla pagina) ────────────
+// Il testo copiato da Zabbix host.view ha questa struttura:
+//
+//   [eventuale header / navigazione]
+//   Host         Availability   Status   Groups   ...
+//   NomeHost1    ZBX SNMP       Enabled  Gruppo1
+//   NomeHost2    ZBX            Enabled  Gruppo2
+//
+// Estraiamo nome host, stato (Enabled/Disabled) e gruppo
+function parseZabbixText(text) {
+  const lines  = text.split(/
+?
+/).map(l => l.trim()).filter(l => l.length > 0);
   const groups = {};
 
-  // Metodo 1: cerca righe con data-hostid (Zabbix 6+)
+  // Parole che indicano che una riga non è un host
+  const SKIP = /^(host|hosts|name|status|availability|tags|info|action|zabbix|monitoring|configuration|dashboard|filter|group|type|template|enabled|disabled|select|show|search|apply|reset|create|import|export|mass|update|check|delete|enable|disable|←|→|«|»|\d+ of \d+|displaying|page)/i;
+  // Availability tokens
+  const AVAIL = /^(ZBX|SNMP|JMX|IPMI|Unknown|Yes|No)$/i;
+
+  lines.forEach(line => {
+    // Salta righe intestazione / navigazione
+    if (SKIP.test(line)) return;
+    if (line.length < 3) return;
+
+    // Tokenizza per tab (copia da pagina Zabbix usa tab tra colonne)
+    const cols = line.split('	').map(c => c.trim()).filter(c => c);
+
+    let hostName  = '';
+    let groupName = 'Cinema';
+    let online    = true;
+
+    if (cols.length >= 2) {
+      // Colonna 0: nome host
+      // Colonna 1: potrebbe essere Status o Availability
+      // Zabbix layout tipico: Host | Status | Availability | Tags | Groups | ...
+      // oppure: Host | Availability | Tags | Groups
+      hostName = cols[0];
+
+      // Cerca "Disabled" nelle prime 3 colonne → host offline
+      const statusCols = cols.slice(1, 4).join(' ').toLowerCase();
+      if (statusCols.includes('disabled')) online = false;
+
+      // Cerca il nome del gruppo: colonna dopo le colonne availability
+      // Le colonne availability contengono solo token tipo ZBX/SNMP/JMX/IPMI
+      let groupIdx = -1;
+      for (let i = 1; i < cols.length; i++) {
+        // Se questa colonna non è un token availability o status, potrebbe essere il gruppo
+        if (!AVAIL.test(cols[i]) &&
+            !['enabled','disabled','yes','no','unknown'].includes(cols[i].toLowerCase()) &&
+            cols[i].length > 1) {
+          // Salta colonne che sembrano tag (contengono ":")
+          if (!cols[i].includes(':')) {
+            groupIdx = i;
+            break;
+          }
+        }
+      }
+      if (groupIdx > 0) groupName = cols[groupIdx];
+
+    } else {
+      // Riga senza tab: potrebbe essere solo il nome host
+      // Salta se sembra un elemento UI
+      if (line.includes('http') || line.includes('://')) return;
+      hostName = line;
+    }
+
+    // Salta righe che non sembrano nomi host
+    if (!hostName || SKIP.test(hostName)) return;
+    if (hostName.length > 80) return;   // troppo lungo = non è un host name
+    if (/^\d+$/.test(hostName)) return; // solo numeri = no
+
+    if (!groups[groupName]) {
+      groups[groupName] = { name: groupName, location: groupName, lat:0, lng:0, devices: [] };
+    }
+
+    // Evita duplicati
+    if (!groups[groupName].devices.find(d => d.name === hostName)) {
+      groups[groupName].devices.push({
+        name:   hostName,
+        ip:     '',      // non disponibile nel testo, verrà risolto dal geocoding
+        type:   guessDeviceType(hostName),
+        online: online,
+        hostid: 0
+      });
+    }
+  });
+
+  return Object.values(groups).filter(g => g.devices.length > 0);
+}
+
+// ── PARSER HTML (Ctrl+U / Salva pagina / View Source) ────────
+function parseZabbixHtml(htmlStr) {
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(htmlStr, 'text/html');
+  const groups = {};
+
+  // Zabbix 6+: righe con data-hostid
   let rows = Array.from(doc.querySelectorAll('tr[data-hostid]'));
 
-  // Metodo 2: cerca righe della tabella con link a hostid (Zabbix 5)
+  // Zabbix 5: righe tabella con link a hostid
   if (rows.length === 0) {
-    rows = Array.from(doc.querySelectorAll('table tbody tr')).filter(r =>
-      r.querySelector('a[href*="hostid"]')
-    );
+    rows = Array.from(doc.querySelectorAll('table tbody tr'))
+               .filter(r => r.querySelector('a[href*="hostid"]'));
   }
 
   rows.forEach(row => {
-    // ── Nome host ──
     const nameLink = row.querySelector('a[href*="hostid"], a[href*="host.edit"]');
     if (!nameLink) return;
     const hostName = nameLink.textContent.trim();
     if (!hostName) return;
 
-    // ── Host ID ──
-    const href     = nameLink.getAttribute('href') || '';
-    const hostid   = parseInt((href.match(/hostid[=\[](\d+)/) || row.dataset.hostid && [,row.dataset.hostid] || [,0])[1]) || 0;
+    const href    = nameLink.getAttribute('href') || '';
+    const hostid  = parseInt((href.match(/hostid[=\[](\d+)/) || [,0])[1]) || 0;
 
-    // ── IP — cerca pattern IP nelle celle ──
     let ip = '';
     row.querySelectorAll('td').forEach(td => {
       const t = td.textContent.trim();
       if (!ip && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(t)) ip = t;
     });
-    // fallback: cerca IP nel testo raw della riga
-    if (!ip) {
-      const m = row.textContent.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
-      if (m) ip = m[1];
-    }
 
-    // ── Stato online/offline ──
-    // Zabbix usa classi CSS come "status-enabled/disabled" o icone problema
-    const rowText  = row.innerHTML;
-    const isDisabled = row.classList.contains('disabled') ||
-                       rowText.includes('status-disabled') ||
-                       rowText.includes('host-disabled');
-    const hasProblems = rowText.includes('problem') || rowText.includes('icon-high') ||
-                        rowText.includes('icon-disaster') || rowText.includes('icon-average');
-    const online = !isDisabled;
+    const rowHtml = row.innerHTML.toLowerCase();
+    const online  = !rowHtml.includes('disabled') && !rowHtml.includes('status-grey');
 
-    // ── Gruppo Zabbix ──
-    // Cerca link a groups nella riga (colonna Gruppi)
     let groupName = 'Cinema';
-    const groupLinks = Array.from(row.querySelectorAll('a[href*="groupid"]'));
+    const groupLinks = row.querySelectorAll('a[href*="groupid"]');
     if (groupLinks.length > 0) {
-      // Prende il primo gruppo che non sembra un gruppo di template
-      const realGroup = groupLinks.find(a => !a.textContent.match(/template|linux|window|network/i));
-      groupName = (realGroup || groupLinks[0]).textContent.trim();
-    } else {
-      // Fallback: prova a indovinare il gruppo dal nome host (es. "Odeon_Pisa_Sala1")
-      const parts = hostName.split(/[\s_\-]/);
-      if (parts.length >= 2) groupName = parts[0];
+      const real = Array.from(groupLinks).find(a => !a.textContent.match(/template|linux|window/i));
+      groupName = (real || groupLinks[0]).textContent.trim();
     }
 
     if (!groups[groupName]) {
-      groups[groupName] = {
-        name:     groupName,
-        location: groupName,
-        lat: 0, lng: 0,
-        devices: []
-      };
+      groups[groupName] = { name: groupName, location: groupName, lat:0, lng:0, devices: [] };
     }
-
     groups[groupName].devices.push({
-      name:   hostName,
-      ip:     ip || '',
-      type:   guessDeviceType(hostName),
-      online: online,
-      hostid: hostid
+      name: hostName, ip, type: guessDeviceType(hostName), online, hostid
     });
   });
 
@@ -1132,8 +1196,8 @@ function parseZabbixHostPage(htmlStr) {
 
 function guessDeviceType(name) {
   const n = name.toLowerCase();
-  if (n.includes('server') || n.includes('ims') || n.includes('doremi') || n.includes('srv')) return 'server';
-  return 'projector';
+  return (n.includes('server') || n.includes('ims') || n.includes('doremi') || n.includes('srv'))
+    ? 'server' : 'projector';
 }
 
 // ── DASHBOARD CARDS ────────────────────────────────────────────
@@ -1304,7 +1368,7 @@ function showMapOverlay() {
       <div style="font-family:Share Tech Mono,monospace;font-size:11px;color:#4a6080;line-height:1.8;letter-spacing:1px;margin-bottom:26px">
         Premi <strong style="color:#2979ff">Carica Zabbix</strong> per posizionare<br>i cinema sulla mappa.
       </div>
-      <button onclick="openZabbixLogin()" style="background:linear-gradient(135deg,#1565c0,#2979ff);border:none;border-radius:8px;color:#fff;font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;padding:11px 30px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 18px rgba(21,101,192,0.4)">
+      <button onclick="openZabbixLogin()" style="background:linear-gradient(135deg,#1565c0,#2979ff;border:none;border-radius:8px;color:#fff;font-family:Rajdhani,sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;padding:11px 30px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 18px rgba(21,101,192,0.4)">
         Carica Zabbix
       </button>
     </div>`;
