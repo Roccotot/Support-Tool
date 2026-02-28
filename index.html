@@ -8,385 +8,561 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
+/* ============================================================
+   VARIABILI & RESET
+   ============================================================ */
 :root {
-  --sf-red:#e8192c; --sf-green:#1db954; --sf-blue:#1565c0;
-  --bg:#07090e; --panel:#0d1018; --panel2:#121620; --panel3:#181e2a;
-  --accent:#2979ff; --accent2:#1565c0;
-  --green:#00e676; --red:#ff1744; --orange:#ff9100;
-  --text:#dce8ff; --text2:#4a6080;
-  --border:rgba(41,121,255,0.18); --border2:rgba(41,121,255,0.07);
-  --glow:0 0 22px rgba(41,121,255,0.35);
-  --rainbow:linear-gradient(90deg,#e8192c,#1db954,#1565c0);
+  --bg:      #060810;
+  --panel:   #0d1526;
+  --panel2:  #111d35;
+  --accent:  #00d4ff;
+  --accent2: #0077ff;
+  --green:   #00ff88;
+  --red:     #ff3355;
+  --orange:  #ff8c00;
+  --text:    #c8d8f0;
+  --text2:   #6a8aaa;
+  --border:  rgba(0,212,255,0.15);
+  --glow:    0 0 20px rgba(0,212,255,0.3);
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;display:flex;flex-direction:column}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(41,121,255,0.06) 1px,transparent 1px);
-  background-size:28px 28px}
-body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px)}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
 
-/* ── RAINBOW TOP BAR ── */
-.rainbow-bar{height:3px;background:var(--rainbow);flex-shrink:0;position:relative;z-index:300}
+/* Grid background */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+/* Scanlines */
+body::after {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);
+}
 
-/* ── HEADER ── */
-header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
-  backdrop-filter:blur(24px);border-bottom:1px solid var(--border);
-  height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 28px}
-.logo{display:flex;align-items:center;gap:14px}
-.logo img{height:38px;width:auto;object-fit:contain;filter:drop-shadow(0 0 8px rgba(41,121,255,0.4))}
-.logo-divider{width:1px;height:28px;background:linear-gradient(180deg,transparent,#1565c0,transparent);opacity:0.5}
-.logo-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:2px;line-height:1.6}
-.logo-sub b{color:var(--accent)}
-.header-right{display:flex;align-items:center;gap:8px}
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  position: relative; z-index: 200;
+  flex-shrink: 0;
+  background: rgba(6,8,16,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
 
-/* ── VIEW TOGGLE ── */
-.view-toggle{display:flex;background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-right:4px}
-.view-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;
-  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;
-  background:none;border:none;color:var(--text2);cursor:pointer;transition:all 0.2s;
-  border-right:1px solid var(--border);position:relative}
-.view-btn:last-child{border-right:none}
-.view-btn svg{width:14px;height:14px;flex-shrink:0}
-.view-btn:hover{color:var(--text);background:rgba(41,121,255,0.06)}
-.view-btn.active{background:rgba(41,121,255,0.12);color:#fff}
-.view-btn.active::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:2px;
-  background:var(--rainbow);border-radius:2px 2px 0 0}
+.logo { display:flex; align-items:center; gap:14px; }
+.logo-icon svg { width:34px; height:34px; }
+.logo-text {
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:20px;
+  letter-spacing:3px; color:var(--accent); text-transform:uppercase;
+}
+.logo-sub {
+  font-family:'Share Tech Mono',monospace; font-size:10px;
+  color:var(--text2); letter-spacing:2px; margin-top:2px;
+}
 
-/* ── VPN ── */
-.vpn-widget{display:flex;align-items:center;gap:9px;background:var(--panel);
-  border:1px solid var(--border);border-radius:8px;padding:7px 13px}
-.vpn-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);flex-shrink:0;transition:all 0.4s}
-.vpn-dot.on{background:var(--green);box-shadow:0 0 9px var(--green);animation:pdot 2s infinite}
-@keyframes pdot{0%,100%{opacity:1}50%{opacity:0.35}}
-.vpn-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px}
-.vpn-state{font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:var(--red);transition:color 0.4s}
-.vpn-state.on{color:var(--green)}
-.btn-vpn{background:linear-gradient(135deg,#1565c0,#2979ff);border:none;border-radius:6px;color:#fff;
-  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;padding:7px 15px;
-  cursor:pointer;text-transform:uppercase;transition:all 0.2s;white-space:nowrap;box-shadow:0 2px 12px rgba(21,101,192,0.4)}
-.btn-vpn:hover{opacity:0.88;transform:translateY(-1px)}
-.btn-vpn:disabled{opacity:0.5;cursor:default;transform:none}
+.header-right { display:flex; align-items:center; gap:10px; }
 
-/* ── ZABBIX BTN ── */
-.btn-zabbix{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--border);
-  border-radius:8px;padding:7px 13px;color:var(--accent);font-family:'Rajdhani',sans-serif;
-  font-weight:600;font-size:12px;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;
-  transition:all 0.2s;white-space:nowrap}
-.btn-zabbix svg{width:14px;height:14px}
-.btn-zabbix:hover{background:var(--panel2);border-color:var(--accent);box-shadow:var(--glow);color:#fff}
+/* View toggle pills */
+.view-toggle {
+  display:flex;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-right: 4px;
+}
+.view-btn {
+  display:flex; align-items:center; gap:7px;
+  padding: 8px 18px;
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px;
+  letter-spacing:1.5px; text-transform:uppercase;
+  background: none; border:none; color:var(--text2);
+  cursor:pointer; transition:all 0.2s;
+  border-right: 1px solid var(--border);
+}
+.view-btn:last-child { border-right:none; }
+.view-btn svg { width:14px; height:14px; flex-shrink:0; }
+.view-btn:hover { color:var(--text); background:rgba(0,212,255,0.05); }
+.view-btn.active {
+  background: linear-gradient(135deg, rgba(0,119,255,0.2), rgba(0,212,255,0.15));
+  color: var(--accent);
+  box-shadow: inset 0 0 12px rgba(0,212,255,0.1);
+}
 
-/* ── VIEWS ── */
-.view{display:none;flex:1;overflow:hidden;position:relative}
-.view.active{display:flex;flex-direction:column}
-#view-dashboard{overflow-y:auto}
-#view-dashboard::-webkit-scrollbar{width:5px}
-#view-dashboard::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* VPN widget */
+.vpn-widget {
+  display:flex; align-items:center; gap:10px;
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:8px; padding:8px 14px;
+}
+.vpn-dot {
+  width:9px; height:9px; border-radius:50%;
+  background:var(--red); box-shadow:0 0 7px var(--red);
+  flex-shrink:0; transition:all 0.4s;
+}
+.vpn-dot.on { background:var(--green); box-shadow:0 0 10px var(--green); animation:pdot 2s infinite; }
+@keyframes pdot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.vpn-label { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text2); letter-spacing:1px; }
+.vpn-state { font-family:'Share Tech Mono',monospace; font-size:11px; font-weight:700; color:var(--red); transition:color 0.4s; }
+.vpn-state.on { color:var(--green); }
 
-/* ── DASHBOARD ── */
-.dash-main{position:relative;z-index:1;padding:24px 28px;max-width:1600px;margin:0 auto;width:100%}
-.vpn-info{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 22px;
-  margin-bottom:22px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;
-  position:relative;overflow:hidden;transition:border-color 0.4s}
-.vpn-info::before{content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(90deg,rgba(21,101,192,0.06),transparent 55%)}
-.vpn-info::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--rainbow);opacity:0.7}
-.vpn-info-icon{width:42px;height:42px;border-radius:9px;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(21,101,192,0.25),rgba(41,121,255,0.2));
-  border:1px solid rgba(41,121,255,0.25);display:flex;align-items:center;justify-content:center}
-.vpn-info-icon svg{width:20px;height:20px;color:var(--accent)}
-.vpn-info-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;
-  letter-spacing:2px;color:#fff;text-transform:uppercase;margin-bottom:5px}
-.vpn-info-row{display:flex;gap:16px;flex-wrap:wrap}
-.vpn-info-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2)}
-.vpn-big-status{text-align:right}
-.vpn-big-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:2px;margin-bottom:4px}
-.vpn-big-value{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:var(--red);letter-spacing:2px;transition:color 0.4s;min-height:26px}
-.vpn-big-value.on{color:var(--green)}
-.vpn-check-msg{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);margin-top:4px}
+.btn-vpn {
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  border:none; border-radius:6px; color:#000;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:2px; padding:7px 16px; cursor:pointer;
+  text-transform:uppercase; transition:all 0.2s; white-space:nowrap;
+}
+.btn-vpn:hover { opacity:0.85; }
 
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
-.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 20px;
-  position:relative;overflow:hidden;animation:fadeUp 0.5s ease both;transition:border-color 0.2s,box-shadow 0.2s}
-.stat-card:hover{border-color:rgba(41,121,255,0.4);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
-.stat-card:nth-child(1)::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#1565c0}
-.stat-card:nth-child(2)::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#1db954}
-.stat-card:nth-child(3)::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)}
-.stat-card:nth-child(4)::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red)}
-.stat-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px}
-.stat-value{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--accent);line-height:1}
-.stat-value.g{color:var(--green)} .stat-value.r{color:var(--red)}
+/* Zabbix btn */
+.btn-zabbix {
+  display:flex; align-items:center; gap:7px;
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:8px; padding:8px 14px;
+  color:var(--accent); font-family:'Rajdhani',sans-serif;
+  font-weight:600; font-size:13px; letter-spacing:2px;
+  cursor:pointer; text-transform:uppercase; transition:all 0.25s;
+  white-space:nowrap;
+}
+.btn-zabbix svg { width:15px; height:15px; }
+.btn-zabbix:hover { background:var(--panel2); border-color:var(--accent); box-shadow:var(--glow); color:#fff; }
 
-.cinemas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:18px}
-.cinema-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;
-  animation:fadeUp 0.6s ease both;transition:border-color 0.25s,box-shadow 0.25s}
-.cinema-card:hover{border-color:rgba(41,121,255,0.5);box-shadow:0 6px 28px rgba(0,0,0,0.5),0 0 18px rgba(41,121,255,0.12)}
-.cinema-card:nth-child(1){animation-delay:.04s}.cinema-card:nth-child(2){animation-delay:.08s}
-.cinema-card:nth-child(3){animation-delay:.12s}.cinema-card:nth-child(4){animation-delay:.16s}
-.cinema-card:nth-child(5){animation-delay:.20s}.cinema-card:nth-child(6){animation-delay:.24s}
-.cinema-card:nth-child(7){animation-delay:.28s}
-.cinema-hdr{background:var(--panel2);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--border2);cursor:pointer;user-select:none;transition:background 0.15s}
-.cinema-hdr:hover{background:var(--panel3)}
-.cinema-name-block{display:flex;align-items:center;gap:10px}
-.cinema-ico{width:28px;height:28px;border-radius:6px;flex-shrink:0;
-  background:linear-gradient(135deg,#e8192c,#1db954,#1565c0);
-  display:flex;align-items:center;justify-content:center}
-.cinema-ico svg{width:15px;height:15px;fill:#fff}
-.cinema-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:1.5px;color:#fff;text-transform:uppercase}
-.cinema-loc{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:1px;margin-top:2px}
-.cinema-meta{display:flex;align-items:center;gap:7px}
-.badge{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:3px;padding:2px 8px;
-  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2)}
-.badge.ok{border-color:rgba(0,230,118,0.4);color:var(--green)}
-.badge.err{border-color:rgba(255,23,68,0.4);color:var(--red)}
-.chevron{width:16px;height:16px;color:var(--text2);transition:transform 0.3s;flex-shrink:0}
-.cinema-card.collapsed .chevron{transform:rotate(-90deg)}
-.devices-table{max-height:1000px;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1)}
-.cinema-card.collapsed .devices-table{max-height:0}
-.device-row{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:10px;padding:8px 16px;
-  border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s}
-.device-row:last-child{border-bottom:none}
-.device-row:hover{background:rgba(41,121,255,0.04)}
-.device-name{font-size:12px;color:var(--text)}
-.dev-type{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;white-space:nowrap}
-.dev-type.projector{color:#b39ddb;border:1px solid rgba(179,157,219,0.3)}
-.dev-type.server{color:#90caf9;border:1px solid rgba(144,202,249,0.3)}
-.dev-ip{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);text-decoration:none;
-  border-bottom:1px dashed rgba(41,121,255,0.3);white-space:nowrap;transition:all 0.15s}
-.dev-ip:hover{color:#fff;text-shadow:0 0 7px var(--accent)}
-.dev-links{display:flex;align-items:center;gap:5px}
-.dev-status{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dev-status.ok{background:var(--green);box-shadow:0 0 5px var(--green)}
-.dev-status.err{background:var(--red);box-shadow:0 0 5px var(--red);animation:blink 1.5s infinite}
-.dev-btn{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);text-decoration:none;
-  padding:2px 6px;border:1px solid rgba(41,121,255,0.3);border-radius:3px;transition:all 0.15s;white-space:nowrap}
-.dev-btn:hover{background:rgba(41,121,255,0.12);border-color:var(--accent);color:#fff}
-.dev-btn.warn{color:var(--orange);border-color:rgba(255,145,0,0.3)}
-.dev-btn.warn:hover{background:rgba(255,145,0,0.1);border-color:var(--orange)}
+/* ============================================================
+   CONTENT WRAPPER
+   ============================================================ */
+.view { display:none; flex:1; overflow:hidden; position:relative; }
+.view.active { display:flex; flex-direction:column; }
 
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:72px 24px;text-align:center;animation:fadeUp 0.6s ease both}
-.empty-ico{width:80px;height:80px;margin:0 auto 20px;opacity:0.5;animation:float 3s ease-in-out infinite}
-.empty-ico svg{width:100%;height:100%}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.empty-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:3px;color:#fff;text-transform:uppercase;margin-bottom:9px}
-.empty-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;letter-spacing:1px;margin-bottom:26px}
-.empty-sub strong{color:var(--accent)}
-.btn-load{background:linear-gradient(135deg,#1565c0,#2979ff);border:none;border-radius:8px;color:#fff;
-  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;padding:11px 30px;
-  cursor:pointer;text-transform:uppercase;transition:all 0.2s;box-shadow:0 4px 18px rgba(21,101,192,0.4)}
-.btn-load:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(21,101,192,0.5)}
+/* ============================================================
+   DASHBOARD VIEW
+   ============================================================ */
+#view-dashboard {
+  overflow-y: auto;
+}
+#view-dashboard::-webkit-scrollbar { width:6px; }
+#view-dashboard::-webkit-scrollbar-track { background:transparent; }
+#view-dashboard::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
-/* ── MAP ── */
-#view-map{position:relative}
-#map{width:100%;height:100%;z-index:1}
-.leaflet-container{background:#07090e !important}
-.map-stats-bar{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:100;
-  display:flex;gap:10px;align-items:center;background:rgba(7,9,14,0.92);border:1px solid var(--border);
-  border-radius:30px;padding:7px 20px;backdrop-filter:blur(14px);pointer-events:none;
-  box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-.msb-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:1px}
-.msb-item span{font-weight:700;margin-left:4px}
-.msb-item span.g{color:var(--green)} .msb-item span.r{color:var(--red)} .msb-item span.a{color:var(--accent)}
-.msb-sep{color:rgba(255,255,255,0.08);font-family:'Share Tech Mono',monospace}
-.map-legend{position:absolute;bottom:22px;left:14px;z-index:100;background:rgba(7,9,14,0.92);
-  border:1px solid var(--border);border-radius:10px;padding:11px 15px;backdrop-filter:blur(14px);
-  box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-.legend-title{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.legend-item{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text);margin-bottom:5px}
+.dash-main {
+  position:relative; z-index:1;
+  padding:28px 32px;
+  max-width:1600px; margin:0 auto; width:100%;
+}
+
+/* VPN info panel */
+.vpn-info {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; padding:18px 24px; margin-bottom:28px;
+  display:grid; grid-template-columns:auto 1fr auto;
+  align-items:center; gap:20px; position:relative; overflow:hidden;
+  transition:border-color 0.4s;
+}
+.vpn-info::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,212,255,0.05),transparent 60%);
+}
+.vpn-info-icon {
+  width:46px; height:46px; border-radius:10px; flex-shrink:0;
+  background:linear-gradient(135deg,rgba(0,119,255,0.2),rgba(0,212,255,0.2));
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+}
+.vpn-info-icon svg { width:22px; height:22px; color:var(--accent); }
+.vpn-info-title {
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:2px; color:#fff; text-transform:uppercase; margin-bottom:5px;
+}
+.vpn-info-row { display:flex; gap:18px; flex-wrap:wrap; }
+.vpn-info-item { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text2); }
+.vpn-info-item span { color:var(--accent); margin-left:5px; }
+.vpn-big-status { text-align:right; }
+.vpn-big-label { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text2); letter-spacing:2px; margin-bottom:4px; }
+.vpn-big-value {
+  font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700;
+  color:var(--red); letter-spacing:2px; transition:color 0.4s;
+  min-height:28px;
+}
+.vpn-big-value.on { color:var(--green); }
+.vpn-check-msg { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text2); margin-top:5px; }
+
+/* Stats */
+.stats-row {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:14px; margin-bottom:28px;
+}
+.stat-card {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:10px; padding:18px 22px;
+  position:relative; overflow:hidden;
+  animation:fadeUp 0.5s ease both;
+}
+.stat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+}
+.stat-label { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text2); letter-spacing:2px; text-transform:uppercase; margin-bottom:7px; }
+.stat-value { font-family:'Rajdhani',sans-serif; font-size:30px; font-weight:700; color:var(--accent); line-height:1; }
+.stat-value.g { color:var(--green); }
+.stat-value.r { color:var(--red); }
+
+/* Cinema grid */
+.cinemas-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(500px,1fr));
+  gap:22px;
+}
+.cinema-card {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; overflow:hidden;
+  animation:fadeUp 0.6s ease both;
+  transition:border-color 0.3s, box-shadow 0.3s;
+}
+.cinema-card:hover { border-color:rgba(0,212,255,0.4); box-shadow:0 8px 32px rgba(0,0,0,0.4),var(--glow); }
+.cinema-card:nth-child(1){animation-delay:.05s}.cinema-card:nth-child(2){animation-delay:.1s}
+.cinema-card:nth-child(3){animation-delay:.15s}.cinema-card:nth-child(4){animation-delay:.2s}
+.cinema-card:nth-child(5){animation-delay:.25s}.cinema-card:nth-child(6){animation-delay:.3s}
+.cinema-card:nth-child(7){animation-delay:.35s}
+
+.cinema-hdr {
+  background:var(--panel2); padding:14px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  cursor:pointer; user-select:none; transition:background 0.15s;
+}
+.cinema-hdr:hover { background:rgba(17,29,53,0.9); }
+.cinema-name-block { display:flex; align-items:center; gap:11px; }
+.cinema-ico {
+  width:30px; height:30px; border-radius:6px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  display:flex; align-items:center; justify-content:center;
+}
+.cinema-ico svg { width:16px; height:16px; fill:#000; }
+.cinema-name { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; letter-spacing:1.5px; color:#fff; text-transform:uppercase; }
+.cinema-loc { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--accent); letter-spacing:1px; margin-top:2px; }
+.cinema-meta { display:flex; align-items:center; gap:8px; }
+.badge {
+  background:rgba(0,0,0,0.3); border:1px solid var(--border);
+  border-radius:4px; padding:2px 9px;
+  font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text2);
+}
+.badge.ok { border-color:rgba(0,255,136,0.4); color:var(--green); }
+.badge.err { border-color:rgba(255,51,85,0.4); color:var(--red); }
+.chevron { width:18px; height:18px; color:var(--text2); transition:transform 0.3s; flex-shrink:0; }
+.cinema-card.collapsed .chevron { transform:rotate(-90deg); }
+
+.devices-table { max-height:1000px; overflow:hidden; transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1); }
+.cinema-card.collapsed .devices-table { max-height:0; }
+
+.device-row {
+  display:grid; grid-template-columns:1fr auto auto auto;
+  align-items:center; gap:10px; padding:9px 18px;
+  border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s;
+}
+.device-row:last-child { border-bottom:none; }
+.device-row:hover { background:rgba(0,212,255,0.04); }
+.device-name { font-size:12px; color:var(--text); }
+.dev-type { font-family:'Share Tech Mono',monospace; font-size:9px; padding:2px 7px; border-radius:3px; white-space:nowrap; }
+.dev-type.projector { color:#a78bfa; border:1px solid rgba(167,139,250,0.3); }
+.dev-type.server    { color:#60a5fa; border:1px solid rgba(96,165,250,0.3); }
+.dev-ip {
+  font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--accent);
+  text-decoration:none; border-bottom:1px dashed rgba(0,212,255,0.3);
+  white-space:nowrap; transition:all 0.15s;
+}
+.dev-ip:hover { color:#fff; border-bottom-color:var(--accent); text-shadow:0 0 8px var(--accent); }
+.dev-links { display:flex; align-items:center; gap:6px; }
+.dev-status { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.dev-status.ok  { background:var(--green); box-shadow:0 0 5px var(--green); }
+.dev-status.err { background:var(--red);   box-shadow:0 0 5px var(--red);   animation:blink 1.5s infinite; }
+.dev-btn {
+  font-family:'Share Tech Mono',monospace; font-size:9px;
+  color:var(--accent2); text-decoration:none;
+  padding:2px 7px; border:1px solid rgba(0,119,255,0.3);
+  border-radius:3px; transition:all 0.2s; white-space:nowrap;
+}
+.dev-btn:hover { background:rgba(0,119,255,0.15); border-color:var(--accent2); color:#fff; }
+.dev-btn.warn { color:var(--orange); border-color:rgba(255,140,0,0.3); }
+.dev-btn.warn:hover { background:rgba(255,140,0,0.1); border-color:var(--orange); }
+
+/* Empty state */
+.empty-state {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:80px 24px; text-align:center;
+  animation:fadeUp 0.6s ease both;
+}
+.empty-ico { width:90px; height:90px; margin-bottom:22px; opacity:0.55; animation:float 3s ease-in-out infinite; }
+.empty-ico svg { width:100%; height:100%; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.empty-title { font-family:'Rajdhani',sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; color:#fff; text-transform:uppercase; margin-bottom:10px; }
+.empty-sub { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text2); line-height:1.8; letter-spacing:1px; margin-bottom:28px; }
+.empty-sub strong { color:var(--accent); }
+.btn-load {
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  border:none; border-radius:8px; color:#000;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:3px; padding:11px 32px; cursor:pointer;
+  text-transform:uppercase; transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(0,212,255,0.3);
+}
+.btn-load:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,212,255,0.5); }
+
+/* ============================================================
+   MAP VIEW
+   ============================================================ */
+#view-map { position:relative; }
+#map { width:100%; height:100%; z-index:1; }
+.leaflet-container { background:#060810 !important; }
+
+/* Stats bar over map */
+.map-stats-bar {
+  position:absolute; top:16px; left:50%; transform:translateX(-50%);
+  z-index:100;
+  display:flex; gap:10px;
+  background:rgba(13,21,38,0.9); border:1px solid var(--border);
+  border-radius:30px; padding:8px 20px; backdrop-filter:blur(12px);
+  pointer-events:none;
+}
+.msb-item { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text2); letter-spacing:1px; }
+.msb-item span { font-weight:700; margin-left:4px; }
+.msb-item span.g { color:var(--green); }
+.msb-item span.r { color:var(--red); }
+.msb-item span.a { color:var(--accent); }
+.msb-sep { color:rgba(255,255,255,0.1); font-family:'Share Tech Mono',monospace; font-size:11px; }
+
+/* Map legend */
+.map-legend {
+  position:absolute; bottom:24px; left:16px; z-index:100;
+  background:rgba(13,21,38,0.92); border:1px solid var(--border);
+  border-radius:10px; padding:12px 16px; backdrop-filter:blur(12px);
+}
+.legend-title { font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--text2); letter-spacing:2px; text-transform:uppercase; margin-bottom:9px; }
+.legend-item { display:flex; align-items:center; gap:8px; font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text); margin-bottom:5px; }
 .legend-item:last-child{margin-bottom:0}
-.ldot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.cmarker{width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid;
-  display:flex;align-items:center;justify-content:center;cursor:pointer}
-.cmarker.all-ok{background:rgba(0,230,118,0.14);border-color:var(--green);box-shadow:0 0 14px rgba(0,230,118,0.5)}
-.cmarker.has-issues{background:rgba(255,145,0,0.14);border-color:var(--orange);box-shadow:0 0 14px rgba(255,145,0,0.5)}
-.cmarker.all-down{background:rgba(255,23,68,0.14);border-color:var(--red);box-shadow:0 0 14px rgba(255,23,68,0.5);animation:mpulse 1.8s infinite}
-@keyframes mpulse{0%,100%{box-shadow:0 0 14px rgba(255,23,68,0.5)}50%{box-shadow:0 0 30px rgba(255,23,68,0.9)}}
-.cmarker-inner{transform:rotate(45deg);display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:14px}
+.ldot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 
-/* ── LEAFLET POPUP ── */
-.leaflet-popup-content-wrapper{background:rgba(7,9,14,0.97) !important;border:1px solid rgba(41,121,255,0.3) !important;
-  border-radius:12px !important;box-shadow:0 12px 48px rgba(0,0,0,0.8),0 0 24px rgba(41,121,255,0.15) !important;
-  padding:0 !important;min-width:295px;max-width:370px;overflow:hidden}
-.leaflet-popup-tip-container{display:none !important}
-.leaflet-popup-close-button{color:var(--text2) !important;font-size:17px !important;top:9px !important;right:9px !important;z-index:10}
-.leaflet-popup-close-button:hover{color:#fff !important}
-.leaflet-popup-content{margin:0 !important;width:100% !important}
-.popup-rainbow{height:2px;background:var(--rainbow)}
-.popup-hdr{padding:11px 14px 10px;border-bottom:1px solid rgba(41,121,255,0.1);display:flex;align-items:flex-start;gap:10px}
-.popup-ico{width:32px;height:32px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.popup-ico.ok{background:rgba(0,230,118,0.12);border:1px solid rgba(0,230,118,0.35)}
-.popup-ico.warn{background:rgba(255,145,0,0.12);border:1px solid rgba(255,145,0,0.35)}
-.popup-ico.err{background:rgba(255,23,68,0.12);border:1px solid rgba(255,23,68,0.35)}
-.popup-ico svg{width:16px;height:16px}
-.popup-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:1.5px;color:#fff;text-transform:uppercase;line-height:1.2}
-.popup-loc{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px;margin-top:2px}
-.popup-addr{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--sf-green);letter-spacing:0.5px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
-.popup-badges{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
-.pbadge{font-family:'Share Tech Mono',monospace;font-size:8px;border-radius:3px;padding:2px 6px;border:1px solid}
-.pbadge.ok{color:var(--green);border-color:rgba(0,230,118,0.4)}
-.pbadge.err{color:var(--red);border-color:rgba(255,23,68,0.4)}
-.pbadge.info{color:var(--accent);border-color:rgba(41,121,255,0.3)}
-.popup-devs{padding:3px 0;max-height:240px;overflow-y:auto}
-.popup-devs::-webkit-scrollbar{width:3px}
-.popup-devs::-webkit-scrollbar-thumb{background:rgba(41,121,255,0.2);border-radius:2px}
-.popup-dev-row{display:grid;grid-template-columns:7px 1fr auto auto;align-items:center;gap:7px;padding:5px 14px;transition:background 0.12s}
-.popup-dev-row:hover{background:rgba(41,121,255,0.05)}
-.pdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.pdot.ok{background:var(--green);box-shadow:0 0 4px var(--green)}
-.pdot.err{background:var(--red);box-shadow:0 0 4px var(--red);animation:blink 1.5s infinite}
-.pdev-name{font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pdev-type{font-family:'Share Tech Mono',monospace;font-size:8px;padding:1px 5px;border-radius:2px;white-space:nowrap}
-.pdev-type.projector{color:#b39ddb;border:1px solid rgba(179,157,219,0.3)}
-.pdev-type.server{color:#90caf9;border:1px solid rgba(144,202,249,0.3)}
-.pdev-ip{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);text-decoration:none;
-  border-bottom:1px dashed rgba(41,121,255,0.3);transition:all 0.15s;white-space:nowrap}
-.pdev-ip:hover{color:#fff;text-shadow:0 0 7px var(--accent)}
-.popup-footer{display:flex;gap:6px;padding:8px 13px;border-top:1px solid rgba(41,121,255,0.1)}
-.pfooter-btn{flex:1;text-align:center;text-decoration:none;font-family:'Rajdhani',sans-serif;font-weight:600;
-  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 0;border-radius:4px;border:1px solid;transition:all 0.2s}
-.pfooter-btn.zb{color:var(--accent);border-color:rgba(41,121,255,0.3)}
-.pfooter-btn.zb:hover{background:rgba(41,121,255,0.12);border-color:var(--accent);color:#fff}
-.pfooter-btn.pb{color:var(--orange);border-color:rgba(255,145,0,0.3)}
-.pfooter-btn.pb:hover{background:rgba(255,145,0,0.1);border-color:var(--orange);color:#fff}
-.cinema-tooltip .leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important}
-
-/* ── MODAL ── */
-.modal-backdrop{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.78);
-  backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center}
-.modal-box{background:var(--panel);border:1px solid rgba(41,121,255,0.35);border-radius:16px;
-  width:560px;max-width:96vw;box-shadow:0 24px 64px rgba(0,0,0,0.85),0 0 40px rgba(41,121,255,0.1);
-  overflow:hidden;animation:fadeUp 0.25s ease both}
-.modal-rainbow{height:3px;background:var(--rainbow)}
-.modal-hdr{padding:18px 22px 14px;border-bottom:1px solid rgba(41,121,255,0.1);display:flex;align-items:center;gap:12px}
-.modal-ico{width:40px;height:40px;border-radius:9px;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(21,101,192,0.3),rgba(41,121,255,0.2));
-  border:1px solid rgba(41,121,255,0.3);display:flex;align-items:center;justify-content:center}
-.modal-ico svg{width:20px;height:20px;color:var(--accent)}
-.modal-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;letter-spacing:2px;color:#fff;text-transform:uppercase}
-.modal-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px;margin-top:2px}
-.modal-body{padding:18px 22px}
-.modal-error{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red);padding:8px 12px;
-  background:rgba(255,23,68,0.08);border:1px solid rgba(255,23,68,0.25);border-radius:6px;
-  margin-bottom:12px;display:none;letter-spacing:0.5px}
-.modal-error.show{display:block}
-.modal-footer{display:flex;gap:8px;padding:0 22px 18px}
-.btn-modal-cancel{flex:0 0 auto;padding:10px 18px;background:none;border:1px solid rgba(41,121,255,0.2);
-  border-radius:7px;color:var(--text2);font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;
-  letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-decoration:none;
-  display:flex;align-items:center;justify-content:center}
-.btn-modal-cancel:hover{border-color:rgba(41,121,255,0.5);color:var(--text)}
-.btn-modal-ok{flex:1;padding:10px 0;background:linear-gradient(135deg,#1565c0,#2979ff);border:none;
-  border-radius:7px;color:#fff;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;
-  letter-spacing:2px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;
-  box-shadow:0 4px 16px rgba(21,101,192,0.4)}
-.btn-modal-ok:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}
-.btn-modal-ok:disabled{opacity:0.4;cursor:default}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--panel2);
-  border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;
-  padding:12px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);
-  opacity:0;transform:translateX(20px);transition:all 0.3s;pointer-events:none;max-width:320px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.4)}
-.toast.show{opacity:1;transform:translateX(0)}
-.toast-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
-.toast-title.ok{color:var(--green)} .toast-title.err{color:var(--red)} .toast-title.info{color:var(--accent)}
-
-/* ── SHARED ANIMATIONS ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.1}}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader{display:inline-block;width:12px;height:12px;border:2px solid rgba(41,121,255,0.2);
-  border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;
-  vertical-align:middle;margin-right:5px}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .dash-main{padding:14px}
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .cinemas-grid{grid-template-columns:1fr}
-  header{padding:0 14px}
-  .logo-sub{display:none}
+/* Marker */
+.cmarker {
+  width:36px; height:36px; border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg); border:2px solid;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
 }
-@media(max-width:600px){
-  .vpn-info{grid-template-columns:1fr}
-  .header-right{gap:5px}
-  .vpn-widget{display:none}
+.cmarker.all-ok   { background:rgba(0,255,136,0.15); border-color:var(--green);  box-shadow:0 0 12px rgba(0,255,136,0.5); }
+.cmarker.has-issues { background:rgba(255,140,0,0.15); border-color:var(--orange); box-shadow:0 0 12px rgba(255,140,0,0.5); }
+.cmarker.all-down { background:rgba(255,51,85,0.15);  border-color:var(--red);   box-shadow:0 0 12px rgba(255,51,85,0.5); animation:mpulse 1.8s infinite; }
+@keyframes mpulse { 0%,100%{box-shadow:0 0 12px rgba(255,51,85,0.5)} 50%{box-shadow:0 0 28px rgba(255,51,85,0.9)} }
+.cmarker-inner { transform:rotate(45deg); display:flex; align-items:center; justify-content:center; width:100%; height:100%; font-size:13px; }
+
+/* Leaflet popup */
+.leaflet-popup-content-wrapper {
+  background:rgba(10,15,26,0.97) !important;
+  border:1px solid var(--border) !important;
+  border-radius:12px !important;
+  box-shadow:0 8px 40px rgba(0,0,0,0.7),var(--glow) !important;
+  padding:0 !important; min-width:290px; max-width:360px;
+}
+.leaflet-popup-tip-container { display:none !important; }
+.leaflet-popup-close-button { color:var(--text2) !important; font-size:17px !important; top:10px !important; right:10px !important; }
+.leaflet-popup-close-button:hover { color:#fff !important; }
+.leaflet-popup-content { margin:0 !important; width:100% !important; }
+
+.popup-hdr {
+  padding:12px 14px 10px; border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; gap:10px;
+}
+.popup-ico {
+  width:32px; height:32px; border-radius:6px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.popup-ico.ok   { background:rgba(0,255,136,0.12); border:1px solid rgba(0,255,136,0.35); }
+.popup-ico.warn { background:rgba(255,140,0,0.12);  border:1px solid rgba(255,140,0,0.35); }
+.popup-ico.err  { background:rgba(255,51,85,0.12);   border:1px solid rgba(255,51,85,0.35); }
+.popup-ico svg { width:16px; height:16px; }
+.popup-title { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px; letter-spacing:1.5px; color:#fff; text-transform:uppercase; line-height:1.2; }
+.popup-loc { font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--accent); letter-spacing:1px; margin-top:2px; }
+.popup-addr { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--green); letter-spacing:0.5px; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:240px; }
+.popup-badges { display:flex; gap:5px; margin-top:5px; flex-wrap:wrap; }
+.pbadge { font-family:'Share Tech Mono',monospace; font-size:9px; border-radius:3px; padding:2px 7px; border:1px solid; }
+.pbadge.ok   { color:var(--green);  border-color:rgba(0,255,136,0.4); }
+.pbadge.err  { color:var(--red);    border-color:rgba(255,51,85,0.4); }
+.pbadge.info { color:var(--accent); border-color:rgba(0,212,255,0.3); }
+
+.popup-devs { padding:4px 0; max-height:240px; overflow-y:auto; }
+.popup-devs::-webkit-scrollbar { width:3px; }
+.popup-devs::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.popup-dev-row {
+  display:grid; grid-template-columns:7px 1fr auto auto;
+  align-items:center; gap:7px; padding:5px 14px; transition:background 0.15s;
+}
+.popup-dev-row:hover { background:rgba(0,212,255,0.04); }
+.pdot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.pdot.ok  { background:var(--green); box-shadow:0 0 4px var(--green); }
+.pdot.err { background:var(--red);   box-shadow:0 0 4px var(--red);   animation:blink 1.5s infinite; }
+.pdev-name { font-size:11px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pdev-type { font-family:'Share Tech Mono',monospace; font-size:8px; padding:1px 5px; border-radius:2px; white-space:nowrap; }
+.pdev-type.projector { color:#a78bfa; border:1px solid rgba(167,139,250,0.3); }
+.pdev-type.server    { color:#60a5fa; border:1px solid rgba(96,165,250,0.3); }
+.pdev-ip {
+  font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--accent);
+  text-decoration:none; border-bottom:1px dashed rgba(0,212,255,0.3);
+  transition:all 0.15s; white-space:nowrap;
+}
+.pdev-ip:hover { color:#fff; border-bottom-color:var(--accent); text-shadow:0 0 7px var(--accent); }
+
+.popup-footer { display:flex; gap:7px; padding:9px 14px; border-top:1px solid var(--border); }
+.pfooter-btn {
+  flex:1; text-align:center; text-decoration:none;
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+  padding:6px 0; border-radius:4px; border:1px solid; transition:all 0.2s;
+}
+.pfooter-btn.zb  { color:var(--accent); border-color:rgba(0,212,255,0.3); }
+.pfooter-btn.zb:hover { background:rgba(0,212,255,0.1); border-color:var(--accent); color:#fff; }
+.pfooter-btn.pb  { color:var(--orange); border-color:rgba(255,140,0,0.3); }
+.pfooter-btn.pb:hover { background:rgba(255,140,0,0.1); border-color:var(--orange); color:#fff; }
+
+.cinema-tooltip .leaflet-tooltip { background:transparent!important; border:none!important; box-shadow:none!important; }
+
+/* ============================================================
+   SHARED
+   ============================================================ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0.15} }
+@keyframes spin   { to{transform:rotate(360deg)} }
+
+.loader {
+  display:inline-block; width:13px; height:13px;
+  border:2px solid rgba(0,212,255,0.2); border-top-color:var(--accent);
+  border-radius:50%; animation:spin 0.8s linear infinite;
+  vertical-align:middle; margin-right:5px;
+}
+
+/* Toast */
+.toast {
+  position:fixed; bottom:22px; right:22px; z-index:9999;
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:8px; padding:12px 18px;
+  font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text);
+  opacity:0; transform:translateY(10px); transition:all 0.3s;
+  pointer-events:none; max-width:300px;
+}
+.toast.show { opacity:1; transform:translateY(0); }
+.toast-title { color:var(--accent); font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:3px; }
+
+/* Corner deco */
+.corner-tl,.corner-br { position:fixed; width:60px; height:60px; pointer-events:none; z-index:0; opacity:0.3; }
+.corner-tl { top:68px; left:0; border-top:1px solid var(--accent); border-left:1px solid var(--accent); }
+.corner-br { bottom:0; right:0; border-bottom:1px solid var(--accent); border-right:1px solid var(--accent); }
+
+/* Responsive */
+@media(max-width:900px) {
+  .dash-main { padding:16px; }
+  .stats-row { grid-template-columns:repeat(2,1fr); }
+  .cinemas-grid { grid-template-columns:1fr; }
+  header { padding:0 16px; }
+  .logo-sub { display:none; }
+}
+@media(max-width:600px) {
+  .vpn-info { grid-template-columns:1fr; }
+  .vpn-info-row { flex-direction:column; gap:4px; }
+  .header-right { gap:6px; }
+  .vpn-widget { display:none; }
 }
 </style>
 </head>
 <body>
 
-<div class="rainbow-bar"></div>
+<div class="corner-tl"></div>
+<div class="corner-br"></div>
 
-<!-- HEADER -->
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════ -->
 <header>
   <div class="logo">
-    <img src="data:image/png;base64,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" alt="Sigra Film">
-    <div class="logo-divider"></div>
-    <div class="logo-sub">NOC DASHBOARD<br><b>di Rocco Totaro — V1.2</b></div>
+    <div class="logo-icon">
+      <svg viewBox="0 0 36 36" fill="none">
+        <rect x="2" y="2" width="32" height="32" rx="4" stroke="#00d4ff" stroke-width="1.5"/>
+        <circle cx="18" cy="18" r="8" stroke="#00d4ff" stroke-width="1.5"/>
+        <circle cx="18" cy="18" r="3" fill="#00d4ff"/>
+        <line x1="18" y1="2" x2="18" y2="10" stroke="#00d4ff" stroke-width="1.5"/>
+        <line x1="18" y1="26" x2="18" y2="34" stroke="#00d4ff" stroke-width="1.5"/>
+        <line x1="2"  y1="18" x2="10" y2="18" stroke="#00d4ff" stroke-width="1.5"/>
+        <line x1="26" y1="18" x2="34" y2="18" stroke="#00d4ff" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Sigra Film</div>
+      <div class="logo-sub">NOC DASHBOARD di Rocco Totaro — V1.1</div>
+    </div>
   </div>
+
   <div class="header-right">
+
+    <!-- VIEW TOGGLE -->
     <div class="view-toggle">
-      <button class="view-btn" id="tab-dash" onclick="switchView('dashboard')">
+      <button class="view-btn active" id="tab-dash" onclick="switchView('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
           <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-        </svg>Dashboard
+        </svg>
+        Dashboard
       </button>
-      <button class="view-btn active" id="tab-map" onclick="switchView('map')">
+      <button class="view-btn" id="tab-map" onclick="switchView('map')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
           <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
-        </svg>Mappa
+        </svg>
+        Mappa
       </button>
     </div>
-    <button class="btn-zabbix" id="btnZabbix" onclick="openModal()">
+
+    <!-- ZABBIX -->
+    <button class="btn-zabbix" id="btnZabbix" onclick="loadZabbixData()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="2" y="3" width="20" height="14" rx="2"/>
-        <path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="2"/>
-        <path d="M7 10h2M15 10h2"/>
+        <path d="M8 21h8M12 17v4"/>
+        <circle cx="12" cy="10" r="2"/><path d="M7 10h2M15 10h2"/>
       </svg>
-      <span id="btnZabbixLabel">Importa Zabbix</span>
+      <span id="btnZabbixLabel">Carica da Zabbix</span>
     </button>
+
+    <!-- VPN WIDGET -->
     <div class="vpn-widget">
       <div class="vpn-dot" id="vpnDot"></div>
       <div>
-        <div class="vpn-label">WIREGUARD</div>
-        <div class="vpn-state" id="vpnState">---</div>
+        <div class="vpn-label">WIREGUARD VPN</div>
+        <div class="vpn-state" id="vpnState">DISCONNESSO</div>
       </div>
     </div>
-    <button class="btn-vpn" id="btnVpn" onclick="checkVPN()">VERIFICA</button>
+
+    <button class="btn-vpn" id="btnVpn" onclick="checkVPNStatus()">VERIFICA</button>
   </div>
 </header>
 
-<!-- MAP VIEW (default) -->
-<div class="view active" id="view-map">
-  <div id="map"></div>
-  <div class="map-stats-bar">
-    <div class="msb-item">CINEMA <span class="a" id="msb-cinemas">—</span></div>
-    <div class="msb-sep">|</div>
-    <div class="msb-item">HOST <span class="a" id="msb-devices">—</span></div>
-    <div class="msb-sep">|</div>
-    <div class="msb-item">ONLINE <span class="g" id="msb-online">—</span></div>
-    <div class="msb-sep">|</div>
-    <div class="msb-item">OFFLINE <span class="r" id="msb-offline">—</span></div>
-  </div>
-  <div class="map-legend">
-    <div class="legend-title">Legenda</div>
-    <div class="legend-item"><div class="ldot" style="background:var(--green);box-shadow:0 0 5px var(--green)"></div>Tutti online</div>
-    <div class="legend-item"><div class="ldot" style="background:var(--orange);box-shadow:0 0 5px var(--orange)"></div>Problemi parziali</div>
-    <div class="legend-item"><div class="ldot" style="background:var(--red);box-shadow:0 0 5px var(--red)"></div>Fuori rete</div>
-  </div>
-</div>
-
-<!-- DASHBOARD VIEW -->
-<div class="view" id="view-dashboard">
+<!-- ═══════════════════════════════════════════════════════════
+     DASHBOARD VIEW
+     ═══════════════════════════════════════════════════════════ -->
+<div class="view active" id="view-dashboard">
   <div class="dash-main">
-    <!-- VPN PANEL -->
+
+    <!-- VPN INFO PANEL -->
     <div class="vpn-info" id="vpnInfoPanel">
       <div class="vpn-info-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -397,452 +573,340 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       <div>
         <div class="vpn-info-title">WireGuard — Sigra Film NOC</div>
         <div class="vpn-info-row">
-          <div class="vpn-info-item" style="font-style:italic;font-size:9px">Configurazione riservata</div>
+          <div class="vpn-info-item">ENDPOINT <span>91.187.215.2:13001</span></div>
+          <div class="vpn-info-item">INDIRIZZO <span>172.31.1.20/24</span></div>
+          <div class="vpn-info-item">DNS <span>8.8.8.8</span></div>
+          <div class="vpn-info-item">MTU <span>1412</span></div>
+          <div class="vpn-info-item">LISTEN <span>51820</span></div>
+          <div class="vpn-info-item">PEER KEY <span>677LTbWPy…</span></div>
         </div>
       </div>
       <div class="vpn-big-status">
         <div class="vpn-big-label">Stato VPN</div>
-        <div class="vpn-big-value" id="vpnBigValue"><span class="loader"></span></div>
+        <div class="vpn-big-value" id="vpnBigValue">
+          <span class="loader"></span>
+        </div>
         <div class="vpn-check-msg" id="vpnCheckMsg">Verifica in corso...</div>
       </div>
     </div>
+
     <!-- STATS -->
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Gruppi Cinema</div><div class="stat-value" id="statCinemas">—</div></div>
-      <div class="stat-card"><div class="stat-label">Host Totali</div><div class="stat-value" id="statDevices">—</div></div>
-      <div class="stat-card"><div class="stat-label">Online</div><div class="stat-value g" id="statOnline">—</div></div>
-      <div class="stat-card"><div class="stat-label">Offline</div><div class="stat-value r" id="statOffline">—</div></div>
+      <div class="stat-card"><div class="stat-label">Cinema Totali</div><div class="stat-value" id="statCinemas">—</div></div>
+      <div class="stat-card"><div class="stat-label">Dispositivi Totali</div><div class="stat-value" id="statDevices">—</div></div>
+      <div class="stat-card"><div class="stat-label">Online (SNMP ✓)</div><div class="stat-value g" id="statOnline">—</div></div>
+      <div class="stat-card"><div class="stat-label">Offline (SNMP ✗)</div><div class="stat-value r" id="statOffline">—</div></div>
     </div>
-    <!-- GRID -->
+
+    <!-- CINEMA GRID (hidden until load) -->
     <div class="cinemas-grid" id="cinemasGrid" style="display:none"></div>
+
     <!-- EMPTY STATE -->
     <div class="empty-state" id="emptyState">
       <div class="empty-ico">
         <svg viewBox="0 0 64 64" fill="none">
-          <rect x="4" y="10" width="56" height="40" rx="4" stroke="#2979ff" stroke-width="2"/>
-          <circle cx="32" cy="30" r="10" stroke="#2979ff" stroke-width="2"/>
-          <circle cx="32" cy="30" r="4" fill="rgba(41,121,255,0.15)" stroke="#2979ff" stroke-width="2"/>
-          <line x1="32" y1="10" x2="32" y2="20" stroke="#2979ff" stroke-width="2"/>
-          <line x1="32" y1="40" x2="32" y2="50" stroke="#2979ff" stroke-width="2"/>
-          <line x1="4" y1="30" x2="14" y2="30" stroke="#2979ff" stroke-width="2"/>
-          <line x1="50" y1="30" x2="60" y2="30" stroke="#2979ff" stroke-width="2"/>
+          <rect x="4" y="10" width="56" height="40" rx="4" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="32" cy="30" r="10" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="32" cy="30" r="4" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="2"/>
+          <line x1="32" y1="10" x2="32" y2="20" stroke="#00d4ff" stroke-width="2"/>
+          <line x1="32" y1="40" x2="32" y2="50" stroke="#00d4ff" stroke-width="2"/>
+          <line x1="4"  y1="30" x2="14" y2="30" stroke="#00d4ff" stroke-width="2"/>
+          <line x1="50" y1="30" x2="60" y2="30" stroke="#00d4ff" stroke-width="2"/>
+          <line x1="22" y1="54" x2="42" y2="54" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="32" y1="50" x2="32" y2="54" stroke="#00d4ff" stroke-width="1.5"/>
         </svg>
       </div>
       <div class="empty-title">Nessun dato caricato</div>
-      <div class="empty-sub">Premi <strong>Importa Zabbix</strong> per caricare i cinema.</div>
-      <button class="btn-load" onclick="openModal()">Importa Zabbix</button>
+      <div class="empty-sub">Premi <strong>Carica da Zabbix</strong> per recuperare<br>la lista dei dispositivi monitorati.</div>
+      <button class="btn-load" onclick="loadZabbixData()">
+        <span id="btnEmptyLabel">Carica da Zabbix</span>
+      </button>
     </div>
+
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-backdrop" id="zbModal" style="display:none" onclick="if(event.target===this)closeModal()">
-  <div class="modal-box">
-    <div class="modal-rainbow"></div>
-    <div class="modal-hdr">
-      <div class="modal-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <rect x="2" y="3" width="20" height="14" rx="2"/>
-          <path d="M8 21h8M12 17v4"/>
-          <circle cx="12" cy="10" r="2"/><path d="M7 10h2M15 10h2"/>
-        </svg>
-      </div>
-      <div>
-        <div class="modal-title">Importa da Zabbix</div>
-        <div class="modal-sub">Incolla il testo della pagina host list oppure il link diretto</div>
-      </div>
-    </div>
-    <div class="modal-body">
-      <!-- Steps -->
-      <div style="display:flex;gap:6px;margin-bottom:14px">
-        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <div style="width:17px;height:17px;border-radius:50%;background:#e8192c;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;flex-shrink:0">1</div>
-            <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px">APRI ZABBIX</span>
-          </div>
-          <a href="http://162.19.84.22/zabbix.php?action=host.view&sort=name&sortorder=ASC" target="_blank"
-             style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);text-decoration:none;border-bottom:1px dashed rgba(41,121,255,0.4)">Vai alla pagina host ↗</a>
-        </div>
-        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <div style="width:17px;height:17px;border-radius:50%;background:#1db954;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;flex-shrink:0">2</div>
-            <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px">COPIA TUTTO</span>
-          </div>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text)">
-            <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px">Ctrl+A</kbd> poi
-            <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px">Ctrl+C</kbd>
-          </span>
-        </div>
-        <div style="flex:1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <div style="width:17px;height:17px;border-radius:50%;background:#1565c0;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:700;font-size:10px;color:#fff;flex-shrink:0">3</div>
-            <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px">INCOLLA QUI</span>
-          </div>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text)">
-            <kbd style="background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 5px">Ctrl+V</kbd> nella box
-          </span>
-        </div>
-      </div>
-
-      <!-- Input area: testo o link -->
-      <textarea id="zbInput"
-        placeholder="Incolla qui il testo copiato dalla pagina Zabbix (Ctrl+A → Ctrl+C sulla pagina host list)...&#10;&#10;Oppure incolla direttamente il link della pagina, es: http://162.19.84.22/zabbix.php?action=host.view..."
-        style="width:100%;height:160px;background:var(--panel2);border:1px solid rgba(41,121,255,0.2);
-               border-radius:8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;
-               padding:12px 14px;resize:vertical;outline:none;line-height:1.6;transition:border-color 0.2s"
-        onfocus="this.style.borderColor='var(--accent)'"
-        onblur="this.style.borderColor='rgba(41,121,255,0.2)'"
-        oninput="onInputChange(this.value)"
-        onpaste="setTimeout(()=>onInputChange(this.value),30)"
-      ></textarea>
-      <div id="zbPreview" style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);
-           margin-top:6px;min-height:14px;letter-spacing:1px;transition:color 0.2s"></div>
-      <div class="modal-error" id="zbError"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-modal-cancel" onclick="closeModal()">Annulla</button>
-      <a href="http://162.19.84.22/zabbix.php?action=host.view&sort=name&sortorder=ASC"
-         target="_blank" class="btn-modal-cancel">Apri Zabbix ↗</a>
-      <button class="btn-modal-ok" id="zbOkBtn" onclick="doImport()" disabled>
-        <span id="zbOkLabel">Importa</span>
-      </button>
-    </div>
+<!-- ═══════════════════════════════════════════════════════════
+     MAP VIEW
+     ═══════════════════════════════════════════════════════════ -->
+<div class="view" id="view-map">
+  <div id="map"></div>
+  <!-- Stats bar -->
+  <div class="map-stats-bar">
+    <div class="msb-item">CINEMA <span class="a" id="msb-cinemas">7</span></div>
+    <div class="msb-sep">|</div>
+    <div class="msb-item">DISPOSITIVI <span class="a" id="msb-devices">47</span></div>
+    <div class="msb-sep">|</div>
+    <div class="msb-item">ONLINE  <span class="g" id="msb-online">—</span></div>
+    <div class="msb-sep">|</div>
+    <div class="msb-item">OFFLINE <span class="r" id="msb-offline">—</span></div>
+  </div>
+  <!-- Legend -->
+  <div class="map-legend">
+    <div class="legend-title">Legenda</div>
+    <div class="legend-item"><div class="ldot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></div> Tutti online</div>
+    <div class="legend-item"><div class="ldot" style="background:var(--orange);box-shadow:0 0 6px var(--orange)"></div> Problemi parziali</div>
+    <div class="legend-item"><div class="ldot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></div> Fuori rete</div>
   </div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
-  <div class="toast-title info" id="toastTitle"></div>
+  <div class="toast-title" id="toastTitle"></div>
   <div id="toastMsg"></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════════════ -->
 <script>
 const ZABBIX_BASE = 'http://162.19.84.22';
-const CINEMAS = [];
-let dataLoaded = false;
+
+// ── DATA ──────────────────────────────────────────────────────
+const CINEMAS = [
+  {
+    name:'Aurelia Antica', location:'Grosseto', lat:42.7601, lng:11.1521,
+    devices:[
+      {name:'Sala 1 – Proiettore e ICMP', ip:'10.57.91.12', type:'projector', online:true,  hostid:11193},
+      {name:'Sala 2 – Proiettore e ICMP', ip:'10.57.91.22', type:'projector', online:true,  hostid:11194},
+      {name:'Sala 3 – Proiettore e ICMP', ip:'10.57.91.32', type:'projector', online:true,  hostid:11195},
+      {name:'Sala 4 – Proiettore e ICMP', ip:'10.57.91.42', type:'projector', online:true,  hostid:11196},
+    ]
+  },
+  {
+    name:'Clev Village', location:'Chiusi (SI)', lat:42.9975, lng:11.9474,
+    devices:[
+      {name:'Screen 01 – Proiettore', ip:'10.56.70.12', type:'projector', online:false, hostid:11228},
+      {name:'Screen 01 – Server',     ip:'10.56.70.10', type:'server',    online:false, hostid:11234},
+      {name:'Screen 02 – Proiettore', ip:'10.56.70.22', type:'projector', online:true,  hostid:11229},
+      {name:'Screen 02 – Server',     ip:'10.56.70.20', type:'server',    online:false, hostid:11235},
+      {name:'Screen 03 – Proiettore', ip:'10.56.70.32', type:'projector', online:true,  hostid:11230},
+      {name:'Screen 03 – Server',     ip:'10.56.70.30', type:'server',    online:true,  hostid:11236},
+      {name:'Screen 04 – Proiettore', ip:'10.56.70.42', type:'projector', online:true,  hostid:11231},
+      {name:'Screen 04 – Server',     ip:'10.56.70.40', type:'server',    online:true,  hostid:11237},
+      {name:'Screen 05 – Proiettore', ip:'10.56.70.52', type:'projector', online:true,  hostid:11232},
+      {name:'Screen 05 – Server',     ip:'10.56.70.50', type:'server',    online:true,  hostid:11238},
+      {name:'Screen 06 – Proiettore', ip:'10.56.70.62', type:'projector', online:true,  hostid:11233},
+      {name:'Screen 06 – Server',     ip:'10.56.70.60', type:'server',    online:true,  hostid:11239},
+    ]
+  },
+  {
+    name:'Imperiale', location:'Montecatini Terme', lat:43.8845, lng:10.7722,
+    devices:[
+      {name:'Sala 1 – Proiettore',          ip:'10.57.97.12', type:'projector', online:false, hostid:11289},
+      {name:'Sala 1 – Server IMS3000',      ip:'10.57.97.10', type:'server',    online:false, hostid:11293},
+      {name:'Sala 2 – Proiettore',          ip:'10.57.97.22', type:'projector', online:false, hostid:11290},
+      {name:'Sala 2 – Server IMS3000',      ip:'10.57.97.20', type:'server',    online:false, hostid:11294},
+      {name:'Sala 3 – Proiettore e Server', ip:'10.57.97.32', type:'projector', online:true,  hostid:11291},
+      {name:'Sala 4 – Proiettore e Server', ip:'10.57.97.42', type:'projector', online:false, hostid:11292},
+    ]
+  },
+  {
+    name:'Isola Verde', location:'Pisa', lat:43.7236, lng:10.4017,
+    devices:[
+      {name:'Screen 01 – Proiettore', ip:'10.58.70.12', type:'projector', online:true, hostid:11254},
+      {name:'Screen 01 – Server',     ip:'10.58.70.10', type:'server',    online:true, hostid:11255},
+      {name:'Screen 02 – Proiettore', ip:'10.58.70.22', type:'projector', online:true, hostid:11256},
+      {name:'Screen 02 – Server',     ip:'10.58.70.20', type:'server',    online:true, hostid:11257},
+      {name:'Screen 03 – Proiettore', ip:'10.58.70.32', type:'projector', online:true, hostid:11258},
+      {name:'Screen 03 – Server',     ip:'10.58.70.30', type:'server',    online:true, hostid:11259},
+    ]
+  },
+  {
+    name:'Multisala Odeon', location:'Pisa', lat:43.7156, lng:10.3997,
+    devices:[
+      {name:'Sala 1 Venezia – Proiettore',  ip:'10.55.76.12', type:'projector', online:true, hostid:11051},
+      {name:'Sala 2 Amalfi – Proiettore',   ip:'10.55.76.22', type:'projector', online:true, hostid:11052},
+      {name:'Sala 3 Pisa – Proiettore',     ip:'10.55.76.32', type:'projector', online:true, hostid:11053},
+      {name:'Sala 3 Pisa – Server IMS3000', ip:'10.55.76.33', type:'server',    online:true, hostid:11056},
+      {name:'Sala 4 Genova – Proiettore',   ip:'10.55.76.42', type:'projector', online:true, hostid:11054},
+      {name:'Sala 5 Kinzica – Proiettore',  ip:'10.55.76.52', type:'projector', online:true, hostid:11055},
+    ]
+  },
+  {
+    name:'Nuova Aurora', location:'Sansepolcro', lat:43.5704, lng:12.1402,
+    devices:[
+      {name:'Sala 1 – Proiettore Barco', ip:'10.58.78.12', type:'projector', online:true, hostid:11288},
+      {name:'Sala 1 – Server Doremi',    ip:'10.58.78.10', type:'server',    online:true, hostid:11287},
+    ]
+  },
+  {
+    name:'Splendor', location:'Massa', lat:44.0354, lng:10.1395,
+    devices:[
+      {name:'Screen 01 – Proiettore', ip:'10.58.71.12', type:'projector', online:false, hostid:11240},
+      {name:'Screen 01 – Server',     ip:'10.58.71.10', type:'server',    online:false, hostid:11247},
+      {name:'Screen 02 – Proiettore', ip:'10.58.71.22', type:'projector', online:false, hostid:11241},
+      {name:'Screen 03 – Server',     ip:'10.58.71.30', type:'server',    online:false, hostid:11249},
+      {name:'Screen 04 – Proiettore', ip:'10.58.71.42', type:'projector', online:false, hostid:11243},
+      {name:'Screen 05 – Proiettore', ip:'10.58.71.52', type:'projector', online:false, hostid:11244},
+      {name:'Screen 05 – Server',     ip:'10.58.71.50', type:'server',    online:false, hostid:11251},
+      {name:'Screen 06 – Proiettore', ip:'10.58.71.62', type:'projector', online:false, hostid:11245},
+      {name:'Screen 06 – Server',     ip:'10.58.71.60', type:'server',    online:false, hostid:11252},
+      {name:'Screen 07 – Proiettore', ip:'10.58.71.72', type:'projector', online:false, hostid:11246},
+      {name:'Screen 07 – Server',     ip:'10.58.71.70', type:'server',    online:false, hostid:11253},
+    ]
+  }
+];
+
+// ── VIEW SWITCHER ──────────────────────────────────────────────
 let mapInit = false;
 
-// ── VIEW SWITCHER ─────────────────────────────────────────────
 function switchView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.view-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('view-' + v).classList.add('active');
   document.getElementById('tab-' + (v === 'dashboard' ? 'dash' : 'map')).classList.add('active');
-  if (v === 'map') {
-    if (!mapInit) { mapInit = true; initMap(); }
-    else if (window._map) setTimeout(() => window._map.invalidateSize(), 50);
+  if (v === 'map' && !mapInit) {
+    mapInit = true;
+    initMap(); // async — i marker appaiono mano a mano
+  }
+  if (v === 'map' && window._leafletMap) {
+    setTimeout(() => window._leafletMap.invalidateSize(), 50);
   }
 }
 
-// ── TOAST ─────────────────────────────────────────────────────
-let _tt;
-function showToast(title, msg, type) {
+// ── TOAST ──────────────────────────────────────────────────────
+let _toastTimer = null;
+function showToast(title, msg) {
   const t = document.getElementById('toast');
-  const tl = document.getElementById('toastTitle');
-  tl.textContent = title;
-  tl.className = 'toast-title ' + (type || 'info');
-  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent   = msg;
   t.classList.add('show');
-  clearTimeout(_tt);
-  _tt = setTimeout(() => t.classList.remove('show'), 5000);
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 4500);
 }
 
-// ── VPN ───────────────────────────────────────────────────────
+// ── VPN AUTO-DETECT ────────────────────────────────────────────
 const VPN_PROBES = ['http://10.57.91.12','http://10.56.70.30','http://10.55.76.12'];
-let vpnBusy = false;
+let vpnChecking = false;
+
 function probeIP(url, ms) {
   return new Promise(res => {
-    const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); res(false); }, ms);
-    fetch(url, {signal:c.signal, mode:'no-cors', cache:'no-store'})
-      .then(() => { clearTimeout(t); res(true); })
-      .catch(() => { clearTimeout(t); res(false); });
+    const ctrl = new AbortController();
+    const t = setTimeout(() => { ctrl.abort(); res(false); }, ms);
+    fetch(url, {signal:ctrl.signal, mode:'no-cors', cache:'no-store'})
+      .then(()  => { clearTimeout(t); res(true);  })
+      .catch(()  => { clearTimeout(t); res(false); });
   });
 }
-async function checkVPN() {
-  if (vpnBusy) return;
-  vpnBusy = true;
-  const btn = document.getElementById('btnVpn');
+
+async function checkVPNStatus() {
+  if (vpnChecking) return;
+  vpnChecking = true;
+  const dot   = document.getElementById('vpnDot');
+  const state = document.getElementById('vpnState');
+  const big   = document.getElementById('vpnBigValue');
+  const msg   = document.getElementById('vpnCheckMsg');
+  const btn   = document.getElementById('btnVpn');
+
   btn.disabled = true;
-  document.getElementById('vpnBigValue').innerHTML = '<span class="loader"></span>';
-  document.getElementById('vpnCheckMsg').textContent = 'Verifica...';
-  const ok = (await Promise.all(VPN_PROBES.map(u => probeIP(u, 3000)))).some(r => r);
-  vpnBusy = false; btn.disabled = false;
-  const dot = document.getElementById('vpnDot');
-  const st  = document.getElementById('vpnState');
-  const big = document.getElementById('vpnBigValue');
-  const msg = document.getElementById('vpnCheckMsg');
-  const pan = document.getElementById('vpnInfoPanel');
-  dot.classList.toggle('on', ok);
-  st.textContent = ok ? 'CONNESSO' : 'OFFLINE';
-  st.classList.toggle('on', ok);
-  big.textContent = ok ? 'ONLINE' : 'OFFLINE';
-  big.className = 'vpn-big-value' + (ok ? ' on' : '');
-  msg.textContent = ok ? 'Rete interna raggiungibile ✓' : 'Rete interna non raggiungibile';
-  pan.style.borderColor = ok ? 'rgba(0,230,118,0.3)' : 'rgba(255,23,68,0.3)';
-  showToast(ok ? 'VPN ATTIVA' : 'VPN OFFLINE', ok ? 'Tunnel WireGuard attivo.' : 'Nessun host interno risponde.', ok ? 'ok' : 'err');
-}
+  big.innerHTML = '<span class="loader"></span>';
+  msg.textContent = 'Verifica connessione...';
 
-// ── MODAL ─────────────────────────────────────────────────────
-function openModal() {
-  document.getElementById('zbInput').value = '';
-  document.getElementById('zbPreview').textContent = '';
-  document.getElementById('zbError').classList.remove('show');
-  document.getElementById('zbOkBtn').disabled = true;
-  document.getElementById('zbOkLabel').textContent = 'Importa';
-  document.getElementById('zbModal').style.display = 'flex';
-  setTimeout(() => document.getElementById('zbInput').focus(), 80);
-}
-function closeModal() {
-  document.getElementById('zbModal').style.display = 'none';
-}
+  const results   = await Promise.all(VPN_PROBES.map(ip => probeIP(ip, 3000)));
+  const reachable = results.some(r => r);
+  vpnChecking = false;
+  btn.disabled = false;
 
-// ── DETECT INPUT TYPE & PREVIEW ───────────────────────────────
-function onInputChange(val) {
-  const prev = document.getElementById('zbPreview');
-  const btn  = document.getElementById('zbOkBtn');
-  const err  = document.getElementById('zbError');
-  err.classList.remove('show');
-  const v = val.trim();
-  if (!v) { prev.textContent = ''; btn.disabled = true; return; }
-
-  // Rileva se è un URL Zabbix
-  if (isZabbixUrl(v)) {
-    prev.textContent = '🔗 Link Zabbix rilevato — premi Importa per scaricare la pagina';
-    prev.style.color = 'var(--accent)';
-    btn.disabled = false;
-    return;
-  }
-
-  // Altrimenti tenta parsing immediato del testo
-  const result = parseZabbixText(v);
-  const tot = result.reduce((s, c) => s + c.devices.length, 0);
-  if (tot > 0) {
-    prev.textContent = '✓ Rilevati ' + tot + ' host in ' + result.length + ' gruppi';
-    prev.style.color = 'var(--green)';
-    btn.disabled = false;
+  if (reachable) {
+    dot.classList.add('on'); state.textContent = 'CONNESSO'; state.classList.add('on');
+    big.textContent = 'ONLINE'; big.className = 'vpn-big-value on';
+    msg.textContent = 'Rete VPN raggiungibile ✓';
+    document.getElementById('vpnInfoPanel').style.borderColor = 'rgba(0,255,136,0.3)';
   } else {
-    prev.textContent = '⚠ Nessun host riconosciuto — prova a copiare tutta la pagina con Ctrl+A → Ctrl+C';
-    prev.style.color = 'var(--orange)';
-    btn.disabled = true;
+    dot.classList.remove('on'); state.textContent = 'DISCONNESSO'; state.classList.remove('on');
+    big.textContent = 'OFFLINE'; big.className = 'vpn-big-value';
+    msg.textContent = 'Rete VPN non raggiungibile ✗';
+    document.getElementById('vpnInfoPanel').style.borderColor = 'rgba(255,51,85,0.3)';
   }
+  showToast(reachable ? 'VPN ATTIVA' : 'VPN NON RILEVATA',
+    reachable ? 'Tunnel WireGuard attivo. Rete interna raggiungibile.'
+              : 'Nessun host interno risponde. Controlla WireGuard.');
 }
 
-function isZabbixUrl(v) {
-  // Accetta qualsiasi URL che punta al server Zabbix o che contiene action=host.view
-  return /^https?:\/\//i.test(v) && (v.includes('host.view') || v.includes('zabbix.php') || v.includes('162.19.84.22'));
+// ── ZABBIX LOAD ────────────────────────────────────────────────
+let dataLoaded = false;
+
+function loadZabbixData() {
+  if (dataLoaded) return;
+  const lbl1 = document.getElementById('btnZabbixLabel');
+  const lbl2 = document.getElementById('btnEmptyLabel');
+  lbl1.innerHTML = '<span class="loader"></span>Caricamento...';
+  lbl2.innerHTML = '<span class="loader"></span>Caricamento...';
+
+  setTimeout(() => {
+    dataLoaded = true;
+    buildDashboardCards();
+    document.getElementById('emptyState').style.display  = 'none';
+    document.getElementById('cinemasGrid').style.display = 'grid';
+    lbl1.textContent = '✓ Dati caricati';
+    showToast('ZABBIX SYNC', '47 dispositivi caricati da 7 cinema.');
+  }, 1200);
 }
 
-// ── IMPORTA ───────────────────────────────────────────────────
-async function doImport() {
-  const v   = document.getElementById('zbInput').value.trim();
-  const err = document.getElementById('zbError');
-  const btn = document.getElementById('zbOkBtn');
-  const lbl = document.getElementById('zbOkLabel');
-  err.classList.remove('show');
-  if (!v) return;
-
-  if (isZabbixUrl(v)) {
-    // Tentativo fetch diretto con cookie di sessione
-    btn.disabled = true;
-    lbl.innerHTML = '<span class="loader"></span>Scarico...';
-    try {
-      const resp = await fetch(v, { credentials: 'include', signal: AbortSignal.timeout(8000) });
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const html = await resp.text();
-      if (html.includes('action=user.login') || html.includes('id="login-form"'))
-        throw new Error('Sessione Zabbix scaduta. Fai login su Zabbix poi riprova, oppure copia il testo della pagina con Ctrl+A Ctrl+C.');
-      const cinemas = parseZabbixHtml(html);
-      if (cinemas.length === 0)
-        throw new Error('Pagina scaricata ma nessun host trovato. Prova a copiare il testo con Ctrl+A Ctrl+C.');
-      applyData(cinemas);
-    } catch(e) {
-      lbl.textContent = 'Importa';
-      btn.disabled = false;
-      let msg = e.message;
-      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS')) {
-        msg = 'Il browser blocca la richiesta diretta (CORS). Copia invece il testo della pagina con Ctrl+A → Ctrl+C e incollalo qui.';
-      }
-      err.textContent = '⚠ ' + msg;
-      err.classList.add('show');
-    }
-    return;
-  }
-
-  // Testo incollato
-  const cinemas = parseZabbixText(v);
-  if (cinemas.length === 0) {
-    err.textContent = '⚠ Nessun host trovato nel testo. Assicurati di aver copiato dalla pagina host.view con Ctrl+A Ctrl+C.';
-    err.classList.add('show');
-    return;
-  }
-  applyData(cinemas);
-}
-
-function applyData(cinemas) {
-  CINEMAS.length = 0;
-  cinemas.forEach(c => CINEMAS.push(c));
-  dataLoaded = true;
-  closeModal();
-  buildDashboard();
-  document.getElementById('emptyState').style.display = 'none';
-  document.getElementById('cinemasGrid').style.display = 'grid';
-  document.getElementById('btnZabbixLabel').textContent = '↺ Aggiorna';
-  const tot = CINEMAS.reduce((s,c) => s + c.devices.length, 0);
-  showToast('ZABBIX IMPORT', CINEMAS.length + ' gruppi · ' + tot + ' host caricati', 'ok');
-  // Se mappa già inizializzata, ripopola i marker
-  if (mapInit) populateMarkers();
-  // Aggiorna stats barra mappa
-  updateMapStats();
-}
-
-// ── PARSER TESTO (Ctrl+A Ctrl+C) ─────────────────────────────
-// Zabbix host.view copia così (colonne separate da tab):
-//   NomeHost   [Enabled/Disabled]   [ZBX/SNMP...]   [NomeGruppo]   ...
-function parseZabbixText(raw) {
-  const lines  = raw.split(/\r?\n/);
-  const groups = {};
-  // Parole da ignorare (intestazioni UI, navigazione, ecc.)
-  const SKIP_RX = /^(host|hosts|name|status|availability|tags|info|action|zabbix|monitoring|configuration|dashboard|filter|group|type|template|problems|latest|graphs|web|items|triggers|discovery|select|show|apply|reset|create|import|export|mass|update|check|delete|enable|disable|displaying|page|of|\d+|\s*)$/i;
-  const AVAIL_RX = /^(ZBX|SNMP|JMX|IPMI|Unknown|Yes|No)$/i;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.length < 2) continue;
-
-    // Colonne separate da tab
-    const cols = trimmed.split('\t').map(c => c.trim()).filter(Boolean);
-    if (cols.length === 0) continue;
-
-    const hostName = cols[0];
-    if (!hostName || hostName.length < 2 || hostName.length > 100) continue;
-    if (SKIP_RX.test(hostName)) continue;
-    if (/^https?:/.test(hostName)) continue;
-
-    // Stato online/offline
-    let online = true;
-    for (let i = 1; i < Math.min(cols.length, 5); i++) {
-      if (/^disabled$/i.test(cols[i])) { online = false; break; }
-    }
-
-    // Gruppo: prima colonna che non è availability, status, o tag "key:val"
-    let groupName = 'Cinema';
-    for (let i = 1; i < cols.length; i++) {
-      const c = cols[i];
-      if (AVAIL_RX.test(c)) continue;
-      if (/^(enabled|disabled|yes|no|unknown)$/i.test(c)) continue;
-      if (c.includes(':')) continue;  // tag
-      if (c.length < 2) continue;
-      groupName = c;
-      break;
-    }
-
-    if (!groups[groupName]) groups[groupName] = { name: groupName, location: groupName, lat:0, lng:0, devices:[] };
-    if (!groups[groupName].devices.find(d => d.name === hostName)) {
-      groups[groupName].devices.push({ name: hostName, ip:'', type: guessType(hostName), online, hostid:0 });
-    }
-  }
-  return Object.values(groups).filter(g => g.devices.length > 0);
-}
-
-// ── PARSER HTML (link / sorgente pagina) ─────────────────────
-function parseZabbixHtml(htmlStr) {
-  const doc    = new DOMParser().parseFromString(htmlStr, 'text/html');
-  const groups = {};
-  // Zabbix 6+: tr[data-hostid]; Zabbix 5: tr con link hostid
-  const rows = Array.from(
-    doc.querySelectorAll('tr[data-hostid]').length
-      ? doc.querySelectorAll('tr[data-hostid]')
-      : doc.querySelectorAll('table tbody tr')
-  ).filter(r => r.querySelector('a[href*="hostid"]'));
-
-  for (const row of rows) {
-    const nameEl = row.querySelector('a[href*="hostid"]');
-    if (!nameEl) continue;
-    const hostName = nameEl.textContent.trim();
-    if (!hostName) continue;
-    const href   = nameEl.getAttribute('href') || '';
-    const hostid = parseInt((href.match(/hostid[=\[](\d+)/) || [,0])[1]) || 0;
-
-    let ip = '';
-    row.querySelectorAll('td').forEach(td => {
-      const t = td.textContent.trim();
-      if (!ip && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(t)) ip = t;
-    });
-
-    const rowHtml = row.innerHTML.toLowerCase();
-    const online  = !rowHtml.includes('disabled') && !rowHtml.includes('status-grey');
-
-    let groupName = 'Cinema';
-    const gLinks  = row.querySelectorAll('a[href*="groupid"]');
-    if (gLinks.length) {
-      const real = Array.from(gLinks).find(a => !/template|linux|window/i.test(a.textContent));
-      groupName = (real || gLinks[0]).textContent.trim();
-    }
-
-    if (!groups[groupName]) groups[groupName] = { name: groupName, location: groupName, lat:0, lng:0, devices:[] };
-    groups[groupName].devices.push({ name: hostName, ip, type: guessType(hostName), online, hostid });
-  }
-  return Object.values(groups).filter(g => g.devices.length > 0);
-}
-
-function guessType(name) {
-  return /server|ims|doremi|srv/i.test(name) ? 'server' : 'projector';
-}
-
-// ── DASHBOARD ─────────────────────────────────────────────────
-function buildDashboard() {
+// ── DASHBOARD CARDS ────────────────────────────────────────────
+function buildDashboardCards() {
   const grid = document.getElementById('cinemasGrid');
   grid.innerHTML = '';
   let totOn = 0, totOff = 0;
-  CINEMAS.forEach(c => {
-    const on  = c.devices.filter(d => d.online).length;
-    const off = c.devices.length - on;
+
+  CINEMAS.forEach(cinema => {
+    const on  = cinema.devices.filter(d => d.online).length;
+    const off = cinema.devices.length - on;
     totOn += on; totOff += off;
-    const rows = c.devices.map(d => {
-      const lUrl = d.hostid ? ZABBIX_BASE + '/zabbix.php?action=latest.view&hostids[]=' + d.hostid + '&filter_set=1' : '#';
-      const pUrl = d.hostid ? ZABBIX_BASE + '/zabbix.php?action=problem.view&hostids[]=' + d.hostid + '&filter_set=1' : '#';
-      const ipHtml = d.ip ? `<a class="dev-ip" href="http://${d.ip}" target="_blank">${d.ip}</a>` : `<span style="color:var(--text2);font-size:9px;font-family:'Share Tech Mono',monospace">—</span>`;
-      return `<div class="device-row">
-        <div class="device-name">${d.name}</div>
-        <span class="dev-type ${d.type}">${d.type === 'projector' ? 'PROIETTORE' : 'SERVER'}</span>
-        ${ipHtml}
-        <div class="dev-links">
-          <div class="dev-status ${d.online ? 'ok' : 'err'}"></div>
-          ${d.hostid ? `<a class="dev-btn" href="${lUrl}" target="_blank">DATI</a><a class="dev-btn warn" href="${pUrl}" target="_blank">LOG</a>` : ''}
-        </div></div>`;
+
+    const rows = cinema.devices.map(d => {
+      const latUrl  = `${ZABBIX_BASE}/zabbix.php?action=latest.view&hostids%5B0%5D=${d.hostid}&filter_set=1`;
+      const probUrl = `${ZABBIX_BASE}/zabbix.php?action=problem.view&hostids%5B0%5D=${d.hostid}&filter_set=1`;
+      return `
+        <div class="device-row">
+          <div class="device-name">${d.name}</div>
+          <span class="dev-type ${d.type}">${d.type === 'projector' ? 'PROIETTORE' : 'SERVER'}</span>
+          <a class="dev-ip device-ip-link" href="http://${d.ip}" target="_blank">${d.ip}</a>
+          <div class="dev-links">
+            <div class="dev-status ${d.online ? 'ok' : 'err'}"></div>
+            <a class="dev-btn" href="${latUrl}" target="_blank">DATI</a>
+            <a class="dev-btn warn" href="${probUrl}" target="_blank">LOG</a>
+          </div>
+        </div>`;
     }).join('');
+
     const card = document.createElement('div');
     card.className = 'cinema-card';
     card.innerHTML = `
       <div class="cinema-hdr" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
         <div class="cinema-name-block">
-          <div class="cinema-ico"><svg viewBox="0 0 24 24"><path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 4v10h12V7H6zm2 2h3v6H8V9zm5 0h3v6h-3V9z"/></svg></div>
+          <div class="cinema-ico">
+            <svg viewBox="0 0 24 24"><path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 4v10h12V7H6zm2 2h3v6H8V9zm5 0h3v6h-3V9z"/></svg>
+          </div>
           <div>
-            <div class="cinema-name">${c.name}</div>
-            <div class="cinema-loc">📍 ${c.location}</div>
+            <div class="cinema-name">${cinema.name}</div>
+            <div class="cinema-loc">📍 ${cinema.location}</div>
           </div>
         </div>
         <div class="cinema-meta">
-          <span class="badge ok">✓ ${on}</span>
-          ${off > 0 ? `<span class="badge err">✗ ${off}</span>` : ''}
-          <span class="badge">${c.devices.length} host</span>
+          <span class="badge ok">✓ ${on} online</span>
+          ${off > 0 ? `<span class="badge err">✗ ${off} offline</span>` : ''}
+          <span class="badge">${cinema.devices.length} dev</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
       <div class="devices-table">${rows}</div>`;
     grid.appendChild(card);
   });
-  document.getElementById('statCinemas').textContent  = CINEMAS.length;
-  document.getElementById('statDevices').textContent  = CINEMAS.reduce((s,c) => s+c.devices.length,0);
-  document.getElementById('statOnline').textContent   = totOn;
-  document.getElementById('statOffline').textContent  = totOff;
+
+  document.getElementById('statCinemas').textContent = CINEMAS.length;
+  document.getElementById('statDevices').textContent = CINEMAS.reduce((s,c)=>s+c.devices.length,0);
+  document.getElementById('statOnline').textContent  = totOn;
+  document.getElementById('statOffline').textContent = totOff;
 }
 
-// ── MAP ───────────────────────────────────────────────────────
+// ── MAP ────────────────────────────────────────────────────────
 function cinemaStatus(c) {
   const on = c.devices.filter(d => d.online).length;
-  return on === c.devices.length ? 'all-ok' : on === 0 ? 'all-down' : 'has-issues';
+  if (on === c.devices.length) return 'all-ok';
+  if (on === 0)                return 'all-down';
+  return 'has-issues';
 }
 function statusColor(s) {
   return s === 'all-ok' ? 'var(--green)' : s === 'all-down' ? 'var(--red)' : 'var(--orange)';
@@ -854,151 +918,166 @@ function buildPopupHTML(c, address) {
   const st  = cinemaStatus(c);
   const ic  = st === 'all-ok' ? 'ok' : st === 'all-down' ? 'err' : 'warn';
   const col = statusColor(st);
-  const locLine = address
-    ? `<div class="popup-addr">📍 ${address}</div>`
-    : `<div class="popup-loc">📍 ${c.location}</div>`;
-  const rows = c.devices.map(d =>
-    `<div class="popup-dev-row">
-      <div class="pdot ${d.online ? 'ok' : 'err'}"></div>
+  const addrLine = address
+    ? `<div class="popup-addr">🏠 ${address}</div>`
+    : `<div class="popup-addr" style="color:var(--text2)">📍 ${c.location}</div>`;
+
+  const rows = c.devices.map(d => `
+    <div class="popup-dev-row">
+      <div class="pdot ${d.online?'ok':'err'}"></div>
       <div class="pdev-name" title="${d.name}">${d.name}</div>
-      <span class="pdev-type ${d.type}">${d.type === 'projector' ? 'PROJ' : 'SRV'}</span>
-      ${d.ip ? `<a class="pdev-ip" href="http://${d.ip}" target="_blank">${d.ip}</a>` : '<span style="font-size:9px;color:var(--text2)">—</span>'}
-    </div>`
-  ).join('');
-  return `<div class="popup-rainbow"></div>
+      <span class="pdev-type ${d.type}">${d.type==='projector'?'PROJ':'SRV'}</span>
+      <a class="pdev-ip" href="http://${d.ip}" target="_blank">${d.ip}</a>
+    </div>`).join('');
+
+  return `
     <div class="popup-hdr">
       <div class="popup-ico ${ic}">
-        <svg viewBox="0 0 24 24" fill="${col}"><path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 4v10h12V7H6zm2 2h3v6H8V9zm5 0h3v6h-3V9z"/></svg>
+        <svg viewBox="0 0 24 24" fill="${col}">
+          <path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 4v10h12V7H6zm2 2h3v6H8V9zm5 0h3v6h-3V9z"/>
+        </svg>
       </div>
       <div style="flex:1;min-width:0">
         <div class="popup-title">${c.name}</div>
-        ${locLine}
+        ${addrLine}
         <div class="popup-badges">
           <span class="pbadge ok">✓ ${on} online</span>
           ${off > 0 ? `<span class="pbadge err">✗ ${off} offline</span>` : ''}
-          <span class="pbadge info">${c.devices.length} host</span>
+          <span class="pbadge info">${c.devices.length} dispositivi</span>
         </div>
       </div>
     </div>
     <div class="popup-devs">${rows}</div>
     <div class="popup-footer">
-      <a class="pfooter-btn zb" href="${ZABBIX_BASE}/zabbix.php?action=host.view" target="_blank">📊 Host List</a>
-      <a class="pfooter-btn pb" href="${ZABBIX_BASE}/zabbix.php?action=problem.view&filter_set=1" target="_blank">⚠ Problemi</a>
+      <a class="pfooter-btn zb" href="${ZABBIX_BASE}/zabbix.php?action=host.view" target="_blank">📊 Zabbix Host</a>
+      <a class="pfooter-btn pb" href="${ZABBIX_BASE}/zabbix.php?action=problem.view&filter_set=1" target="_blank">⚠️ Problemi</a>
     </div>`;
 }
 
+// Geocoding via Nominatim (OpenStreetMap, gratuito, nessuna API key)
+// Cerca "Cinema [nome] [città]" → fallback solo "[nome] [città]"
 async function geocodeCinema(name, location) {
+  // Pulisce la città (rimuove eventuali "(SI)" ecc.)
   const city = location.replace(/\s*\(.*?\)/g, '').trim();
-  for (const q of ['Cinema ' + name + ', ' + city + ', Italia', name + ', ' + city + ', Italia']) {
+  const queries = [
+    `Cinema ${name}, ${city}, Italia`,
+    `${name}, ${city}, Italia`,
+  ];
+  for (const q of queries) {
     try {
-      const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q), { headers:{'Accept-Language':'it'} });
-      const d = await r.json();
-      if (d && d[0]) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon), address: d[0].display_name.split(',').slice(0,3).join(', ') };
-    } catch(e) {}
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
+      const res = await fetch(url, {headers:{'Accept-Language':'it'}});
+      const data = await res.json();
+      if (data && data[0]) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+          address: data[0].display_name.split(',').slice(0,3).join(', ')
+        };
+      }
+    } catch(e) { /* continua con il fallback */ }
   }
-  return null;
+  return null; // usa le coordinate fisse se geocoding fallisce
 }
 
-function showMapOverlay() {
-  if (document.getElementById('mapOverlay')) return;
-  const ov = document.createElement('div');
-  ov.id = 'mapOverlay';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(7,9,14,0.85);backdrop-filter:blur(6px)';
-  ov.innerHTML = `
-    <div style="text-align:center;animation:fadeUp 0.5s ease both">
-      <div style="width:70px;height:70px;margin:0 auto 18px;opacity:0.45;animation:float 3s ease-in-out infinite">
-        <svg viewBox="0 0 64 64" fill="none" style="width:100%;height:100%">
-          <rect x="4" y="10" width="56" height="40" rx="4" stroke="#2979ff" stroke-width="2"/>
-          <circle cx="32" cy="30" r="10" stroke="#2979ff" stroke-width="2"/>
-          <circle cx="32" cy="30" r="4" fill="rgba(41,121,255,0.15)" stroke="#2979ff" stroke-width="2"/>
-          <line x1="32" y1="10" x2="32" y2="20" stroke="#2979ff" stroke-width="2"/>
-          <line x1="32" y1="40" x2="32" y2="50" stroke="#2979ff" stroke-width="2"/>
-          <line x1="4" y1="30" x2="14" y2="30" stroke="#2979ff" stroke-width="2"/>
-          <line x1="50" y1="30" x2="60" y2="30" stroke="#2979ff" stroke-width="2"/>
-        </svg>
-      </div>
-      <div style="font-family:Rajdhani,sans-serif;font-weight:700;font-size:20px;letter-spacing:3px;color:#fff;text-transform:uppercase;margin-bottom:8px">Mappa non disponibile</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a6080;line-height:1.8;margin-bottom:22px">
-        Premi <strong style="color:#2979ff">Importa Zabbix</strong> per posizionare i cinema sulla mappa
-      </div>
-      <button onclick="openModal()" style="background:linear-gradient(135deg,#1565c0,#2979ff);border:none;border-radius:8px;color:#fff;font-family:Rajdhani,sans-serif;font-weight:700;font-size:13px;letter-spacing:3px;padding:10px 28px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 18px rgba(21,101,192,0.4)">
-        Importa Zabbix
-      </button>
-    </div>`;
-  document.getElementById('view-map').appendChild(ov);
-}
+async function initMap() {
+  const map = L.map('map', {
+    center:[43.5, 11.0], zoom:8,
+    zoomControl:false, attributionControl:false
+  });
+  window._leafletMap = map;
 
-function hideMapOverlay() {
-  const el = document.getElementById('mapOverlay');
-  if (el) { el.style.opacity='0'; el.style.transition='opacity 0.4s'; setTimeout(()=>el.remove(),400); }
-}
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    subdomains:'abcd', maxZoom:19
+  }).addTo(map);
 
-function initMap() {
-  const map = L.map('map', { center:[43.5,11.0], zoom:8, zoomControl:false, attributionControl:false });
-  window._map = map;
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains:'abcd', maxZoom:19 }).addTo(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
-  const s = document.createElement('style');
-  s.textContent = '.leaflet-tooltip{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important}';
-  document.head.appendChild(s);
-  showMapOverlay();
-}
 
-async function populateMarkers() {
-  const map = window._map;
-  if (!map) return;
-  hideMapOverlay();
-  // Rimuovi marker esistenti
-  map.eachLayer(l => { if (l instanceof L.Marker) map.removeLayer(l); });
+  // Fix tooltip style
+  const s = document.createElement('style');
+  s.textContent = `.leaflet-tooltip{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important}`;
+  document.head.appendChild(s);
 
   let totOn = 0, totOff = 0;
+
+  // Per ogni cinema: geocoding dinamico + creazione marker
+  // Rate limit Nominatim: 1 req/secondo → aspettiamo 1.1s tra le chiamate
   for (let i = 0; i < CINEMAS.length; i++) {
-    const c  = CINEMAS[i];
-    const st = cinemaStatus(c);
-    const on = c.devices.filter(d => d.online).length;
-    totOn  += on; totOff += c.devices.length - on;
+    const c = CINEMAS[i];
+    const st  = cinemaStatus(c);
+    const col = statusColor(st);
+    const on  = c.devices.filter(d => d.online).length;
+    totOn  += on;
+    totOff += c.devices.length - on;
+
+    // Geocoding — aspetta 1.1s tra richieste per rispettare il rate limit di Nominatim
     if (i > 0) await new Promise(r => setTimeout(r, 1100));
-    const geo  = await geocodeCinema(c.name, c.location);
-    const lat  = geo ? geo.lat : (c.lat || 43.5);
-    const lng  = geo ? geo.lng : (c.lng || 11.0);
-    const addr = geo ? geo.address : null;
+    const geo = await geocodeCinema(c.name, c.location);
+
+    const lat = geo ? geo.lat : c.lat;
+    const lng = geo ? geo.lng : c.lng;
+    const address = geo ? geo.address : null;
+
+    // Aggiorna le coordinate nel dato (per usi futuri nella sessione)
+    c._resolvedLat = lat;
+    c._resolvedLng = lng;
+    c._address = address;
+
     const icon = L.divIcon({
       html: `<div class="cmarker ${st}"><div class="cmarker-inner">🎬</div></div>`,
-      className:'', iconSize:[38,38], iconAnchor:[19,38], popupAnchor:[0,-44]
+      className:'', iconSize:[36,36], iconAnchor:[18,36], popupAnchor:[0,-42]
     });
+
     const marker = L.marker([lat, lng], {icon}).addTo(map);
-    const popup  = L.popup({closeButton:false, autoClose:false, closeOnClick:false}).setContent(buildPopupHTML(c, addr));
+
+    const popup = L.popup({
+      closeButton: false,
+      autoClose:   false,
+      closeOnClick:false,
+      className:   'cinema-popup'
+    }).setContent(buildPopupHTML(c, address));
+
     marker.bindPopup(popup);
-    let closeTimer;
-    marker.on('mouseover', () => { clearTimeout(closeTimer); marker.openPopup(); });
-    marker.on('mouseout',  () => { closeTimer = setTimeout(() => marker.closePopup(), 300); });
-    marker.on('popupopen', () => {
+
+    // ── Hover apre/chiude con ritardo per permettere di entrare nel popup ──
+    let closeTimer = null;
+
+    function openPopup()  {
+      clearTimeout(closeTimer);
+      marker.openPopup();
+    }
+    function scheduleClose() {
+      closeTimer = setTimeout(() => {
+        // Chiude solo se il mouse non è dentro il popup
+        marker.closePopup();
+      }, 300);
+    }
+
+    marker.on('mouseover', openPopup);
+    marker.on('mouseout',  scheduleClose);
+
+    // Quando il popup è aperto, intercetta mouseover/mouseout sul suo elemento
+    marker.on('popupopen', function() {
       const el = marker.getPopup().getElement();
       if (!el) return;
       el.addEventListener('mouseenter', () => clearTimeout(closeTimer));
-      el.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => marker.closePopup(), 300); });
+      el.addEventListener('mouseleave', scheduleClose);
     });
-    const sc = st === 'all-ok' ? 'var(--green)' : st === 'all-down' ? 'var(--red)' : 'var(--orange)';
+
+    // Tooltip nome cinema (permanente, sopra il marker)
     marker.bindTooltip(
-      `<span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${sc};background:rgba(7,9,14,0.94);border:1px solid rgba(41,121,255,0.3);padding:3px 9px;border-radius:4px;white-space:nowrap">${c.name}</span>`,
-      {permanent:true, direction:'top', offset:[0,-40], opacity:1, className:'cinema-tooltip'}
+      `<span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${col};background:rgba(6,8,16,0.92);border:1px solid ${col}40;padding:3px 9px;border-radius:4px;white-space:nowrap">${c.name}</span>`,
+      {permanent:true, direction:'top', offset:[0,-38], opacity:1, className:'cinema-tooltip'}
     );
   }
+
   document.getElementById('msb-online').textContent  = totOn;
   document.getElementById('msb-offline').textContent = totOff;
-  updateMapStats();
 }
 
-function updateMapStats() {
-  document.getElementById('msb-cinemas').textContent = CINEMAS.length || '—';
-  document.getElementById('msb-devices').textContent = CINEMAS.reduce((s,c)=>s+c.devices.length,0) || '—';
-}
-
-// ── INIT ──────────────────────────────────────────────────────
-mapInit = true;
-initMap();
-setTimeout(checkVPN, 800);
-setInterval(checkVPN, 30000);
+// ── INIT ───────────────────────────────────────────────────────
+setTimeout(checkVPNStatus, 800);
+setInterval(checkVPNStatus, 30000);
 </script>
 </body>
 </html>
