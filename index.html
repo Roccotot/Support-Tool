@@ -145,6 +145,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .proto-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.5px;
   padding:3px 7px;border-radius:3px;border:1px solid;cursor:pointer;
   transition:all 0.15s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.proto-btn.web{color:#a5d6a7;border-color:rgba(165,214,167,0.3);background:rgba(165,214,167,0.07)}
+.proto-btn.web:hover{background:rgba(165,214,167,0.2);border-color:#a5d6a7;color:#fff}
 .proto-btn.ssh{color:#64b5f6;border-color:rgba(100,181,246,0.3);background:rgba(100,181,246,0.07)}
 .proto-btn.ssh:hover{background:rgba(100,181,246,0.2);border-color:#64b5f6;color:#fff}
 .proto-btn.vnc{color:#ffcc80;border-color:rgba(255,204,128,0.3);background:rgba(255,204,128,0.07)}
@@ -517,13 +519,14 @@ function devBtnsHTML(ip, label) {
   const [tc] = devType(label);
   const safe = label.replace(/'/g,'').replace(/"/g,'').substring(0,40);
   const copyBtn = `<button class="ip-btn" onclick="copyIP('${ip}',this)">${ip}</button>`;
+  const webBtn  = `<a class="proto-btn web" href="http://${ip}" target="_blank" onclick="addHistory('${ip}','${safe}')" title="Apri interfaccia web">WEB</a>`;
   const sshBtn  = tc === 'srv'
     ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
     : '';
   const vncBtn  = tc === 'srv'
     ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
     : '';
-  return copyBtn + sshBtn + vncBtn;
+  return copyBtn + webBtn + sshBtn + vncBtn;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
