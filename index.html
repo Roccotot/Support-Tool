@@ -99,10 +99,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .card-actions{display:flex;align-items:center;gap:7px;position:relative;z-index:1}
 .tag{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;
   background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text2);white-space:nowrap}
-.btn-openall{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 9px;
-  border-radius:4px;border:1px solid rgba(41,121,255,0.35);color:var(--accent);
-  background:rgba(41,121,255,0.08);cursor:pointer;transition:all 0.2s;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
-.btn-openall:hover{background:rgba(41,121,255,0.2);border-color:var(--accent);color:#fff}
 .chevron{width:16px;height:16px;color:var(--text2);transition:transform 0.3s;flex-shrink:0}
 .cinema-card.collapsed .chevron{transform:rotate(-90deg)}
 .card-body{overflow:hidden;max-height:2000px;transition:max-height 0.42s cubic-bezier(0.4,0,0.2,1)}
@@ -111,7 +107,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 /* ── ROOM SEPARATOR ── */
 .room-sep{display:flex;align-items:center;gap:9px;padding:8px 16px 4px;margin-top:3px}
 .room-sep-line{flex:1;height:1px;background:var(--border2)}
-.room-sep-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;white-space:nowrap}
+.room-sep-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#fff;text-transform:uppercase;white-space:nowrap}
 .room-sep-dot{width:5px;height:5px;border-radius:50%;opacity:0.6;flex-shrink:0}
 
 /* ── DEVICE ROW ── */
@@ -467,22 +463,6 @@ function copyIP(ip, el) {
   }).catch(() => showToast('ERRORE','Copia non disponibile','err'));
 }
 
-// ── APRI TUTTI (con delay per bypassare popup blocker) ────────
-async function openAll(e, ips) {
-  e.stopPropagation();
-  // Apriamo la prima URL direttamente nell'handler del click (nessun blocco)
-  // Le successive con piccolo delay — i browser moderni le bloccano comunque,
-  // ma la prima è garantita.
-  for (let i = 0; i < ips.length; i++) {
-    if (i === 0) {
-      window.open('http://' + ips[i], '_blank');
-    } else {
-      await new Promise(r => setTimeout(r, 150));
-      window.open('http://' + ips[i], '_blank');
-    }
-  }
-}
-
 // ── CRONOLOGIA ────────────────────────────────────────────────
 let histList = [];
 try { histList = JSON.parse(localStorage.getItem('noc_hist') || '[]'); } catch(e){}
@@ -579,7 +559,6 @@ function buildDashboard() {
         </div>
         <div class="card-actions">
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
-          <button class="btn-openall" onclick="openAll(event,${ipsJSON})">↗ Apri tutti</button>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
@@ -666,8 +645,6 @@ function buildPopupHTML(c) {
         <div class="popup-badges">
           <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
           <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).length} sale</span>
-          <a class="pbadge" style="color:var(--accent);border-color:rgba(41,121,255,0.3);cursor:pointer"
-             onclick="openAll(event,${ipsJSON})">↗ Apri tutti</a>
         </div>
       </div>
     </div>
