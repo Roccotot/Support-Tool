@@ -647,6 +647,7 @@ function buildPopupHTML(c) {
         <div class="pdev-name" title="${d.label}">${d.label}</div>
         <div class="pdev-btns">
           <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
+          <a class="proto-btn web" href="http://${d.ip}" target="_blank" onclick="addHistory('${d.ip}','${safe}')" style="font-size:8px">WEB</a>
           ${tc==='srv' ? `<a class="proto-btn ssh" href="ssh://${d.ip}" style="font-size:8px">SSH</a>
           <a class="proto-btn vnc" href="vnc://${d.ip}" onclick="addHistory('${d.ip}','${safe}')" style="font-size:8px">VNC</a>` : ''}
         </div>
