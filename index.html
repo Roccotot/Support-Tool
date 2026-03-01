@@ -12,7 +12,7 @@
   --bg:#07090e; --panel:#0c1018; --panel2:#101520; --panel3:#161d2b;
   --red:#e8192c; --green:#1db954; --blue:#1565c0;
   --accent:#2979ff; --lime:#00e676; --crimson:#ff1744; --amber:#ff9100;
-  --text:#d8e8ff; --text2:#4a6080;
+  --text:#d8e8ff; --text2:#7a9bbf;
   --border:rgba(41,121,255,0.14); --border2:rgba(41,121,255,0.06);
   --glow:0 0 28px rgba(41,121,255,0.3);
   --rb:linear-gradient(90deg,#e8192c,#1db954,#1565c0);
@@ -36,7 +36,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .logo-wrap{display:flex;align-items:center;gap:14px;flex-shrink:0}
 .logo-wrap img{height:40px;width:auto;filter:drop-shadow(0 0 10px rgba(41,121,255,0.5))}
 .logo-div{width:1px;height:28px;background:linear-gradient(180deg,transparent,rgba(41,121,255,0.5),transparent)}
-.logo-text{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:2px;line-height:1.8;text-transform:uppercase}
+.logo-text{font-family:'Share Tech Mono',monospace;font-size:10px;color:#c0d8f0;letter-spacing:2px;line-height:1.8;text-transform:uppercase}
 .logo-text b{color:var(--accent)}
 .header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
 
@@ -44,7 +44,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .view-toggle{display:flex;background:var(--panel);border:1px solid var(--border);border-radius:9px;overflow:hidden}
 .view-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;
   font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.5px;
-  text-transform:uppercase;background:none;border:none;color:var(--text2);cursor:pointer;
+  text-transform:uppercase;background:none;border:none;color:#c0d8f0;cursor:pointer;
   transition:all 0.2s;border-right:1px solid var(--border);position:relative}
 .view-btn:last-child{border-right:none}
 .view-btn svg{width:14px;height:14px;flex-shrink:0}
@@ -70,13 +70,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .stat-tile:nth-child(2)::before{background:#1db954}
 .stat-tile:nth-child(3)::before{background:var(--rb)}
 .stat-tile:nth-child(1){animation-delay:.05s}.stat-tile:nth-child(2){animation-delay:.10s}.stat-tile:nth-child(3){animation-delay:.15s}
-.st-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text2);margin-bottom:7px}
+.st-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#c0d8f0;margin-bottom:7px}
 .st-value{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;line-height:1;color:var(--accent)}
 
 /* ── MAIN ── */
 .main{position:relative;z-index:1;padding:20px 28px 56px;max-width:1600px;margin:0 auto;width:100%}
 .section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border2)}
-.section-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text2);text-transform:uppercase;white-space:nowrap}
+.section-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:#c0d8f0;text-transform:uppercase;white-space:nowrap}
+#lastUpdate{color:#fff !important}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 
 /* ── CINEMA GRID ── */
@@ -98,8 +99,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .card-city{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;margin-top:2px}
 .card-actions{display:flex;align-items:center;gap:7px;position:relative;z-index:1}
 .tag{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;
-  background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text2);white-space:nowrap}
-.chevron{width:16px;height:16px;color:var(--text2);transition:transform 0.3s;flex-shrink:0}
+  background:rgba(0,0,0,0.3);border:1px solid var(--border);color:#c0d8f0;white-space:nowrap}
+.chevron{width:16px;height:16px;color:#c0d8f0;transition:transform 0.3s;flex-shrink:0}
 .cinema-card.collapsed .chevron{transform:rotate(-90deg)}
 .card-body{overflow:hidden;max-height:2000px;transition:max-height 0.42s cubic-bezier(0.4,0,0.2,1)}
 .cinema-card.collapsed .card-body{max-height:0}
@@ -153,12 +154,12 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .type-hdr{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border2)}
 .type-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .type-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;text-transform:uppercase}
-.type-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:1px;margin-left:auto}
+.type-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:#c0d8f0;letter-spacing:1px;margin-left:auto}
 .type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .type-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;
   padding:11px 14px;transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s;animation:fadeUp 0.4s ease both}
 .type-card:hover{border-color:rgba(41,121,255,0.4);box-shadow:0 4px 18px rgba(0,0,0,0.4);transform:translateY(-1px)}
-.tc-cinema{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--text2);text-transform:uppercase;margin-bottom:4px}
+.tc-cinema{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#c0d8f0;text-transform:uppercase;margin-bottom:4px}
 .tc-name{font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tc-btns{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
 .tc-ping{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--text2);
@@ -176,7 +177,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   display:flex;gap:12px;align-items:center;background:rgba(7,9,14,0.93);
   border:1px solid var(--border);border-radius:30px;padding:9px 22px;
   backdrop-filter:blur(14px);pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-.msb-item{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);letter-spacing:1px}
+.msb-item{font-family:'Share Tech Mono',monospace;font-size:11px;color:#c0d8f0;letter-spacing:1px}
 .msb-item span{font-weight:700;margin-left:4px;color:var(--accent)}
 .msb-sep{color:rgba(255,255,255,0.1)}
 .cmarker{width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
@@ -194,10 +195,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .popup-ico{width:36px;height:36px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid rgba(255,255,255,0.1)}
 .popup-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:1.5px;color:#fff;text-transform:uppercase;line-height:1.2}
 .popup-city{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;margin-top:3px}
-.popup-addr{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
+.popup-addr{font-family:'Share Tech Mono',monospace;font-size:9px;color:#fff;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
 .popup-badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
 .pbadge{font-family:'Share Tech Mono',monospace;font-size:9px;border-radius:3px;padding:2px 7px;border:1px solid;white-space:nowrap;text-decoration:none;display:inline-block}
-.popup-room-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;padding:6px 15px 3px;border-top:1px solid rgba(41,121,255,0.06);margin-top:2px}
+.popup-room-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:#ffe066;letter-spacing:2px;text-transform:uppercase;padding:6px 15px 3px;border-top:1px solid rgba(41,121,255,0.06);margin-top:2px}
 .popup-devs{padding:2px 0;max-height:230px;overflow-y:auto}
 .popup-devs::-webkit-scrollbar{width:3px}
 .popup-devs::-webkit-scrollbar-thumb{background:rgba(41,121,255,0.2);border-radius:2px}
@@ -212,18 +213,18 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   background:rgba(7,9,14,0.96);border-top:1px solid var(--border);
   backdrop-filter:blur(14px);padding:7px 20px;
   display:flex;align-items:center;gap:10px;min-height:40px}
-.history-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text2);
+.history-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:#c0d8f0;
   letter-spacing:2px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
 .history-items{display:flex;gap:6px;overflow-x:auto;flex:1}
 .history-items::-webkit-scrollbar{display:none}
-.hist-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);
+.hist-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:#fff;
   padding:3px 10px;border-radius:4px;border:1px solid rgba(41,121,255,0.25);
   background:rgba(41,121,255,0.07);white-space:nowrap;cursor:pointer;
   text-decoration:none;transition:all 0.15s;flex-shrink:0;display:inline-flex;align-items:center;gap:5px}
 .hist-item:hover{background:rgba(41,121,255,0.2);border-color:var(--accent);color:#fff}
-.hist-item-label{font-size:8px;color:var(--text2);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-item-label{font-size:8px;color:rgba(255,255,255,0.6);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hist-empty{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);font-style:italic}
-.history-clear{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);
+.history-clear{font-family:'Share Tech Mono',monospace;font-size:9px;color:#c0d8f0;
   padding:3px 8px;border-radius:4px;border:1px solid var(--border2);
   background:none;cursor:pointer;transition:all 0.15s;flex-shrink:0}
 .history-clear:hover{color:var(--crimson);border-color:rgba(255,23,68,0.3)}
@@ -398,13 +399,38 @@ Splendor - Massa - Screen 07 - Proiettore\t10.58.71.72:161\tSNMP
 Splendor - Massa - Screen 07 - Server\t10.58.71.70:161\tSNMP`;
 
 // ── PALETTE ───────────────────────────────────────────────────
-const PALETTE = ['#ff6b6b','#ffa552','#ffd166','#06d6a0','#1db954',
-  '#00b4d8','#4361ee','#9b5de5','#e040fb','#f72585',
-  '#43d9ad','#f9c74f','#90be6d','#4cc9f0','#c77dff'];
+const PALETTE = [
+  '#ff6b6b','#ffa552','#ffd166','#c8f060','#06d6a0',
+  '#1db954','#00b4d8','#4cc9f0','#4361ee','#9b5de5',
+  '#e040fb','#f72585','#43d9ad','#f9c74f','#90be6d',
+  '#ff9a3c','#00e5ff','#69f0ae','#ea80fc','#ff6090',
+  '#b388ff','#82b1ff','#80d8ff','#ccff90','#ffd740'
+];
+
+// Assegnazione con deduplicazione garantita:
+// costruiamo la mappa nome→colore una volta sola al primo parseRaw
+const _colorMap = {};
 function cinemaColor(name) {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = (Math.imul(31,h) + name.charCodeAt(i)) | 0;
+  if (_colorMap[name]) return _colorMap[name];
+  // non ancora assegnato — non dovrebbe succedere se initColors() è chiamato prima
+  const h = name.split('').reduce((h,c) => (Math.imul(31,h) + c.charCodeAt(0)) | 0, 0);
   return PALETTE[Math.abs(h) % PALETTE.length];
+}
+function initColors(cinemas) {
+  const used = new Set(Object.values(_colorMap));
+  cinemas.forEach(c => {
+    if (_colorMap[c.name]) return;
+    let h = c.name.split('').reduce((h,ch) => (Math.imul(31,h) + ch.charCodeAt(0)) | 0, 0);
+    let idx = Math.abs(h) % PALETTE.length;
+    // se colore già usato, cerca il prossimo libero
+    let attempts = 0;
+    while (used.has(PALETTE[idx]) && attempts < PALETTE.length) {
+      idx = (idx + 1) % PALETTE.length;
+      attempts++;
+    }
+    _colorMap[c.name] = PALETTE[idx];
+    used.add(PALETTE[idx]);
+  });
 }
 
 // ── PARSE ─────────────────────────────────────────────────────
@@ -512,6 +538,7 @@ function devBtnsHTML(ip, label) {
 // ── DASHBOARD ─────────────────────────────────────────────────
 function buildDashboard() {
   const cinemas = parseRaw(RAW);
+  initColors(cinemas);
   const grid = document.getElementById('cinemasGrid');
   grid.innerHTML = '';
   let totalDevs = 0, totalRooms = 0;
@@ -546,10 +573,10 @@ function buildDashboard() {
 
     const card = document.createElement('div');
     card.className = 'cinema-card';
-    // passa array JS direttamente all'onclick
+    card.style.cssText = `background:${color}0d;border-color:${color}55`;
     const ipsJSON = JSON.stringify(allIPs);
     card.innerHTML = `
-      <div class="card-hdr" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
+      <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
         <div class="card-title-block">
           <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
           <div>
@@ -579,6 +606,7 @@ function buildDashboard() {
 // ── PER TIPO ──────────────────────────────────────────────────
 function buildByType() {
   const cinemas = parseRaw(RAW);
+  initColors(cinemas);
   const gp = document.getElementById('grid-proj');
   const gs = document.getElementById('grid-srv');
   gp.innerHTML = ''; gs.innerHTML = '';
@@ -592,6 +620,7 @@ function buildByType() {
         const safe = d.label.replace(/'/g,'').substring(0,40);
         const card = document.createElement('div');
         card.className = 'type-card';
+        card.style.cssText = `background:${color}0d;border-color:${color}44`;
         card.innerHTML = `
           <div class="tc-cinema" style="color:${color}">${c.name} — ${c.city}</div>
           <div class="tc-name" title="${room}: ${d.label}">${room}: ${d.label}</div>
@@ -635,8 +664,9 @@ function buildPopupHTML(c) {
   });
 
   const addrLine = c._address ? `<div class="popup-addr">📍 ${c._address}</div>` : '';
-  return `<div class="popup-rb" style="background:${color}"></div>
-    <div class="popup-hdr">
+  return `<div style="background:${color}0d;border-radius:13px;overflow:hidden">
+    <div class="popup-rb" style="background:${color}"></div>
+    <div class="popup-hdr" style="background:${color}12">
       <div class="popup-ico" style="background:${color}20;border-color:${color}55">🎬</div>
       <div style="flex:1;min-width:0">
         <div class="popup-title">${c.name}</div>
@@ -648,7 +678,8 @@ function buildPopupHTML(c) {
         </div>
       </div>
     </div>
-    <div class="popup-devs">${devRows}</div>`;
+    <div class="popup-devs">${devRows}</div>
+  </div>`;
 }
 
 async function geocodeCinema(name, city) {
@@ -683,6 +714,7 @@ async function buildMap() {
   document.head.appendChild(s);
 
   const cinemas = parseRaw(RAW);
+  initColors(cinemas);
   document.getElementById('msb-cinema').textContent = cinemas.length;
   document.getElementById('msb-host').textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
 
