@@ -12,7 +12,7 @@
   --bg:#07090e; --panel:#0c1018; --panel2:#101520; --panel3:#161d2b;
   --red:#e8192c; --green:#1db954; --blue:#1565c0;
   --accent:#2979ff; --lime:#00e676; --crimson:#ff1744; --amber:#ff9100;
-  --text:#d8e8ff; --text2:#3d5470;
+  --text:#d8e8ff; --text2:#4a6080;
   --border:rgba(41,121,255,0.14); --border2:rgba(41,121,255,0.06);
   --glow:0 0 28px rgba(41,121,255,0.3);
   --rb:linear-gradient(90deg,#e8192c,#1db954,#1565c0);
@@ -22,54 +22,54 @@ html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   display:flex;flex-direction:column}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:radial-gradient(ellipse 80% 60% at 10% 0%,rgba(232,25,44,0.04) 0%,transparent 60%),
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 0%,rgba(232,25,44,0.04) 0%,transparent 60%),
     radial-gradient(ellipse 60% 80% at 90% 100%,rgba(21,101,192,0.06) 0%,transparent 60%)}
 body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(41,121,255,0.022) 1px,transparent 1px),
+  background-image:
+    linear-gradient(rgba(41,121,255,0.022) 1px,transparent 1px),
     linear-gradient(90deg,rgba(41,121,255,0.022) 1px,transparent 1px);
   background-size:44px 44px}
 
-/* ── RAINBOW BAR ── */
-.rb-bar{height:3px;background:var(--rb);flex-shrink:0;position:relative;z-index:300}
+.rb-bar{height:3px;background:var(--rb);flex-shrink:0;z-index:300;position:relative}
 
 /* ── HEADER ── */
 header{position:relative;z-index:200;flex-shrink:0;
   background:rgba(7,9,14,0.97);backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border);height:62px;
-  display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:14px}
-.logo-wrap{display:flex;align-items:center;gap:14px;flex-shrink:0}
-.logo-wrap img{height:36px;width:auto;filter:drop-shadow(0 0 10px rgba(41,121,255,0.5))}
-.logo-div{width:1px;height:26px;background:linear-gradient(180deg,transparent,rgba(41,121,255,0.5),transparent)}
-.logo-text{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);
-  letter-spacing:2px;line-height:1.7;text-transform:uppercase}
+  border-bottom:1px solid var(--border);height:70px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:16px}
+.logo-wrap{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.logo-wrap img{height:42px;width:auto;filter:drop-shadow(0 0 10px rgba(41,121,255,0.5))}
+.logo-div{width:1px;height:30px;background:linear-gradient(180deg,transparent,rgba(41,121,255,0.5),transparent)}
+.logo-text{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);
+  letter-spacing:2px;line-height:1.8;text-transform:uppercase}
 .logo-text b{color:var(--accent)}
-.header-right{display:flex;align-items:center;gap:8px}
+.header-right{display:flex;align-items:center;gap:10px}
 
-/* ── VIEW TOGGLE ── */
 .view-toggle{display:flex;background:var(--panel);border:1px solid var(--border);
-  border-radius:8px;overflow:hidden;margin-right:4px}
-.view-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;
-  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.5px;
+  border-radius:9px;overflow:hidden;margin-right:4px}
+.view-btn{display:flex;align-items:center;gap:8px;padding:10px 22px;
+  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:15px;letter-spacing:1.5px;
   text-transform:uppercase;background:none;border:none;color:var(--text2);cursor:pointer;
   transition:all 0.2s;border-right:1px solid var(--border);position:relative}
 .view-btn:last-child{border-right:none}
-.view-btn svg{width:14px;height:14px;flex-shrink:0}
-.view-btn:hover{color:var(--text);background:rgba(41,121,255,0.06)}
-.view-btn.active{background:rgba(41,121,255,0.12);color:#fff}
+.view-btn svg{width:16px;height:16px;flex-shrink:0}
+.view-btn:hover{color:var(--text);background:rgba(41,121,255,0.07)}
+.view-btn.active{background:rgba(41,121,255,0.13);color:#fff}
 .view-btn.active::after{content:'';position:absolute;bottom:0;left:8px;right:8px;
   height:2px;background:var(--rb);border-radius:2px 2px 0 0}
 
 /* ── VPN PILL ── */
-.vpn-pill{display:flex;align-items:center;gap:8px;background:var(--panel);
-  border:1px solid var(--border);border-radius:30px;padding:6px 14px 6px 10px;
+.vpn-pill{display:flex;align-items:center;gap:10px;background:var(--panel);
+  border:1px solid var(--border);border-radius:30px;padding:8px 18px 8px 13px;
   cursor:pointer;transition:border-color 0.3s,box-shadow 0.3s;user-select:none}
-.vpn-pill:hover{border-color:rgba(41,121,255,0.4);box-shadow:var(--glow)}
-.vpn-dot{width:9px;height:9px;border-radius:50%;background:var(--crimson);
-  box-shadow:0 0 6px var(--crimson);flex-shrink:0;transition:all 0.4s}
-.vpn-dot.on{background:var(--lime);box-shadow:0 0 10px var(--lime);animation:pulse 2.2s infinite}
+.vpn-pill:hover{border-color:rgba(41,121,255,0.45);box-shadow:var(--glow)}
+.vpn-dot{width:11px;height:11px;border-radius:50%;background:var(--crimson);
+  box-shadow:0 0 8px var(--crimson);flex-shrink:0;transition:all 0.4s}
+.vpn-dot.on{background:var(--lime);box-shadow:0 0 12px var(--lime);animation:pulse 2.2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
-.vpn-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px}
-.vpn-status{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;
+.vpn-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);letter-spacing:1px}
+.vpn-status{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;
   letter-spacing:2px;color:var(--crimson);transition:color 0.4s;text-transform:uppercase}
 .vpn-status.on{color:var(--lime)}
 
@@ -80,34 +80,34 @@ header{position:relative;z-index:200;flex-shrink:0;
 #view-dashboard::-webkit-scrollbar{width:5px}
 #view-dashboard::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ── STATS STRIP ── */
+/* ── STATS ── */
 .stats-strip{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);
-  gap:14px;padding:22px 28px 0;max-width:1600px;margin:0 auto;width:100%}
-.stat-tile{background:var(--panel);border:1px solid var(--border);border-radius:12px;
-  padding:15px 20px;position:relative;overflow:hidden;animation:fadeUp 0.5s ease both;
+  gap:16px;padding:26px 32px 0;max-width:1600px;margin:0 auto;width:100%}
+.stat-tile{background:var(--panel);border:1px solid var(--border);border-radius:13px;
+  padding:20px 24px;position:relative;overflow:hidden;animation:fadeUp 0.5s ease both;
   transition:border-color 0.2s,box-shadow 0.2s}
 .stat-tile:hover{border-color:rgba(41,121,255,0.35);box-shadow:0 4px 24px rgba(0,0,0,0.4)}
 .stat-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
 .stat-tile:nth-child(1)::before{background:#1565c0}
 .stat-tile:nth-child(2)::before{background:#1db954}
 .stat-tile:nth-child(3)::before{background:var(--rb)}
-.stat-tile:nth-child(1){animation-delay:.05s}.stat-tile:nth-child(2){animation-delay:.1s}
+.stat-tile:nth-child(1){animation-delay:.05s}
+.stat-tile:nth-child(2){animation-delay:.10s}
 .stat-tile:nth-child(3){animation-delay:.15s}
-.st-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2.5px;
-  text-transform:uppercase;color:var(--text2);margin-bottom:7px}
-.st-value{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;
-  line-height:1;color:var(--accent)}
+.st-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--text2);margin-bottom:8px}
+.st-value{font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:700;line-height:1;color:var(--accent)}
 
-/* ── CINEMA GRID ── */
-.main{position:relative;z-index:1;padding:18px 28px 32px;max-width:1600px;margin:0 auto;width:100%}
-.section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;
-  padding-bottom:10px;border-bottom:1px solid var(--border2)}
-.section-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;
+/* ── GRID ── */
+.main{position:relative;z-index:1;padding:22px 32px 40px;max-width:1600px;margin:0 auto;width:100%}
+.section-hdr{display:flex;align-items:center;gap:14px;margin-bottom:20px;
+  padding-bottom:12px;border-bottom:1px solid var(--border2)}
+.section-title{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;
   color:var(--text2);text-transform:uppercase;white-space:nowrap}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
-.cinemas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:18px}
+.cinemas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:20px}
 
-/* ── CINEMA CARD ── */
+/* ── CARD ── */
 .cinema-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
   overflow:hidden;animation:fadeUp 0.6s ease both;
   transition:border-color 0.25s,box-shadow 0.25s,transform 0.2s}
@@ -117,144 +117,130 @@ header{position:relative;z-index:200;flex-shrink:0;
 .cinema-card:nth-child(3){animation-delay:.12s}.cinema-card:nth-child(4){animation-delay:.16s}
 .cinema-card:nth-child(5){animation-delay:.20s}.cinema-card:nth-child(6){animation-delay:.24s}
 .cinema-card:nth-child(7){animation-delay:.28s}
-.card-hdr{background:linear-gradient(135deg,var(--panel2),var(--panel3));padding:13px 16px;
+.card-hdr{background:linear-gradient(135deg,var(--panel2),var(--panel3));padding:16px 18px;
   display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);cursor:pointer;user-select:none;
-  position:relative;overflow:hidden;transition:background 0.2s}
+  position:relative;overflow:hidden}
 .card-hdr::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:var(--rb);opacity:0.55}
-.card-title-block{display:flex;align-items:center;gap:11px;position:relative;z-index:1}
-.card-icon{width:32px;height:32px;border-radius:7px;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(232,25,44,0.25),rgba(29,185,84,0.15),rgba(21,101,192,0.25));
-  border:1px solid rgba(41,121,255,0.2);display:flex;align-items:center;justify-content:center;font-size:15px}
-.card-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;
+.card-title-block{display:flex;align-items:center;gap:13px;position:relative;z-index:1}
+.card-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  border:1px solid rgba(255,255,255,0.1)}
+.card-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;
   letter-spacing:1.5px;color:#fff;text-transform:uppercase;line-height:1.2}
-.card-city{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);
-  letter-spacing:1px;margin-top:2px}
-.card-meta{display:flex;align-items:center;gap:6px;position:relative;z-index:1}
-.tag{font-family:'Share Tech Mono',monospace;font-size:8px;padding:2px 7px;border-radius:3px;
+.card-city{font-family:'Share Tech Mono',monospace;font-size:11px;
+  letter-spacing:1px;margin-top:3px}
+.card-meta{display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+.tag{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 9px;border-radius:4px;
   background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text2);white-space:nowrap}
-.tag.info{color:var(--accent);border-color:rgba(41,121,255,0.3)}
-.chevron{width:15px;height:15px;color:var(--text2);transition:transform 0.3s;flex-shrink:0}
+.chevron{width:18px;height:18px;color:var(--text2);transition:transform 0.3s;flex-shrink:0}
 .cinema-card.collapsed .chevron{transform:rotate(-90deg)}
 .card-body{overflow:hidden;max-height:1200px;
   transition:max-height 0.42s cubic-bezier(0.4,0,0.2,1)}
 .cinema-card.collapsed .card-body{max-height:0}
-.room-sep{display:flex;align-items:center;gap:9px;padding:7px 16px 4px;margin-top:3px}
+
+.room-sep{display:flex;align-items:center;gap:9px;padding:9px 18px 5px;margin-top:3px}
 .room-sep-line{flex:1;height:1px;background:var(--border2)}
-.room-sep-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;
+.room-sep-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;
   color:var(--text2);text-transform:uppercase;white-space:nowrap}
-.room-sep-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:0.4;flex-shrink:0}
-.dev-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;
-  padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s}
+.room-sep-dot{width:6px;height:6px;border-radius:50%;opacity:0.6;flex-shrink:0}
+
+.dev-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;
+  padding:9px 18px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s}
 .dev-row:last-child{border-bottom:none}
 .dev-row:hover{background:rgba(41,121,255,0.04)}
-.dev-name{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dev-type{font-family:'Share Tech Mono',monospace;font-size:8px;padding:2px 6px;
+.dev-name{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dev-type{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;
   border-radius:3px;white-space:nowrap;flex-shrink:0}
 .dev-type.proj{color:#b39ddb;border:1px solid rgba(179,157,219,0.3)}
 .dev-type.srv{color:#90caf9;border:1px solid rgba(144,202,249,0.3)}
-.dev-ip{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);
+.dev-ip{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--accent);
   text-decoration:none;border-bottom:1px dashed rgba(41,121,255,0.3);
   transition:all 0.15s;white-space:nowrap;flex-shrink:0}
 .dev-ip:hover{color:#fff;text-shadow:0 0 8px var(--accent)}
 
-/* ── MAP VIEW ── */
+/* ── MAP ── */
 #view-map{position:relative}
 #map{width:100%;height:100%;z-index:1}
 .leaflet-container{background:#07090e !important}
-.map-stats-bar{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:100;
-  display:flex;gap:10px;align-items:center;background:rgba(7,9,14,0.92);
-  border:1px solid var(--border);border-radius:30px;padding:7px 20px;
+.map-stats-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:100;
+  display:flex;gap:14px;align-items:center;background:rgba(7,9,14,0.93);
+  border:1px solid var(--border);border-radius:30px;padding:10px 26px;
   backdrop-filter:blur(14px);pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-.msb-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:1px}
-.msb-item span{font-weight:700;margin-left:4px;color:var(--accent)}
-.msb-sep{color:rgba(255,255,255,0.08)}
-.map-legend{position:absolute;bottom:22px;left:14px;z-index:100;background:rgba(7,9,14,0.92);
-  border:1px solid var(--border);border-radius:10px;padding:11px 15px;backdrop-filter:blur(14px)}
-.legend-title{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text2);
-  letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.legend-item{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;
-  font-size:10px;color:var(--text);margin-bottom:5px}
-.legend-item:last-child{margin-bottom:0}
-.ldot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.msb-item{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);letter-spacing:1px}
+.msb-item span{font-weight:700;margin-left:5px;color:var(--accent)}
+.msb-sep{color:rgba(255,255,255,0.1);font-size:14px}
 
 /* ── MAP MARKER ── */
-.cmarker{width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
-  border:2px solid;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.cmarker.ok{background:rgba(0,230,118,0.15);border-color:var(--lime);box-shadow:0 0 14px rgba(0,230,118,0.5)}
-.cmarker.warn{background:rgba(255,145,0,0.15);border-color:var(--amber);box-shadow:0 0 14px rgba(255,145,0,0.5)}
-.cmarker-inner{transform:rotate(45deg);display:flex;align-items:center;justify-content:center;
-  width:100%;height:100%;font-size:14px}
+.cmarker{width:42px;height:42px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+  border:2.5px solid;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cmarker-inner{transform:rotate(45deg);display:flex;align-items:center;
+  justify-content:center;width:100%;height:100%;font-size:16px}
 
-/* ── LEAFLET POPUP ── */
+/* ── POPUP ── */
 .leaflet-popup-content-wrapper{background:rgba(7,9,14,0.97) !important;
-  border:1px solid rgba(41,121,255,0.3) !important;border-radius:12px !important;
+  border:1px solid rgba(41,121,255,0.3) !important;border-radius:14px !important;
   box-shadow:0 12px 48px rgba(0,0,0,0.8),0 0 24px rgba(41,121,255,0.15) !important;
-  padding:0 !important;min-width:280px;max-width:360px;overflow:hidden}
+  padding:0 !important;min-width:310px;max-width:400px;overflow:hidden}
 .leaflet-popup-tip-container{display:none !important}
-.leaflet-popup-close-button{color:var(--text2) !important;font-size:17px !important;
-  top:9px !important;right:9px !important;z-index:10}
+.leaflet-popup-close-button{color:var(--text2) !important;font-size:19px !important;
+  top:10px !important;right:10px !important;z-index:10}
 .leaflet-popup-close-button:hover{color:#fff !important}
 .leaflet-popup-content{margin:0 !important;width:100% !important}
-.popup-rb{height:2px;background:var(--rb)}
-.popup-hdr{padding:11px 14px 10px;border-bottom:1px solid rgba(41,121,255,0.1);
-  display:flex;align-items:flex-start;gap:10px}
-.popup-ico{width:34px;height:34px;border-radius:7px;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(232,25,44,0.2),rgba(21,101,192,0.2));
-  border:1px solid rgba(41,121,255,0.25);display:flex;align-items:center;justify-content:center;font-size:15px}
-.popup-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;
+.popup-rb{height:3px}
+.popup-hdr{padding:14px 16px 12px;border-bottom:1px solid rgba(41,121,255,0.1);
+  display:flex;align-items:flex-start;gap:12px}
+.popup-ico{width:38px;height:38px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  border:1px solid rgba(255,255,255,0.1)}
+.popup-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;
   letter-spacing:1.5px;color:#fff;text-transform:uppercase;line-height:1.2}
-.popup-city{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);
-  letter-spacing:1px;margin-top:2px}
-.popup-addr{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--lime);
-  letter-spacing:0.5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
-.popup-badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
-.pbadge{font-family:'Share Tech Mono',monospace;font-size:8px;border-radius:3px;
-  padding:2px 6px;border:1px solid;white-space:nowrap}
-.pbadge.info{color:var(--accent);border-color:rgba(41,121,255,0.3)}
-.pbadge.ok{color:var(--lime);border-color:rgba(0,230,118,0.4)}
-.popup-devs{padding:3px 0;max-height:220px;overflow-y:auto}
+.popup-city{font-family:'Share Tech Mono',monospace;font-size:11px;
+  letter-spacing:1px;margin-top:3px}
+.popup-addr{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,0.4);
+  letter-spacing:0.5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;max-width:240px}
+.popup-badges{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+.pbadge{font-family:'Share Tech Mono',monospace;font-size:10px;border-radius:3px;
+  padding:3px 8px;border:1px solid;white-space:nowrap}
+.popup-room-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);
+  letter-spacing:2px;text-transform:uppercase;padding:7px 16px 3px;
+  border-top:1px solid rgba(41,121,255,0.06);margin-top:2px}
+.popup-devs{padding:2px 0;max-height:240px;overflow-y:auto}
 .popup-devs::-webkit-scrollbar{width:3px}
 .popup-devs::-webkit-scrollbar-thumb{background:rgba(41,121,255,0.2);border-radius:2px}
 .popup-dev-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;
-  gap:8px;padding:5px 14px;transition:background 0.12s}
+  gap:9px;padding:6px 16px;transition:background 0.12s}
 .popup-dev-row:hover{background:rgba(41,121,255,0.05)}
-.pdev-name{font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pdev-type{font-family:'Share Tech Mono',monospace;font-size:8px;padding:1px 5px;
+.pdev-name{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdev-type{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 6px;
   border-radius:2px;white-space:nowrap;flex-shrink:0}
 .pdev-type.proj{color:#b39ddb;border:1px solid rgba(179,157,219,0.3)}
 .pdev-type.srv{color:#90caf9;border:1px solid rgba(144,202,249,0.3)}
-.pdev-ip{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);
+.pdev-ip{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent);
   text-decoration:none;border-bottom:1px dashed rgba(41,121,255,0.3);
   transition:all 0.15s;white-space:nowrap;flex-shrink:0}
 .pdev-ip:hover{color:#fff;text-shadow:0 0 7px var(--accent)}
-.popup-footer{display:flex;gap:6px;padding:8px 13px;border-top:1px solid rgba(41,121,255,0.1)}
-.pfooter-btn{flex:1;text-align:center;text-decoration:none;font-family:'Rajdhani',sans-serif;
-  font-weight:600;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
-  padding:5px 0;border-radius:4px;border:1px solid;transition:all 0.2s}
-.pfooter-btn.zb{color:var(--accent);border-color:rgba(41,121,255,0.3)}
-.pfooter-btn.zb:hover{background:rgba(41,121,255,0.12);border-color:var(--accent);color:#fff}
-.cinema-tooltip .leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important}
+.cinema-tooltip .leaflet-tooltip{background:transparent !important;
+  border:none !important;box-shadow:none !important}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--panel2);
-  border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;
-  padding:11px 17px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text);
+.toast{position:fixed;bottom:22px;right:22px;z-index:9999;background:var(--panel2);
+  border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;
+  padding:13px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);
   opacity:0;transform:translateX(20px);transition:all 0.3s;pointer-events:none;
-  max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+  max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
 .toast.show{opacity:1;transform:translateX(0)}
-.toast-title{font-size:8px;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+.toast-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
 .toast-title.ok{color:var(--lime)} .toast-title.err{color:var(--crimson)} .toast-title.info{color:var(--accent)}
 
-/* ── ANIMATIONS ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(41,121,255,0.2);
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(41,121,255,0.2);
   border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;
-  vertical-align:middle;margin-right:4px}
+  vertical-align:middle;margin-right:5px}
 
-/* ── RESPONSIVE ── */
 @media(max-width:900px){
   .stats-strip{grid-template-columns:repeat(3,1fr);padding:14px}
   .main{padding:14px 14px 28px}
@@ -264,7 +250,6 @@ header{position:relative;z-index:200;flex-shrink:0;
 @media(max-width:600px){
   .logo-text,.logo-div{display:none}
   header{padding:0 10px}
-  .stats-strip{grid-template-columns:1fr 1fr 1fr}
 }
 </style>
 </head>
@@ -286,7 +271,7 @@ header{position:relative;z-index:200;flex-shrink:0;
           <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
         </svg>Mappa
       </button>
-      <button class="view-btn" id="tab-dash" onclick="switchView('dashboard')">
+      <button class="view-btn" id="tab-dashboard" onclick="switchView('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
           <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
@@ -303,7 +288,7 @@ header{position:relative;z-index:200;flex-shrink:0;
   </div>
 </header>
 
-<!-- MAP VIEW (default) -->
+<!-- MAP (default) -->
 <div class="view active" id="view-map">
   <div id="map"></div>
   <div class="map-stats-bar">
@@ -311,16 +296,11 @@ header{position:relative;z-index:200;flex-shrink:0;
     <div class="msb-sep">|</div>
     <div class="msb-item">HOST <span id="msb-host">47</span></div>
     <div class="msb-sep">|</div>
-    <div class="msb-item">VPN <span id="msb-vpn">—</span></div>
-  </div>
-  <div class="map-legend">
-    <div class="legend-title">Legenda</div>
-    <div class="legend-item"><div class="ldot" style="background:var(--lime);box-shadow:0 0 5px var(--lime)"></div>Cinema attivo</div>
-    <div class="legend-item"><div class="ldot" style="background:var(--amber);box-shadow:0 0 5px var(--amber)"></div>Cinema parziale</div>
+    <div class="msb-item">VPN <span id="msb-vpn" style="color:var(--text2)">—</span></div>
   </div>
 </div>
 
-<!-- DASHBOARD VIEW -->
+<!-- DASHBOARD -->
 <div class="view" id="view-dashboard">
   <div class="stats-strip">
     <div class="stat-tile">
@@ -346,127 +326,81 @@ header{position:relative;z-index:200;flex-shrink:0;
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast">
   <div class="toast-title info" id="toastTitle"></div>
   <div id="toastMsg"></div>
 </div>
 
 <script>
-// ── DATI STATICI ──────────────────────────────────────────────
-const RAW = `
+const RAW = `Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP\t10.57.91.12:161\tSNMP
+Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP\t10.57.91.22:161\tSNMP
+Aurelia Antica - Grosseto - Sala 3 - Proiettore e ICMP\t10.57.91.32:161\tSNMP
+Aurelia Antica - Grosseto - Sala 4 - Proiettore e ICMP\t10.57.91.42:161\tSNMP
+Clev Village - Chiusi -SI - Screen 01 - Proiettore\t10.56.70.12:161\tSNMP
+Clev Village - Chiusi -SI - Screen 01 - Server\t10.56.70.10:161\tSNMP
+Clev Village - Chiusi -SI - Screen 02 - Proiettore\t10.56.70.22:161\tSNMP
+Clev Village - Chiusi -SI - Screen 02 - Server\t10.56.70.20:161\tSNMP
+Clev Village - Chiusi -SI - Screen 03 - Proiettore\t10.56.70.32:161\tSNMP
+Clev Village - Chiusi -SI - Screen 03 - Server\t10.56.70.30:161\tSNMP
+Clev Village - Chiusi -SI - Screen 04 - Proiettore\t10.56.70.42:161\tSNMP
+Clev Village - Chiusi -SI - Screen 04 - Server\t10.56.70.40:161\tSNMP
+Clev Village - Chiusi -SI - Screen 05 - Proiettore\t10.56.70.52:161\tSNMP
+Clev Village - Chiusi -SI - Screen 05 - Server\t10.56.70.50:161\tSNMP
+Clev Village - Chiusi -SI - Screen 06 - Proiettore\t10.56.70.62:161\tSNMP
+Clev Village - Chiusi -SI - Screen 06 - Server\t10.56.70.60:161\tSNMP
+Imperiale - Montecatini Terme - Sala 1 - Proiettore\t10.57.97.12:161\tSNMP
+Imperiale - Montecatini Terme - Sala 1 - Server - IMS3000\t10.57.97.10:161\tSNMP
+Imperiale - Montecatini Terme - Sala 2 - Proiettore\t10.57.97.22:161\tSNMP
+Imperiale - Montecatini Terme - Sala 2 - Server - IMS3000\t10.57.97.20:161\tSNMP
+Imperiale - Montecatini Terme - Sala 3 - Proiettore e Server\t10.57.97.32:161\tSNMP
+Imperiale - Montecatini Terme - Sala 4 - Proiettore e Server\t10.57.97.42:161\tSNMP
+Isola Verde - Pisa - Screen 01 - Proiettore\t10.58.70.12:161\tSNMP
+Isola Verde - Pisa - Screen 01 - Server\t10.58.70.10:161\tSNMP
+Isola Verde - Pisa - Screen 02 - Proiettore\t10.58.70.22:161\tSNMP
+Isola Verde - Pisa - Screen 02 - Server\t10.58.70.20:161\tSNMP
+Isola Verde - Pisa - Screen 03 - Proiettore\t10.58.70.32:161\tSNMP
+Isola Verde - Pisa - Screen 03 - Server\t10.58.70.30:161\tSNMP
+Multisala Odeon - Pisa - Sala 1 Venezia - Proiettore\t10.55.76.12:161\tSNMP
+Multisala Odeon - Pisa - Sala 2 Amalfi - Proiettore\t10.55.76.22:161\tSNMP
+Multisala Odeon - Pisa - Sala 3 Pisa - Proiettore\t10.55.76.32:161\tSNMP
+Multisala Odeon - Pisa - Sala 3 Pisa - Server IMS3000\t10.55.76.33:161\tSNMP
+Multisala Odeon - Pisa - Sala 4 Genova - Proiettore\t10.55.76.42:161\tSNMP
+Multisala Odeon - Pisa - Sala 5 Kinzica - Proiettore\t10.55.76.52:161\tSNMP
+Nuova Aurora - San Sepolcro - Sala 1 - Proiettore Barco\t10.58.78.12:161\tSNMP
+Nuova Aurora - San Sepolcro - Sala 1 - Server Doremi\t10.58.78.10:161\tSNMP
+Splendor - Massa - Screen 01 - Proiettore\t10.58.71.12:161\tSNMP
+Splendor - Massa - Screen 01 - Server\t10.58.71.10:161\tSNMP
+Splendor - Massa - Screen 02 - Proiettore\t10.58.71.22:161\tSNMP
+Splendor - Massa - Screen 03 - Server\t10.58.71.30:161\tSNMP
+Splendor - Massa - Screen 04 - Proiettore\t10.58.71.42:161\tSNMP
+Splendor - Massa - Screen 05 - Proiettore\t10.58.71.52:161\tSNMP
+Splendor - Massa - Screen 05 - Server\t10.58.71.50:161\tSNMP
+Splendor - Massa - Screen 06 - Proiettore\t10.58.71.62:161\tSNMP
+Splendor - Massa - Screen 06 - Server\t10.58.71.60:161\tSNMP
+Splendor - Massa - Screen 07 - Proiettore\t10.58.71.72:161\tSNMP
+Splendor - Massa - Screen 07 - Server\t10.58.71.70:161\tSNMP`;
 
+// ── COLORI CINEMA — assegnati deterministicamente dal nome ────
+// Ogni cinema avrà sempre lo stesso colore, casuale ma stabile
+const PALETTE = [
+  '#ff6b6b','#ffa552','#ffd166','#06d6a0','#1db954',
+  '#00b4d8','#4361ee','#7b2d8b','#e040fb','#f72585',
+  '#43d9ad','#f9c74f','#90be6d','#4cc9f0','#c77dff'
+];
+function cinemaColor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (Math.imul(31, h) + name.charCodeAt(i)) | 0;
+  return PALETTE[Math.abs(h) % PALETTE.length];
+}
 
-
-
-
-Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP	10.57.91.12:161	SNMP	
-Abilitato	Ultimi dati 21	1	Grafici	Dashboard	Web
-Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP	10.57.91.22:161	SNMP	
-Abilitato	Ultimi dati 24	1	Grafici	Dashboard	Web
-Aurelia Antica - Grosseto - Sala 3 - Proiettore e ICMP	10.57.91.32:161	SNMP	
-Abilitato	Ultimi dati 21	Problemi	Grafici	Dashboard	Web
-Aurelia Antica - Grosseto - Sala 4 - Proiettore e ICMP	10.57.91.42:161	SNMP	
-Abilitato	Ultimi dati 21	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 01 - Proiettore	10.56.70.12:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 01 - Server	10.56.70.10:161	SNMP	
-Abilitato	Ultimi dati 21	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 02 - Proiettore	10.56.70.22:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 02 - Server	10.56.70.20:161	SNMP	
-Abilitato	Ultimi dati 70	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 03 - Proiettore	10.56.70.32:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 03 - Server	10.56.70.30:161	SNMP	
-Abilitato	Ultimi dati 70	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 04 - Proiettore	10.56.70.42:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 04 - Server	10.56.70.40:161	SNMP	
-Abilitato	Ultimi dati 69	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 05 - Proiettore	10.56.70.52:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 05 - Server	10.56.70.50:161	SNMP	
-Abilitato	Ultimi dati 79	1	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 06 - Proiettore	10.56.70.62:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Clev Village - Chiusi -SI - Screen 06 - Server	10.56.70.60:161	SNMP	
-Abilitato	Ultimi dati 79	Problemi	Grafici	Dashboard	Web
-Imperiale - Montecatini Terme - Sala 1 - Proiettore	10.57.97.12:161	SNMP	
-Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
-Imperiale - Montecatini Terme - Sala 1 - Server - IMS3000	10.57.97.10:161	SNMP	
-Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
-Imperiale - Montecatini Terme - Sala 2 - Proiettore	10.57.97.22:161	SNMP	
-Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
-Imperiale - Montecatini Terme - Sala 2 - Server - IMS3000	10.57.97.20:161	SNMP	
-Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
-Imperiale - Montecatini Terme - Sala 3 - Proiettore e Server	10.57.97.32:161	SNMP	
-Abilitato	Ultimi dati 28	Problemi	Grafici	Dashboard	Web
-Imperiale - Montecatini Terme - Sala 4 - Proiettore e Server	10.57.97.42:161	SNMP	
-Abilitato	Ultimi dati 28	Problemi	Grafici	Dashboard	Web
-Isola Verde - Pisa - Screen 01 - Proiettore	10.58.70.12:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Isola Verde - Pisa - Screen 01 - Server	10.58.70.10:161	SNMP	
-Abilitato	Ultimi dati 70	Problemi	Grafici	Dashboard	Web
-Isola Verde - Pisa - Screen 02 - Proiettore	10.58.70.22:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Isola Verde - Pisa - Screen 02 - Server	10.58.70.20:161	SNMP	
-Abilitato	Ultimi dati 69	1	Grafici	Dashboard	Web
-Isola Verde - Pisa - Screen 03 - Proiettore	10.58.70.32:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Isola Verde - Pisa - Screen 03 - Server	10.58.70.30:161	SNMP	
-Abilitato	Ultimi dati 72	Problemi	Grafici	Dashboard	Web
-Multisala Odeon - Pisa - Sala 1 Venezia - Proiettore	10.55.76.12:161	SNMP	
-Abilitato	Ultimi dati 24	3	Grafici	Dashboard	Web
-Multisala Odeon - Pisa - Sala 2 Amalfi - Proiettore	10.55.76.22:161	SNMP	
-Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
-Multisala Odeon - Pisa - Sala 3 Pisa - Proiettore	10.55.76.32:161	SNMP	
-Abilitato	Ultimi dati 15	1	Grafici	Dashboard	Web
-Multisala Odeon - Pisa - Sala 3 Pisa - Server IMS3000	10.55.76.33:161	SNMP	
-Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
-Multisala Odeon - Pisa - Sala 4 Genova - Proiettore	10.55.76.42:161	SNMP	
-Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
-Multisala Odeon - Pisa - Sala 5 Kinzica - Proiettore	10.55.76.52:161	SNMP	
-Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
-Nuova Aurora - San Sepolcro - Sala 1 - Proiettore Barco	10.58.78.12:161	SNMP	
-Abilitato	Ultimi dati 15	Problemi	Grafici	Dashboard	Web
-Nuova Aurora - San Sepolcro - Sala 1 - Server Doremi	10.58.78.10:161	SNMP	
-Abilitato	Ultimi dati 79	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 01 - Proiettore	10.58.71.12:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 01 - Server	10.58.71.10:161	SNMP	
-Abilitato	Ultimi dati 71	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 02 - Proiettore	10.58.71.22:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 03 - Server	10.58.71.30:161	SNMP	
-Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 04 - Proiettore	10.58.71.42:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 05 - Proiettore	10.58.71.52:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 05 - Server	10.58.71.50:161	SNMP	
-Abilitato	Ultimi dati 71	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 06 - Proiettore	10.58.71.62:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 06 - Server	10.58.71.60:161	SNMP	
-Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 07 - Proiettore	10.58.71.72:161	SNMP	
-Abilitato	Ultimi dati 8	Problemi	Grafici	Dashboard	Web
-Splendor - Massa - Screen 07 - Server	10.58.71.70:161	SNMP	
-Abilitato	Ultimi dati 68	Problemi	Grafici	Dashboard	Web
-
-
-
-
-`;
-
-// ── VPN: gateway della rete VPN WireGuard ─────────────────────
-// Pinga il gateway VPN (primo IP assegnato dalla VPN),
-// NON i singoli dispositivi cinema
-const VPN_GATEWAY = 'http://162.19.84.22'; // server Zabbix = gateway VPN raggiungibile
-const VPN_FALLBACKS = [
-  'http://162.19.84.22/favicon.ico',
-  'http://162.19.84.22/index.php'
+// ── VPN: pinga il gateway della rete interna VPN ──────────────
+// La config WireGuard ha Address = 172.31.1.20/24
+// Il gateway della sottorete è 172.31.1.1
+// Se questo IP risponde → siamo connessi alla VPN Sigra Film
+// Se non risponde → VPN non attiva (anche se internet funziona)
+const VPN_TARGETS = [
+  'http://172.31.1.1',   // gateway VPN interno — esiste SOLO se VPN attiva
+  'http://172.31.1.2',   // altro host fisso nella subnet VPN (fallback)
 ];
 let vpnBusy = false;
 
@@ -475,7 +409,7 @@ function probe(url, ms) {
     const c = new AbortController();
     const t = setTimeout(() => { c.abort(); res(false); }, ms);
     fetch(url, { signal: c.signal, mode: 'no-cors', cache: 'no-store' })
-      .then(() => { clearTimeout(t); res(true); })
+      .then(() => { clearTimeout(t); res(true);  })
       .catch(() => { clearTimeout(t); res(false); });
   });
 }
@@ -488,32 +422,30 @@ async function checkVPN() {
   st.innerHTML = '<span class="spinner"></span>...';
   dot.classList.remove('on');
 
-  // Prova il server Zabbix come indicatore VPN attiva
-  const ok = await probe(VPN_GATEWAY, 4000) ||
-             await probe(VPN_FALLBACKS[0], 3000) ||
-             await probe(VPN_FALLBACKS[1], 3000);
+  // Prova 172.31.1.1 (gateway VPN): risponde solo se il tunnel è su
+  const ok = await probe('http://172.31.1.1', 3000) ||
+             await probe('http://172.31.1.2', 2000);
 
   vpnBusy = false;
   dot.classList.toggle('on', ok);
   st.textContent = ok ? 'CONNESSA' : 'OFFLINE';
-  st.className = 'vpn-status' + (ok ? ' on' : '');
+  st.className   = 'vpn-status' + (ok ? ' on' : '');
 
-  // Aggiorna stats bar mappa
-  const vpnEl = document.getElementById('msb-vpn');
-  if (vpnEl) {
-    vpnEl.textContent = ok ? 'ONLINE' : 'OFFLINE';
-    vpnEl.style.color = ok ? 'var(--lime)' : 'var(--crimson)';
+  const msb = document.getElementById('msb-vpn');
+  if (msb) {
+    msb.textContent = ok ? 'ONLINE' : 'OFFLINE';
+    msb.style.color = ok ? 'var(--lime)' : 'var(--crimson)';
   }
 
   showToast(
     ok ? 'VPN ATTIVA' : 'VPN OFFLINE',
-    ok ? 'Server Zabbix raggiungibile — rete Sigra Film online.'
-       : 'Server non raggiungibile. Controlla WireGuard.',
+    ok ? 'Gateway 172.31.1.1 raggiungibile — tunnel WireGuard attivo.'
+       : 'Gateway 172.31.1.1 non risponde — VPN non connessa.',
     ok ? 'ok' : 'err'
   );
 }
 
-// ── PARSE RAW ─────────────────────────────────────────────────
+// ── PARSE ─────────────────────────────────────────────────────
 function parseRaw(raw) {
   const cinemas = {};
   raw.split('\n').forEach(line => {
@@ -526,11 +458,10 @@ function parseRaw(raw) {
     if (parts.length < 2) return;
     const cinemaName = parts[0].trim();
     const cityRaw    = parts[1].trim();
-    // normalizza città (rimuove codici provincia tipo "-SI")
-    const city = cityRaw.replace(/\s*-\s*[A-Z]{2}$/,'').trim();
-    const room = parts[2] ? parts[2].trim() : 'Dispositivi';
-    const dev  = parts.slice(3).join(' - ').trim() || 'Unità';
-    const key  = cinemaName + '|||' + city;
+    const city       = cityRaw.replace(/\s*-\s*[A-Z]{2}$/, '').trim();
+    const room       = parts[2] ? parts[2].trim() : 'Dispositivi';
+    const dev        = parts.slice(3).join(' - ').trim() || 'Unità';
+    const key        = cinemaName + '|||' + city;
     if (!cinemas[key]) cinemas[key] = { name: cinemaName, city, rooms: {} };
     if (!cinemas[key].rooms[room]) cinemas[key].rooms[room] = [];
     cinemas[key].rooms[room].push({ label: dev, ip });
@@ -539,33 +470,34 @@ function parseRaw(raw) {
 }
 
 function devType(label) {
-  if (/server|ims|doremi|srv/i.test(label))           return ['srv','SERVER'];
-  if (/proiettore|barco|christie|nec|projector/i.test(label)) return ['proj','PROIETT.'];
+  if (/server|ims|doremi|srv/i.test(label))                    return ['srv','SERVER'];
+  if (/proiettore|barco|christie|nec|projector/i.test(label))  return ['proj','PROIETT.'];
   return ['proj','UNITÀ'];
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 function buildDashboard() {
-  const cinemas = parseRaw(RAW);
-  const grid    = document.getElementById('cinemasGrid');
+  const cinemas  = parseRaw(RAW);
+  const grid     = document.getElementById('cinemasGrid');
   grid.innerHTML = '';
   let totalDevs = 0, totalRooms = 0;
 
   cinemas.forEach(c => {
+    const color    = cinemaColor(c.name);
     const rooms    = Object.entries(c.rooms);
-    const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
+    const devCount = rooms.reduce((s,[,r]) => s + r.length, 0);
     totalDevs  += devCount;
     totalRooms += rooms.length;
 
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
       roomsHTML += `<div class="room-sep">
-        <div class="room-sep-dot"></div>
+        <div class="room-sep-dot" style="background:${color}"></div>
         <div class="room-sep-label">${roomName}</div>
         <div class="room-sep-line"></div>
       </div>`;
       devices.forEach(d => {
-        const [tc, tl] = devType(d.label);
+        const [tc,tl] = devType(d.label);
         roomsHTML += `<div class="dev-row">
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <span class="dev-type ${tc}">${tl}</span>
@@ -579,14 +511,14 @@ function buildDashboard() {
     card.innerHTML = `
       <div class="card-hdr" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
         <div class="card-title-block">
-          <div class="card-icon">🎬</div>
+          <div class="card-icon" style="background:${color}20;border-color:${color}50">🎬</div>
           <div>
             <div class="card-name">${c.name}</div>
-            <div class="card-city">📍 ${c.city}</div>
+            <div class="card-city" style="color:${color}">📍 ${c.city}</div>
           </div>
         </div>
         <div class="card-meta">
-          <span class="tag info">${devCount} host</span>
+          <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
@@ -601,18 +533,17 @@ function buildDashboard() {
   document.getElementById('statRooms').textContent   = totalRooms;
   const now = new Date();
   document.getElementById('lastUpdate').textContent  =
-    now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    now.toLocaleDateString('it-IT') + ' ' +
+    now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 }
 
 // ── MAP ───────────────────────────────────────────────────────
-function buildPopupHTML(c, address) {
-  const allDevs = Object.values(c.rooms).flat();
-  const devCount = allDevs.length;
-
+function buildPopupHTML(c) {
+  const color    = cinemaColor(c.name);
+  const devCount = Object.values(c.rooms).flat().length;
   let devRows = '';
   Object.entries(c.rooms).forEach(([room, devices]) => {
-    devRows += `<div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text2);
-      letter-spacing:2px;text-transform:uppercase;padding:5px 14px 2px;border-top:1px solid rgba(41,121,255,0.06)">${room}</div>`;
+    devRows += `<div class="popup-room-lbl">${room}</div>`;
     devices.forEach(d => {
       const [tc,tl] = devType(d.label);
       devRows += `<div class="popup-dev-row">
@@ -622,45 +553,34 @@ function buildPopupHTML(c, address) {
       </div>`;
     });
   });
-
-  const addrLine = address
-    ? `<div class="popup-addr">📍 ${address}</div>` : '';
-
-  return `<div class="popup-rb"></div>
+  const addrLine = c._address
+    ? `<div class="popup-addr">📍 ${c._address}</div>` : '';
+  return `<div class="popup-rb" style="background:${color}"></div>
     <div class="popup-hdr">
-      <div class="popup-ico">🎬</div>
+      <div class="popup-ico" style="background:${color}20;border-color:${color}50">🎬</div>
       <div style="flex:1;min-width:0">
         <div class="popup-title">${c.name}</div>
-        <div class="popup-city">📍 ${c.city}</div>
+        <div class="popup-city" style="color:${color}">📍 ${c.city}</div>
         ${addrLine}
         <div class="popup-badges">
-          <span class="pbadge ok">✓ ${devCount} host</span>
-          <span class="pbadge info">${Object.keys(c.rooms).length} sale</span>
+          <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
+          <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).length} sale</span>
         </div>
       </div>
     </div>
-    <div class="popup-devs">${devRows}</div>
-    <div class="popup-footer">
-      <a class="pfooter-btn zb" href="http://162.19.84.22/zabbix.php?action=host.view" target="_blank">📊 Zabbix</a>
-    </div>`;
+    <div class="popup-devs">${devRows}</div>`;
 }
 
-async function geocode(cityName) {
-  // Prova prima la città precisa, poi più generica
-  const queries = [
-    cityName + ', Toscana, Italia',
-    cityName + ', Italia'
-  ];
-  for (const q of queries) {
+async function geocode(city) {
+  for (const q of [city + ', Toscana, Italia', city + ', Italia']) {
     try {
       const r = await fetch(
         'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q),
-        { headers: { 'Accept-Language': 'it' } }
+        { headers:{'Accept-Language':'it'} }
       );
       const d = await r.json();
       if (d && d[0]) return {
-        lat: parseFloat(d[0].lat),
-        lng: parseFloat(d[0].lon),
+        lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon),
         address: d[0].display_name.split(',').slice(0,3).join(', ')
       };
     } catch(e) {}
@@ -670,55 +590,44 @@ async function geocode(cityName) {
 
 async function buildMap() {
   const map = L.map('map', {
-    center: [43.5, 11.2], zoom: 8,
-    zoomControl: false, attributionControl: false
+    center:[43.5,11.2], zoom:8, zoomControl:false, attributionControl:false
   });
   window._map = map;
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    { subdomains:'abcd', maxZoom:19 }).addTo(map);
+  L.control.zoom({ position:'bottomright' }).addTo(map);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd', maxZoom: 19
-  }).addTo(map);
-
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-  // Fix tooltip leaflet
   const s = document.createElement('style');
   s.textContent = '.leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important;padding:0 !important}';
   document.head.appendChild(s);
 
   const cinemas = parseRaw(RAW);
-  // Aggiorna stats bar
-  document.getElementById('msb-cinema').textContent =
-    cinemas.length;
+  document.getElementById('msb-cinema').textContent = cinemas.length;
   document.getElementById('msb-host').textContent   =
-    cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
+    cinemas.reduce((s,c) => s + Object.values(c.rooms).flat().length, 0);
 
-  // Geocoding con rate limit Nominatim (1 req/sec)
   for (let i = 0; i < cinemas.length; i++) {
-    const c = cinemas[i];
+    const c     = cinemas[i];
+    const color = cinemaColor(c.name);
     if (i > 0) await new Promise(r => setTimeout(r, 1150));
 
-    const geo = await geocode(c.city);
-    const lat = geo ? geo.lat : 43.5 + (i * 0.15);
-    const lng = geo ? geo.lng : 11.0 + (i * 0.1);
-    const addr = geo ? geo.address : null;
-
-    const allDevs = Object.values(c.rooms).flat();
-    // Marker: verde se ha dispositivi, ambra se è multipla sala
-    const markerClass = Object.keys(c.rooms).length > 3 ? 'warn' : 'ok';
+    const geo  = await geocode(c.city);
+    const lat  = geo ? geo.lat : 43.4 + i * 0.13;
+    const lng  = geo ? geo.lng : 10.9 + i * 0.11;
+    c._address = geo ? geo.address : null;
 
     const icon = L.divIcon({
-      html: `<div class="cmarker ${markerClass}"><div class="cmarker-inner">🎬</div></div>`,
-      className: '', iconSize:[38,38], iconAnchor:[19,38], popupAnchor:[0,-44]
+      html: `<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80">
+               <div class="cmarker-inner">🎬</div>
+             </div>`,
+      className:'', iconSize:[42,42], iconAnchor:[21,42], popupAnchor:[0,-48]
     });
 
-    const marker = L.marker([lat, lng], { icon }).addTo(map);
-    const popup  = L.popup({
-      closeButton: false, autoClose: false, closeOnClick: false
-    }).setContent(buildPopupHTML(c, addr));
+    const marker = L.marker([lat,lng], {icon}).addTo(map);
+    const popup  = L.popup({ closeButton:false, autoClose:false, closeOnClick:false })
+                    .setContent(buildPopupHTML(c));
     marker.bindPopup(popup);
 
-    // Hover con grace period 300ms
     let closeTimer;
     marker.on('mouseover', () => { clearTimeout(closeTimer); marker.openPopup(); });
     marker.on('mouseout',  () => { closeTimer = setTimeout(() => marker.closePopup(), 300); });
@@ -726,23 +635,19 @@ async function buildMap() {
       const el = marker.getPopup().getElement();
       if (!el) return;
       el.addEventListener('mouseenter', () => clearTimeout(closeTimer));
-      el.addEventListener('mouseleave', () => {
-        closeTimer = setTimeout(() => marker.closePopup(), 300);
-      });
+      el.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => marker.closePopup(), 300); });
     });
 
-    // Tooltip nome cinema permanente
-    const col = markerClass === 'ok' ? 'var(--lime)' : 'var(--amber)';
     marker.bindTooltip(
-      `<span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${col};
-        background:rgba(7,9,14,0.94);border:1px solid rgba(41,121,255,0.3);
-        padding:3px 9px;border-radius:4px;white-space:nowrap">${c.name}</span>`,
-      { permanent: true, direction: 'top', offset: [0,-40], opacity: 1, className: 'cinema-tooltip' }
+      `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};
+        background:rgba(7,9,14,0.95);border:1px solid ${color}55;
+        padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
+      { permanent:true, direction:'top', offset:[0,-44], opacity:1, className:'cinema-tooltip' }
     );
   }
 }
 
-// ── VIEW SWITCHER ─────────────────────────────────────────────
+// ── VIEWS ─────────────────────────────────────────────────────
 let mapBuilt = false;
 function switchView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
@@ -760,17 +665,15 @@ let _tt;
 function showToast(title, msg, type) {
   const t  = document.getElementById('toast');
   const tl = document.getElementById('toastTitle');
-  tl.textContent = title;
-  tl.className = 'toast-title ' + (type || 'info');
+  tl.textContent = title; tl.className = 'toast-title ' + (type||'info');
   document.getElementById('toastMsg').textContent = msg;
   t.classList.add('show');
-  clearTimeout(_tt);
-  _tt = setTimeout(() => t.classList.remove('show'), 5000);
+  clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 5000);
 }
 
 // ── INIT ──────────────────────────────────────────────────────
 buildDashboard();
-switchView('map');   // apre sulla mappa
+switchView('map');
 setTimeout(checkVPN, 700);
 setInterval(checkVPN, 30000);
 </script>
