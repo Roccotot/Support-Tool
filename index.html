@@ -17,6 +17,13 @@
   --glow:0 0 28px rgba(41,121,255,0.3);
   --rb:linear-gradient(90deg,#e8192c,#1db954,#1565c0);
 }
+
+
+/* ── TEMA NEGATIVO ── */
+html.light { filter:invert(1) hue-rotate(180deg) }
+html.light img { filter:invert(1) hue-rotate(180deg) }
+html.light .cmarker-inner { filter:invert(1) hue-rotate(180deg) }
+html.light .leaflet-tile { filter:invert(1) hue-rotate(180deg) }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;display:flex;flex-direction:column}
@@ -41,6 +48,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
 
 /* ── VIEW TOGGLE ── */
+.theme-toggle{background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:8px 11px;cursor:pointer;font-size:16px;
+  transition:all 0.2s;line-height:1;display:flex;align-items:center}
+.theme-toggle:hover{border-color:rgba(41,121,255,0.5);box-shadow:var(--glow)}
 .view-toggle{display:flex;background:var(--panel);border:1px solid var(--border);border-radius:9px;overflow:hidden}
 .view-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;
   font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.5px;
@@ -262,6 +273,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <div class="logo-text">NOC DASHBOARD<br><b>di Rocco Totaro</b> — V3.1</div>
   </div>
   <div class="header-right">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia tema">
+      <span id="themeIcon">☀️</span>
+    </button>
     <div class="view-toggle">
       <button class="view-btn" id="tab-map" onclick="switchView('map')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -350,10 +364,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 
 <script>
 // ── DATI ─────────────────────────────────────────────────────
-const RAW = `
-
-
-Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP\t10.57.91.12:161\tSNMP
+const RAW = `Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP\t10.57.91.12:161\tSNMP
 Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP\t10.57.91.22:161\tSNMP
 Aurelia Antica - Grosseto - Sala 3 - Proiettore e ICMP\t10.57.91.32:161\tSNMP
 Aurelia Antica - Grosseto - Sala 4 - Proiettore e ICMP\t10.57.91.42:161\tSNMP
@@ -399,45 +410,30 @@ Splendor - Massa - Screen 05 - Server\t10.58.71.50:161\tSNMP
 Splendor - Massa - Screen 06 - Proiettore\t10.58.71.62:161\tSNMP
 Splendor - Massa - Screen 06 - Server\t10.58.71.60:161\tSNMP
 Splendor - Massa - Screen 07 - Proiettore\t10.58.71.72:161\tSNMP
-Splendor - Massa - Screen 07 - Server\t10.58.71.70:161\tSNMP
-
-
-
-`;
+Splendor - Massa - Screen 07 - Server\t10.58.71.70:161\tSNMP`;
 
 // ── PALETTE ───────────────────────────────────────────────────
+// 15 colori distinti e vividi — un colore unico per ogni cinema fino a 15
 const PALETTE = [
   '#ff6b6b','#ffa552','#ffd166','#c8f060','#06d6a0',
   '#1db954','#00b4d8','#4cc9f0','#4361ee','#9b5de5',
-  '#e040fb','#f72585','#43d9ad','#f9c74f','#90be6d',
-  '#ff9a3c','#00e5ff','#69f0ae','#ea80fc','#ff6090',
-  '#b388ff','#82b1ff','#80d8ff','#ccff90','#ffd740'
+  '#e040fb','#f72585','#43d9ad','#f9c74f','#ff6090'
 ];
 
-// Assegnazione con deduplicazione garantita:
-// costruiamo la mappa nome→colore una volta sola al primo parseRaw
 const _colorMap = {};
-function cinemaColor(name) {
-  if (_colorMap[name]) return _colorMap[name];
-  // non ancora assegnato — non dovrebbe succedere se initColors() è chiamato prima
-  const h = name.split('').reduce((h,c) => (Math.imul(31,h) + c.charCodeAt(0)) | 0, 0);
-  return PALETTE[Math.abs(h) % PALETTE.length];
-}
+
 function initColors(cinemas) {
-  const used = new Set(Object.values(_colorMap));
-  cinemas.forEach(c => {
-    if (_colorMap[c.name]) return;
-    let h = c.name.split('').reduce((h,ch) => (Math.imul(31,h) + ch.charCodeAt(0)) | 0, 0);
-    let idx = Math.abs(h) % PALETTE.length;
-    // se colore già usato, cerca il prossimo libero
-    let attempts = 0;
-    while (used.has(PALETTE[idx]) && attempts < PALETTE.length) {
-      idx = (idx + 1) % PALETTE.length;
-      attempts++;
-    }
-    _colorMap[c.name] = PALETTE[idx];
-    used.add(PALETTE[idx]);
+  // Reset completo ad ogni init
+  Object.keys(_colorMap).forEach(k => delete _colorMap[k]);
+  // Assegna in ordine di indice: i primi 15 prendono colori tutti diversi,
+  // oltre 15 si ricicla (per forza maggiore)
+  cinemas.forEach((c, i) => {
+    _colorMap[c.name] = PALETTE[i % PALETTE.length];
   });
+}
+
+function cinemaColor(name) {
+  return _colorMap[name] || PALETTE[0];
 }
 
 // ── PARSE ─────────────────────────────────────────────────────
@@ -783,6 +779,25 @@ function showToast(title,msg,type){
   document.getElementById('toastMsg').textContent=msg;
   t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),4000);
 }
+
+// ── THEME ────────────────────────────────────────────────────
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle('light');
+  document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
+  try { localStorage.setItem('noc_theme', isLight ? 'light' : 'dark'); } catch(e){}
+}
+// Ripristina tema salvato
+(function(){
+  try {
+    if (localStorage.getItem('noc_theme') === 'light') {
+      document.documentElement.classList.add('light');
+      document.addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('themeIcon');
+        if (el) el.textContent = '🌙';
+      });
+    }
+  } catch(e){}
+})();
 
 // ── INIT ──────────────────────────────────────────────────────
 buildDashboard();
