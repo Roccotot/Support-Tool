@@ -38,16 +38,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .logo-div{width:1px;height:28px;background:linear-gradient(180deg,transparent,rgba(41,121,255,0.5),transparent)}
 .logo-text{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:2px;line-height:1.8;text-transform:uppercase}
 .logo-text b{color:var(--accent)}
-.header-center{flex:1;display:flex;justify-content:center;padding:0 20px}
-.search-wrap{position:relative;width:100%;max-width:420px}
-.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);
-  width:15px;height:15px;color:var(--text2);pointer-events:none}
-#searchInput{width:100%;background:var(--panel2);border:1px solid var(--border);
-  border-radius:8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;
-  padding:9px 14px 9px 36px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;letter-spacing:1px}
-#searchInput:focus{border-color:rgba(41,121,255,0.5);box-shadow:0 0 0 3px rgba(41,121,255,0.08)}
-#searchInput::placeholder{color:var(--text2)}
-.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
 
 /* ── VIEW TOGGLE ── */
 .view-toggle{display:flex;background:var(--panel);border:1px solid var(--border);border-radius:9px;overflow:hidden}
@@ -83,7 +74,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .st-value{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;line-height:1;color:var(--accent)}
 
 /* ── MAIN ── */
-.main{position:relative;z-index:1;padding:20px 28px 36px;max-width:1600px;margin:0 auto;width:100%}
+.main{position:relative;z-index:1;padding:20px 28px 56px;max-width:1600px;margin:0 auto;width:100%}
 .section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border2)}
 .section-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text2);text-transform:uppercase;white-space:nowrap}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
@@ -93,12 +84,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .cinema-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
   overflow:hidden;animation:fadeUp 0.6s ease both;transition:border-color 0.25s,box-shadow 0.25s,transform 0.2s}
 .cinema-card:hover{border-color:rgba(41,121,255,0.4);box-shadow:0 8px 36px rgba(0,0,0,0.5),var(--glow);transform:translateY(-1px)}
-.cinema-card[data-hidden="true"]{display:none}
 .cinema-card:nth-child(1){animation-delay:.04s}.cinema-card:nth-child(2){animation-delay:.08s}
 .cinema-card:nth-child(3){animation-delay:.12s}.cinema-card:nth-child(4){animation-delay:.16s}
 .cinema-card:nth-child(5){animation-delay:.20s}.cinema-card:nth-child(6){animation-delay:.24s}
 .cinema-card:nth-child(7){animation-delay:.28s}
-
 .card-hdr{background:linear-gradient(135deg,var(--panel2),var(--panel3));padding:13px 16px;
   display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);cursor:pointer;user-select:none;position:relative;overflow:hidden}
@@ -112,8 +101,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text2);white-space:nowrap}
 .btn-openall{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 9px;
   border-radius:4px;border:1px solid rgba(41,121,255,0.35);color:var(--accent);
-  background:rgba(41,121,255,0.08);cursor:pointer;transition:all 0.2s;white-space:nowrap;
-  text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+  background:rgba(41,121,255,0.08);cursor:pointer;transition:all 0.2s;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
 .btn-openall:hover{background:rgba(41,121,255,0.2);border-color:var(--accent);color:#fff}
 .chevron{width:16px;height:16px;color:var(--text2);transition:transform 0.3s;flex-shrink:0}
 .cinema-card.collapsed .chevron{transform:rotate(-90deg)}
@@ -127,57 +115,60 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .room-sep-dot{width:5px;height:5px;border-radius:50%;opacity:0.6;flex-shrink:0}
 
 /* ── DEVICE ROW ── */
-.dev-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;
+.dev-row{display:flex;align-items:center;gap:10px;
   padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s}
 .dev-row:last-child{border-bottom:none}
 .dev-row:hover{background:rgba(41,121,255,0.04)}
-.dev-row[data-hidden="true"]{display:none}
-.dev-main{display:flex;align-items:center;gap:8px;min-width:0}
+
+/* ping dot */
 .ping-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;
-  background:var(--text2);box-shadow:none;cursor:pointer;transition:all 0.3s}
-.ping-dot.ok{background:var(--lime);box-shadow:0 0 5px var(--lime)}
-.ping-dot.err{background:var(--crimson);box-shadow:0 0 5px var(--crimson);animation:blinkdot 1.5s infinite}
-.ping-dot.checking{background:var(--amber);box-shadow:0 0 5px var(--amber);animation:blinkdot 0.6s infinite}
-@keyframes blinkdot{0%,100%{opacity:1}50%{opacity:0.2}}
-.dev-name{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  background:var(--text2);cursor:pointer;transition:all 0.3s;
+  border:1px solid rgba(255,255,255,0.1)}
+.ping-dot:hover{transform:scale(1.3)}
+.ping-dot.ok{background:var(--lime);box-shadow:0 0 6px var(--lime);border-color:var(--lime)}
+.ping-dot.err{background:var(--crimson);box-shadow:0 0 6px var(--crimson);border-color:var(--crimson);animation:blinkdot 1.5s infinite}
+.ping-dot.checking{background:var(--amber);box-shadow:0 0 6px var(--amber);border-color:var(--amber);animation:blinkdot 0.5s infinite}
+@keyframes blinkdot{0%,100%{opacity:1}50%{opacity:0.15}}
+
+.dev-name{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .dev-type{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0}
 .dev-type.proj{color:#b39ddb;border:1px solid rgba(179,157,219,0.3)}
 .dev-type.srv{color:#90caf9;border:1px solid rgba(144,202,249,0.3)}
 
-/* ── DEVICE ACTIONS ── */
-.dev-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+/* ── DEVICE BUTTONS ── */
+.dev-btns{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .ip-btn{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);
-  padding:3px 8px;border-radius:3px;border:1px solid rgba(41,121,255,0.25);
-  background:rgba(41,121,255,0.06);cursor:pointer;transition:all 0.15s;white-space:nowrap;
-  text-decoration:none;display:inline-flex;align-items:center}
-.ip-btn:hover{color:#fff;background:rgba(41,121,255,0.18);border-color:var(--accent)}
-.ip-btn.copied{color:var(--lime);border-color:rgba(0,230,118,0.4);background:rgba(0,230,118,0.08)}
-.proto-btn{font-family:'Share Tech Mono',monospace;font-size:9px;
-  padding:3px 6px;border-radius:3px;border:1px solid;cursor:pointer;
-  transition:all 0.15s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
-.proto-btn.ssh{color:#64b5f6;border-color:rgba(100,181,246,0.3);background:rgba(100,181,246,0.06)}
-.proto-btn.ssh:hover{background:rgba(100,181,246,0.18);border-color:#64b5f6;color:#fff}
-.proto-btn.web{color:#a5d6a7;border-color:rgba(165,214,167,0.3);background:rgba(165,214,167,0.06)}
-.proto-btn.web:hover{background:rgba(165,214,167,0.18);border-color:#a5d6a7;color:#fff}
-.proto-btn.rdp{color:#ffcc80;border-color:rgba(255,204,128,0.3);background:rgba(255,204,128,0.06)}
-.proto-btn.rdp:hover{background:rgba(255,204,128,0.18);border-color:#ffcc80;color:#fff}
+  padding:3px 9px;border-radius:3px;border:1px solid rgba(41,121,255,0.3);
+  background:rgba(41,121,255,0.07);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.ip-btn:hover{color:#fff;background:rgba(41,121,255,0.2);border-color:var(--accent)}
+.ip-btn.copied{color:var(--lime);border-color:rgba(0,230,118,0.4);background:rgba(0,230,118,0.09)}
+.proto-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.5px;
+  padding:3px 7px;border-radius:3px;border:1px solid;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.proto-btn.ssh{color:#64b5f6;border-color:rgba(100,181,246,0.3);background:rgba(100,181,246,0.07)}
+.proto-btn.ssh:hover{background:rgba(100,181,246,0.2);border-color:#64b5f6;color:#fff}
+.proto-btn.vnc{color:#ffcc80;border-color:rgba(255,204,128,0.3);background:rgba(255,204,128,0.07)}
+.proto-btn.vnc:hover{background:rgba(255,204,128,0.2);border-color:#ffcc80;color:#fff}
 
 /* ── BY TYPE VIEW ── */
-.type-section{margin-bottom:32px}
+.type-section{margin-bottom:30px}
 .type-hdr{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border2)}
 .type-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.type-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;color:#fff;text-transform:uppercase}
+.type-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;text-transform:uppercase}
 .type-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:1px;margin-left:auto}
 .type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .type-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;
-  padding:11px 14px;transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s}
+  padding:11px 14px;transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s;animation:fadeUp 0.4s ease both}
 .type-card:hover{border-color:rgba(41,121,255,0.4);box-shadow:0 4px 18px rgba(0,0,0,0.4);transform:translateY(-1px)}
-.type-card[data-hidden="true"]{display:none}
-.tc-cinema{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1.5px;
-  color:var(--text2);text-transform:uppercase;margin-bottom:5px}
-.tc-name{font-size:12px;color:var(--text);font-weight:600;margin-bottom:6px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tc-actions{display:flex;gap:4px;flex-wrap:wrap}
+.tc-cinema{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--text2);text-transform:uppercase;margin-bottom:4px}
+.tc-name{font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc-btns{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.tc-ping{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--text2);
+  cursor:pointer;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1);margin-right:2px}
+.tc-ping:hover{transform:scale(1.3)}
+.tc-ping.ok{background:var(--lime);box-shadow:0 0 5px var(--lime);border-color:var(--lime)}
+.tc-ping.err{background:var(--crimson);box-shadow:0 0 5px var(--crimson);animation:blinkdot 1.5s infinite}
+.tc-ping.checking{background:var(--amber);box-shadow:0 0 5px var(--amber);animation:blinkdot 0.5s infinite}
 
 /* ── MAP ── */
 #view-map{position:relative}
@@ -207,20 +198,15 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .popup-city{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;margin-top:3px}
 .popup-addr{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
 .popup-badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
-.pbadge{font-family:'Share Tech Mono',monospace;font-size:9px;border-radius:3px;padding:2px 7px;border:1px solid;white-space:nowrap}
+.pbadge{font-family:'Share Tech Mono',monospace;font-size:9px;border-radius:3px;padding:2px 7px;border:1px solid;white-space:nowrap;text-decoration:none;display:inline-block}
 .popup-room-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;padding:6px 15px 3px;border-top:1px solid rgba(41,121,255,0.06);margin-top:2px}
 .popup-devs{padding:2px 0;max-height:230px;overflow-y:auto}
 .popup-devs::-webkit-scrollbar{width:3px}
 .popup-devs::-webkit-scrollbar-thumb{background:rgba(41,121,255,0.2);border-radius:2px}
-.popup-dev-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:5px 15px;transition:background 0.12s}
+.popup-dev-row{display:flex;align-items:center;gap:8px;padding:5px 15px;transition:background 0.12s}
 .popup-dev-row:hover{background:rgba(41,121,255,0.05)}
-.pdev-name{font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pdev-type{font-family:'Share Tech Mono',monospace;font-size:8px;padding:1px 5px;border-radius:2px;white-space:nowrap;flex-shrink:0}
-.pdev-type.proj{color:#b39ddb;border:1px solid rgba(179,157,219,0.3)}
-.pdev-type.srv{color:#90caf9;border:1px solid rgba(144,202,249,0.3)}
-.pdev-ip{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);text-decoration:none;
-  border-bottom:1px dashed rgba(41,121,255,0.3);transition:all 0.15s;white-space:nowrap;flex-shrink:0}
-.pdev-ip:hover{color:#fff;text-shadow:0 0 7px var(--accent)}
+.pdev-name{font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.pdev-btns{display:flex;gap:4px;flex-shrink:0}
 .cinema-tooltip .leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important}
 
 /* ── CRONOLOGIA ── */
@@ -235,8 +221,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .hist-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);
   padding:3px 10px;border-radius:4px;border:1px solid rgba(41,121,255,0.25);
   background:rgba(41,121,255,0.07);white-space:nowrap;cursor:pointer;
-  text-decoration:none;transition:all 0.15s;flex-shrink:0}
+  text-decoration:none;transition:all 0.15s;flex-shrink:0;display:inline-flex;align-items:center;gap:5px}
 .hist-item:hover{background:rgba(41,121,255,0.2);border-color:var(--accent);color:#fff}
+.hist-item-label{font-size:8px;color:var(--text2);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hist-empty{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);font-style:italic}
 .history-clear{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);
   padding:3px 8px;border-radius:4px;border:1px solid var(--border2);
@@ -244,7 +231,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .history-clear:hover{color:var(--crimson);border-color:rgba(255,23,68,0.3)}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:48px;right:20px;z-index:9999;background:var(--panel2);
+.toast{position:fixed;bottom:50px;right:20px;z-index:9999;background:var(--panel2);
   border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;
   padding:11px 17px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);
   opacity:0;transform:translateX(20px);transition:all 0.3s;pointer-events:none;
@@ -253,20 +240,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .toast-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
 .toast-title.ok{color:var(--lime)}.toast-title.err{color:var(--crimson)}.toast-title.info{color:var(--accent)}
 
-/* ── PADDING BOTTOM per cronologia ── */
-#view-dashboard .main,#view-bytype .main{padding-bottom:60px}
-
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(41,121,255,0.2);
-  border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:4px}
 
 @media(max-width:900px){
   .stats-strip{grid-template-columns:repeat(3,1fr);padding:12px}
   .main{padding:12px 12px 56px}
   .cinemas-grid{grid-template-columns:1fr}
-  header{padding:0 12px;height:auto;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
-  .header-center{order:3;width:100%;padding:6px 0 4px}
+  header{padding:0 12px}
 }
 @media(max-width:600px){.logo-text,.logo-div{display:none}}
 </style>
@@ -279,15 +260,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <div class="logo-wrap">
     <img src="data:image/png;base64,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" alt="Sigra Film">
     <div class="logo-div"></div>
-    <div class="logo-text">NOC DASHBOARD<br><b>di Rocco Totaro</b> — V3.0</div>
-  </div>
-  <div class="header-center">
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-      <input id="searchInput" type="text" placeholder="Cerca cinema, sala, IP, dispositivo...">
-    </div>
+    <div class="logo-text">NOC DASHBOARD<br><b>di Rocco Totaro</b> — V3.1</div>
   </div>
   <div class="header-right">
     <div class="view-toggle">
@@ -317,9 +290,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 <div class="view active" id="view-map">
   <div id="map"></div>
   <div class="map-stats-bar">
-    <div class="msb-item">CINEMA <span id="msb-cinema">7</span></div>
+    <div class="msb-item">CINEMA <span id="msb-cinema">—</span></div>
     <div class="msb-sep">|</div>
-    <div class="msb-item">HOST <span id="msb-host">47</span></div>
+    <div class="msb-item">HOST <span id="msb-host">—</span></div>
   </div>
 </div>
 
@@ -343,23 +316,19 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 <!-- PER TIPO -->
 <div class="view" id="view-bytype">
   <div class="main">
-    <div class="type-section" id="section-proiettori">
+    <div class="type-section">
       <div class="type-hdr">
         <div class="type-icon" style="background:rgba(179,157,219,0.15);border:1px solid rgba(179,157,219,0.3)">🎥</div>
-        <div>
-          <div class="type-title" style="color:#b39ddb">Proiettori</div>
-        </div>
-        <div class="type-count" id="count-proj">0 dispositivi</div>
+        <div><div class="type-title" style="color:#b39ddb">Proiettori</div></div>
+        <div class="type-count" id="count-proj">—</div>
       </div>
       <div class="type-grid" id="grid-proj"></div>
     </div>
-    <div class="type-section" id="section-server">
+    <div class="type-section">
       <div class="type-hdr">
         <div class="type-icon" style="background:rgba(144,202,249,0.15);border:1px solid rgba(144,202,249,0.3)">🖥️</div>
-        <div>
-          <div class="type-title" style="color:#90caf9">Server / IMS</div>
-        </div>
-        <div class="type-count" id="count-srv">0 dispositivi</div>
+        <div><div class="type-title" style="color:#90caf9">Server / IMS</div></div>
+        <div class="type-count" id="count-srv">—</div>
       </div>
       <div class="type-grid" id="grid-srv"></div>
     </div>
@@ -372,7 +341,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <div class="history-items" id="historyItems">
     <span class="hist-empty">Nessun dispositivo visitato</span>
   </div>
-  <button class="history-clear" onclick="clearHistory()">✕ Pulisci</button>
+  <button class="history-clear" onclick="clearHistory()">✕</button>
 </div>
 
 <div class="toast" id="toast">
@@ -381,7 +350,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 </div>
 
 <script>
-// ── DATI ──────────────────────────────────────────────────────
+// ── DATI ─────────────────────────────────────────────────────
 const RAW = `Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP\t10.57.91.12:161\tSNMP
 Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP\t10.57.91.22:161\tSNMP
 Aurelia Antica - Grosseto - Sala 3 - Proiettore e ICMP\t10.57.91.32:161\tSNMP
@@ -430,7 +399,7 @@ Splendor - Massa - Screen 06 - Server\t10.58.71.60:161\tSNMP
 Splendor - Massa - Screen 07 - Proiettore\t10.58.71.72:161\tSNMP
 Splendor - Massa - Screen 07 - Server\t10.58.71.70:161\tSNMP`;
 
-// ── PALETTE COLORI ────────────────────────────────────────────
+// ── PALETTE ───────────────────────────────────────────────────
 const PALETTE = ['#ff6b6b','#ffa552','#ffd166','#06d6a0','#1db954',
   '#00b4d8','#4361ee','#9b5de5','#e040fb','#f72585',
   '#43d9ad','#f9c74f','#90be6d','#4cc9f0','#c77dff'];
@@ -469,11 +438,10 @@ function devType(label) {
   return ['proj','UNITÀ'];
 }
 
-// ── PING (HTTP probe) ─────────────────────────────────────────
-// Tenta fetch no-cors: se risponde il dispositivo è online.
-// Funziona solo dentro rete privata (VPN attiva).
-async function pingDevice(ip, dotEl) {
-  dotEl.className = 'ping-dot checking';
+// ── PING ─────────────────────────────────────────────────────
+async function pingDevice(ip, dot) {
+  dot.className = dot.className.replace(/\bprev-class\b/,'') + ' checking';
+  dot.className = dot.className.replace('ok','').replace('err','') + ' checking';
   const ok = await new Promise(res => {
     const c = new AbortController();
     const t = setTimeout(() => { c.abort(); res(false); }, 3000);
@@ -481,64 +449,81 @@ async function pingDevice(ip, dotEl) {
       .then(() => { clearTimeout(t); res(true); })
       .catch(() => { clearTimeout(t); res(false); });
   });
-  dotEl.className = 'ping-dot ' + (ok ? 'ok' : 'err');
-  dotEl.title = ok ? '✓ Raggiungibile' : '✗ Non risponde';
+  // reset classi e assegna risultato
+  dot.className = dot.className.split(' ')
+    .filter(c => !['checking','ok','err'].includes(c)).join(' ');
+  dot.classList.add(ok ? 'ok' : 'err');
+  dot.title = ok ? '✓ Risponde' : '✗ Non risponde';
 }
 
-// ── COPIA IP ──────────────────────────────────────────────────
+// ── COPIA IP ─────────────────────────────────────────────────
 function copyIP(ip, el) {
   navigator.clipboard.writeText(ip).then(() => {
-    el.classList.add('copied');
-    el.textContent = '✓ copiato';
-    setTimeout(() => { el.classList.remove('copied'); el.textContent = ip; }, 1500);
-  }).catch(() => {
-    showToast('COPIA', 'Non supportata in questo browser', 'err');
-  });
+    const orig = el.textContent;
+    el.classList.add('copied'); el.textContent = '✓ copiato';
+    setTimeout(() => { el.classList.remove('copied'); el.textContent = orig; }, 1500);
+  }).catch(() => showToast('ERRORE','Copia non disponibile','err'));
+}
+
+// ── APRI TUTTI (con delay per bypassare popup blocker) ────────
+async function openAll(e, ips) {
+  e.stopPropagation();
+  // Apriamo la prima URL direttamente nell'handler del click (nessun blocco)
+  // Le successive con piccolo delay — i browser moderni le bloccano comunque,
+  // ma la prima è garantita.
+  for (let i = 0; i < ips.length; i++) {
+    if (i === 0) {
+      window.open('http://' + ips[i], '_blank');
+    } else {
+      await new Promise(r => setTimeout(r, 150));
+      window.open('http://' + ips[i], '_blank');
+    }
+  }
 }
 
 // ── CRONOLOGIA ────────────────────────────────────────────────
-const MAX_HIST = 8;
-let history_list = JSON.parse(localStorage.getItem('noc_history') || '[]');
+let histList = [];
+try { histList = JSON.parse(localStorage.getItem('noc_hist') || '[]'); } catch(e){}
 
 function addHistory(ip, label) {
-  history_list = history_list.filter(h => h.ip !== ip);
-  history_list.unshift({ ip, label });
-  if (history_list.length > MAX_HIST) history_list = history_list.slice(0, MAX_HIST);
-  localStorage.setItem('noc_history', JSON.stringify(history_list));
+  histList = histList.filter(h => h.ip !== ip);
+  histList.unshift({ ip, label: label.substring(0,30) });
+  if (histList.length > 8) histList = histList.slice(0,8);
+  try { localStorage.setItem('noc_hist', JSON.stringify(histList)); } catch(e){}
   renderHistory();
 }
-
 function clearHistory() {
-  history_list = [];
-  localStorage.removeItem('noc_history');
+  histList = [];
+  try { localStorage.removeItem('noc_hist'); } catch(e){}
   renderHistory();
 }
-
 function renderHistory() {
   const el = document.getElementById('historyItems');
-  if (history_list.length === 0) {
+  if (!histList.length) {
     el.innerHTML = '<span class="hist-empty">Nessun dispositivo visitato</span>';
     return;
   }
-  el.innerHTML = history_list.map(h =>
+  el.innerHTML = histList.map(h =>
     `<a class="hist-item" href="http://${h.ip}" target="_blank"
-       onclick="addHistory('${h.ip}','${h.label.replace(/'/g,'')}')"
-       title="${h.label}">${h.ip}</a>`
+       onclick="addHistory('${h.ip}','${h.label.replace(/'/g,'')}')">
+       <span>${h.ip}</span>
+       <span class="hist-item-label">${h.label}</span>
+     </a>`
   ).join('');
 }
 
-// ── COSTRUISCE AZIONI DISPOSITIVO ─────────────────────────────
-function devActionsHTML(d, label) {
+// ── COSTRUISCE PULSANTI DISPOSITIVO ──────────────────────────
+function devBtnsHTML(ip, label) {
   const [tc] = devType(label);
-  const safe = label.replace(/'/g,'').replace(/"/g,'');
-  const ipBtns = `
-    <button class="ip-btn" onclick="copyIP('${d.ip}',this)" title="Copia IP">${d.ip}</button>
-    <a class="proto-btn web" href="http://${d.ip}" target="_blank"
-       onclick="addHistory('${d.ip}','${safe}')" title="Apri interfaccia web">WEB</a>`;
-  const sshBtn = tc === 'srv'
-    ? `<a class="proto-btn ssh" href="ssh://${d.ip}" title="Apri SSH">SSH</a>`
+  const safe = label.replace(/'/g,'').replace(/"/g,'').substring(0,40);
+  const copyBtn = `<button class="ip-btn" onclick="copyIP('${ip}',this)">${ip}</button>`;
+  const sshBtn  = tc === 'srv'
+    ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
     : '';
-  return `<div class="dev-actions">${ipBtns}${sshBtn}</div>`;
+  const vncBtn  = tc === 'srv'
+    ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
+    : '';
+  return copyBtn + sshBtn + vncBtn;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -549,14 +534,12 @@ function buildDashboard() {
   let totalDevs = 0, totalRooms = 0;
 
   cinemas.forEach(c => {
-    const color = cinemaColor(c.name);
-    const rooms = Object.entries(c.rooms);
+    const color    = cinemaColor(c.name);
+    const rooms    = Object.entries(c.rooms);
     const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
     totalDevs  += devCount;
     totalRooms += rooms.length;
-
-    // Tutti gli IP del cinema per "apri tutti"
-    const allIPs = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
+    const allIPs   = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
 
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
@@ -567,21 +550,21 @@ function buildDashboard() {
       </div>`;
       devices.forEach(d => {
         const [tc,tl] = devType(d.label);
-        roomsHTML += `<div class="dev-row" data-search="${c.name} ${c.city} ${roomName} ${d.label} ${d.ip}">
-          <div class="dev-main">
-            <div class="ping-dot" title="Clicca per pingare"
-              onclick="pingDevice('${d.ip}',this)"></div>
-            <div class="dev-name" title="${d.label}">${d.label}</div>
-            <span class="dev-type ${tc}">${tl}</span>
-          </div>
-          ${devActionsHTML(d, d.label)}
+        const safe = d.label.replace(/'/g,'').substring(0,40);
+        roomsHTML += `<div class="dev-row">
+          <div class="ping-dot" title="Clicca per verificare raggiungibilità"
+            onclick="pingDevice('${d.ip}',this)"></div>
+          <div class="dev-name" title="${d.label}">${d.label}</div>
+          <span class="dev-type ${tc}">${tl}</span>
+          <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
         </div>`;
       });
     });
 
     const card = document.createElement('div');
     card.className = 'cinema-card';
-    card.dataset.search = `${c.name} ${c.city}`;
+    // passa array JS direttamente all'onclick
+    const ipsJSON = JSON.stringify(allIPs);
     card.innerHTML = `
       <div class="card-hdr" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
         <div class="card-title-block">
@@ -593,9 +576,7 @@ function buildDashboard() {
         </div>
         <div class="card-actions">
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
-          <button class="btn-openall" onclick="openAll(event,'${allIPs.join(',')}')" title="Apri tutti in nuovi tab">
-            ↗ Apri tutti
-          </button>
+          <button class="btn-openall" onclick="openAll(event,${ipsJSON})">↗ Apri tutti</button>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
@@ -613,87 +594,63 @@ function buildDashboard() {
     now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 }
 
-function openAll(e, ipsStr) {
-  e.stopPropagation();
-  ipsStr.split(',').forEach(ip => window.open('http://' + ip, '_blank'));
-}
-
 // ── PER TIPO ──────────────────────────────────────────────────
 function buildByType() {
   const cinemas = parseRaw(RAW);
-  const grids = { proj: document.getElementById('grid-proj'), srv: document.getElementById('grid-srv') };
-  grids.proj.innerHTML = ''; grids.srv.innerHTML = '';
-  let cntProj = 0, cntSrv = 0;
+  const gp = document.getElementById('grid-proj');
+  const gs = document.getElementById('grid-srv');
+  gp.innerHTML = ''; gs.innerHTML = '';
+  let cp=0, cs=0;
 
   cinemas.forEach(c => {
     const color = cinemaColor(c.name);
     Object.entries(c.rooms).forEach(([room, devices]) => {
       devices.forEach(d => {
         const [tc,tl] = devType(d.label);
-        const safe = d.label.replace(/'/g,'').replace(/"/g,'');
+        const safe = d.label.replace(/'/g,'').substring(0,40);
         const card = document.createElement('div');
         card.className = 'type-card';
-        card.dataset.search = `${c.name} ${c.city} ${room} ${d.label} ${d.ip}`;
         card.innerHTML = `
           <div class="tc-cinema" style="color:${color}">${c.name} — ${c.city}</div>
           <div class="tc-name" title="${room}: ${d.label}">${room}: ${d.label}</div>
-          <div class="tc-actions">
-            <button class="ip-btn" onclick="copyIP('${d.ip}',this)">${d.ip}</button>
-            <a class="proto-btn web" href="http://${d.ip}" target="_blank"
-               onclick="addHistory('${d.ip}','${safe}')">WEB</a>
-            ${tc==='srv' ? `<a class="proto-btn ssh" href="ssh://${d.ip}">SSH</a>` : ''}
+          <div class="tc-btns">
+            <div class="tc-ping" title="Clicca per verificare"
+              onclick="pingDevice('${d.ip}',this)"></div>
+            ${devBtnsHTML(d.ip, d.label)}
           </div>`;
-        grids[tc].appendChild(card);
-        tc === 'proj' ? cntProj++ : cntSrv++;
+        (tc === 'srv' ? gs : gp).appendChild(card);
+        tc === 'srv' ? cs++ : cp++;
       });
     });
   });
-  document.getElementById('count-proj').textContent = cntProj + ' dispositivi';
-  document.getElementById('count-srv').textContent  = cntSrv  + ' dispositivi';
+  document.getElementById('count-proj').textContent = cp + ' dispositivi';
+  document.getElementById('count-srv').textContent  = cs + ' dispositivi';
 }
-
-// ── RICERCA ───────────────────────────────────────────────────
-document.getElementById('searchInput').addEventListener('input', function() {
-  const q = this.value.toLowerCase().trim();
-
-  // Dashboard cards e righe
-  document.querySelectorAll('.cinema-card').forEach(card => {
-    const cardMatch = !q || card.dataset.search.toLowerCase().includes(q);
-    let anyRow = false;
-    card.querySelectorAll('.dev-row').forEach(row => {
-      const rowMatch = !q || row.dataset.search.toLowerCase().includes(q);
-      row.dataset.hidden = (!cardMatch && !rowMatch) ? 'true' : 'false';
-      if (rowMatch) anyRow = true;
-    });
-    card.dataset.hidden = (q && !cardMatch && !anyRow) ? 'true' : 'false';
-    if (q && anyRow) card.classList.remove('collapsed');
-  });
-
-  // Type cards
-  document.querySelectorAll('.type-card').forEach(card => {
-    card.dataset.hidden = (q && !card.dataset.search.toLowerCase().includes(q)) ? 'true' : 'false';
-  });
-});
 
 // ── MAP ───────────────────────────────────────────────────────
 function buildPopupHTML(c) {
-  const color = cinemaColor(c.name);
+  const color    = cinemaColor(c.name);
   const devCount = Object.values(c.rooms).flat().length;
-  const allIPs = Object.values(c.rooms).flat().map(d => d.ip);
+  const allIPs   = Object.values(c.rooms).flat().map(d => d.ip);
+  const ipsJSON  = JSON.stringify(allIPs);
+
   let devRows = '';
   Object.entries(c.rooms).forEach(([room, devices]) => {
     devRows += `<div class="popup-room-lbl">${room}</div>`;
     devices.forEach(d => {
       const [tc,tl] = devType(d.label);
-      const safe = d.label.replace(/'/g,'').replace(/"/g,'');
+      const safe = d.label.replace(/'/g,'').substring(0,40);
       devRows += `<div class="popup-dev-row">
         <div class="pdev-name" title="${d.label}">${d.label}</div>
-        <span class="pdev-type ${tc}">${tl}</span>
-        <a class="pdev-ip" href="http://${d.ip}" target="_blank"
-           onclick="addHistory('${d.ip}','${safe}')">${d.ip}</a>
+        <div class="pdev-btns">
+          <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
+          ${tc==='srv' ? `<a class="proto-btn ssh" href="ssh://${d.ip}" style="font-size:8px">SSH</a>
+          <a class="proto-btn vnc" href="vnc://${d.ip}" onclick="addHistory('${d.ip}','${safe}')" style="font-size:8px">VNC</a>` : ''}
+        </div>
       </div>`;
     });
   });
+
   const addrLine = c._address ? `<div class="popup-addr">📍 ${c._address}</div>` : '';
   return `<div class="popup-rb" style="background:${color}"></div>
     <div class="popup-hdr">
@@ -705,8 +662,8 @@ function buildPopupHTML(c) {
         <div class="popup-badges">
           <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
           <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).length} sale</span>
-          <span class="pbadge" style="color:var(--accent);border-color:rgba(41,121,255,0.3);cursor:pointer"
-            onclick="(function(){[${allIPs.map(ip=>`'${ip}'`).join(',')}].forEach(ip=>window.open('http://'+ip,'_blank'))})()">↗ Apri tutti</span>
+          <a class="pbadge" style="color:var(--accent);border-color:rgba(41,121,255,0.3);cursor:pointer"
+             onclick="openAll(event,${ipsJSON})">↗ Apri tutti</a>
         </div>
       </div>
     </div>
@@ -714,30 +671,23 @@ function buildPopupHTML(c) {
 }
 
 async function geocodeCinema(name, city) {
-  const queries = [
-    `${name} ${city} Italia`,
-    `cinema ${name} ${city}`,
-    `${city}, Italia`,
-    `${city} Italia`,
-  ];
+  const queries = [`${name} ${city} Italia`,`cinema ${name} ${city}`,`${city}, Italia`,`${city} Italia`];
   for (const q of queries) {
     try {
       const r = await fetch(
         'https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=it&q=' + encodeURIComponent(q),
-        { headers:{'Accept-Language':'it','User-Agent':'SigraFilmNOC/3.0'} }
+        { headers:{'Accept-Language':'it','User-Agent':'SigraFilmNOC/3.1'} }
       );
       const d = await r.json();
-      if (!d || !d.length) continue;
-      const ranked = d.sort((a,b) => {
-        const s = r => /cinema|theatre|theater/i.test((r.type||'')+(r.class||'')) ? 3
-          : /building|amenity/i.test(r.class||'') ? 2
-          : /city|town/i.test(r.type||'') ? 1 : 0;
+      if (!d||!d.length) continue;
+      const best = d.sort((a,b) => {
+        const s = x => /cinema|theatre/i.test((x.type||'')+(x.class||'')) ? 3
+          : /building|amenity/i.test(x.class||'') ? 2 : /city|town/i.test(x.type||'') ? 1 : 0;
         return s(b)-s(a);
-      });
-      const best = ranked[0];
+      })[0];
       return { lat:parseFloat(best.lat), lng:parseFloat(best.lon),
                address:best.display_name.split(',').slice(0,3).join(', ') };
-    } catch(e) {}
+    } catch(e){}
   }
   return null;
 }
@@ -748,7 +698,7 @@ async function buildMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
   const s = document.createElement('style');
-  s.textContent = '.leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important;padding:0 !important}';
+  s.textContent='.leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important;padding:0 !important}';
   document.head.appendChild(s);
 
   const cinemas = parseRaw(RAW);
@@ -762,29 +712,28 @@ async function buildMap() {
   };
 
   for (let i=0; i<cinemas.length; i++) {
-    const c = cinemas[i];
-    const color = cinemaColor(c.name);
-    if (i > 0) await new Promise(r => setTimeout(r,1150));
-    const geo = await geocodeCinema(c.name, c.city);
-    let lat, lng;
-    if (geo) { lat=geo.lat; lng=geo.lng; c._address=geo.address; }
-    else if (FALLBACK[c.city]) { [lat,lng]=FALLBACK[c.city]; c._address=null; }
-    else { lat=43.4+i*0.1; lng=10.9+i*0.12; c._address=null; }
+    const c=cinemas[i], color=cinemaColor(c.name);
+    if (i>0) await new Promise(r=>setTimeout(r,1150));
+    const geo=await geocodeCinema(c.name,c.city);
+    let lat,lng;
+    if (geo){lat=geo.lat;lng=geo.lng;c._address=geo.address;}
+    else if(FALLBACK[c.city]){[lat,lng]=FALLBACK[c.city];c._address=null;}
+    else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
 
-    const icon = L.divIcon({
+    const icon=L.divIcon({
       html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div></div>`,
       className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
     });
-    const marker = L.marker([lat,lng],{icon}).addTo(map);
-    const popup  = L.popup({closeButton:false,autoClose:false,closeOnClick:false}).setContent(buildPopupHTML(c));
+    const marker=L.marker([lat,lng],{icon}).addTo(map);
+    const popup=L.popup({closeButton:false,autoClose:false,closeOnClick:false}).setContent(buildPopupHTML(c));
     marker.bindPopup(popup);
-    let closeTimer;
-    marker.on('mouseover',()=>{clearTimeout(closeTimer);marker.openPopup()});
-    marker.on('mouseout', ()=>{closeTimer=setTimeout(()=>marker.closePopup(),300)});
+    let ct;
+    marker.on('mouseover',()=>{clearTimeout(ct);marker.openPopup()});
+    marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     marker.on('popupopen',()=>{
       const el=marker.getPopup().getElement(); if(!el) return;
-      el.addEventListener('mouseenter',()=>clearTimeout(closeTimer));
-      el.addEventListener('mouseleave',()=>{closeTimer=setTimeout(()=>marker.closePopup(),300)});
+      el.addEventListener('mouseenter',()=>clearTimeout(ct));
+      el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     });
     marker.bindTooltip(
       `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
@@ -794,25 +743,25 @@ async function buildMap() {
 }
 
 // ── VIEW SWITCHER ─────────────────────────────────────────────
-let mapBuilt = false;
+let mapBuilt=false;
 function switchView(v) {
-  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.view-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('view-' + v).classList.add('active');
-  document.getElementById('tab-' + v).classList.add('active');
-  if (v === 'map') {
-    if (!mapBuilt) { mapBuilt = true; buildMap(); }
-    else if (window._map) setTimeout(() => window._map.invalidateSize(), 50);
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.view-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('tab-'+v).classList.add('active');
+  if(v==='map'){
+    if(!mapBuilt){mapBuilt=true;buildMap();}
+    else if(window._map) setTimeout(()=>window._map.invalidateSize(),50);
   }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────
 let _tt;
-function showToast(title, msg, type) {
+function showToast(title,msg,type){
   const t=document.getElementById('toast'),tl=document.getElementById('toastTitle');
-  tl.textContent=title; tl.className='toast-title '+(type||'info');
+  tl.textContent=title;tl.className='toast-title '+(type||'info');
   document.getElementById('toastMsg').textContent=msg;
-  t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),4000);
+  t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),4000);
 }
 
 // ── INIT ──────────────────────────────────────────────────────
