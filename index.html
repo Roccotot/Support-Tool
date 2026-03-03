@@ -192,8 +192,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .msb-item span{font-weight:700;margin-left:4px;color:var(--accent)}
 .msb-sep{color:rgba(255,255,255,0.1)}
 .cmarker{width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
-  border:2.5px solid;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  border:2.5px solid;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
 .cmarker-inner{transform:rotate(45deg);display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:15px}
+.cmarker-status{position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:50%;
+  background:rgba(122,155,191,0.35);border:2px solid rgba(7,9,14,0.9);
+  transform:rotate(45deg);z-index:10;transition:background 0.3s,box-shadow 0.3s}
+.cmarker-status.ok{background:#00e676;box-shadow:0 0 7px #00e676}
+.cmarker-status.err{background:#ff1744;box-shadow:0 0 7px #ff1744;animation:blinkdot 1.5s infinite}
+.cmarker-status.partial{background:#ff9100;box-shadow:0 0 7px #ff9100}
 .leaflet-popup-content-wrapper{background:rgba(7,9,14,0.97) !important;border:1px solid rgba(41,121,255,0.3) !important;
   border-radius:13px !important;box-shadow:0 12px 48px rgba(0,0,0,0.8),0 0 24px rgba(41,121,255,0.15) !important;
   padding:0 !important;min-width:300px;max-width:380px;overflow:hidden}
@@ -484,11 +490,30 @@ async function pingDevice(ip, dot) {
 }
 
 // ── AUTO PING ────────────────────────────────────────────────
+function cinemaId(name) { return 'ms_' + name.replace(/[^a-zA-Z0-9]/g,'_'); }
+
+function updateMapStatus(cinemaName) {
+  const dots = document.querySelectorAll(`.ping-dot[data-cinema="${cinemaName}"]`);
+  if (!dots.length) return;
+  let ok=0, err=0;
+  dots.forEach(d => { if(d.classList.contains('ok')) ok++; else if(d.classList.contains('err')) err++; });
+  const el = document.getElementById(cinemaId(cinemaName));
+  if (!el) return;
+  el.className = 'cmarker-status';
+  if (ok+err === 0) return;
+  if (err === 0) el.classList.add('ok');
+  else if (ok === 0) el.classList.add('err');
+  else el.classList.add('partial');
+}
+
 async function autoPing() {
   const dots = [...document.querySelectorAll('[data-ip]')];
   for (let i = 0; i < dots.length; i++) {
     if (i > 0) await new Promise(r => setTimeout(r, 80));
-    pingDevice(dots[i].dataset.ip, dots[i]);
+    const dot = dots[i];
+    pingDevice(dot.dataset.ip, dot).then(() => {
+      if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
+    });
   }
 }
 
@@ -574,7 +599,7 @@ function buildDashboard() {
         const [tc,tl] = devType(d.label);
         const safe = d.label.replace(/'/g,'').substring(0,40);
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this)"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <span class="dev-type ${tc}">${tl}</span>
@@ -746,7 +771,7 @@ async function buildMap() {
     else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
 
     const icon=L.divIcon({
-      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div></div>`,
+      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div><div class="cmarker-status" id="${cinemaId(c.name)}"></div></div>`,
       className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
     });
     const marker=L.marker([lat,lng],{icon}).addTo(map);
