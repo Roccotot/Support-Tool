@@ -398,8 +398,8 @@ Multisala Odeon - Pisa - Sala 3 Pisa - Proiettore\t10.55.76.32:161\tSNMP
 Multisala Odeon - Pisa - Sala 3 Pisa - Server IMS3000\t10.55.76.33:161\tSNMP
 Multisala Odeon - Pisa - Sala 4 Genova - Proiettore\t10.55.76.42:161\tSNMP
 Multisala Odeon - Pisa - Sala 5 Kinzica - Proiettore\t10.55.76.52:161\tSNMP
-Nuova Aurora - San Sepolcro - Sala 1 - Proiettore Barco\t10.58.78.12:161\tSNMP
-Nuova Aurora - San Sepolcro - Sala 1 - Server Doremi\t10.58.78.10:161\tSNMP
+Nuova Aurora - Sansepolcro - Sala 1 - Proiettore Barco\t10.58.78.12:161\tSNMP
+Nuova Aurora - Sansepolcro - Sala 1 - Server Doremi\t10.58.78.10:161\tSNMP
 Splendor - Massa - Screen 01 - Proiettore\t10.58.71.12:161\tSNMP
 Splendor - Massa - Screen 01 - Server\t10.58.71.10:161\tSNMP
 Splendor - Massa - Screen 02 - Proiettore\t10.58.71.22:161\tSNMP
@@ -724,20 +724,17 @@ async function buildMap() {
   const FALLBACK = {
     'Grosseto':[42.7629,11.1121],'Chiusi':[43.0146,11.9454],
     'Montecatini Terme':[43.8847,10.7728],'Pisa':[43.7228,10.4017],
-    'San Sepolcro':[43.5693,12.1396],'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],
+    'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],
   };
 
   for (let i=0; i<cinemas.length; i++) {
     const c=cinemas[i], color=cinemaColor(c.name);
+    if (i>0) await new Promise(r=>setTimeout(r,1150));
+    const geo=await geocodeCinema(c.name,c.city);
     let lat,lng;
-    if (FALLBACK[c.city]) {
-      [lat,lng]=FALLBACK[c.city]; c._address=null;
-    } else {
-      if (i>0) await new Promise(r=>setTimeout(r,1150));
-      const geo=await geocodeCinema(c.name,c.city);
-      if (geo){lat=geo.lat;lng=geo.lng;c._address=geo.address;}
-      else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
-    }
+    if (geo){lat=geo.lat;lng=geo.lng;c._address=geo.address;}
+    else if(FALLBACK[c.city]){[lat,lng]=FALLBACK[c.city];c._address=null;}
+    else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
 
     const icon=L.divIcon({
       html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div></div>`,
