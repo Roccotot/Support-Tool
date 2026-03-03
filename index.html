@@ -134,7 +134,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   background:var(--text2);cursor:pointer;transition:all 0.3s;
   border:1px solid rgba(255,255,255,0.1)}
 .ping-dot:hover{transform:scale(1.3)}
-.ping-dot.ok{background:var(--lime);box-shadow:0 0 6px var(--lime);border-color:var(--lime)}
+.ping-dot.ok{background:var(--lime);box-shadow:0 0 6px var(--lime);border-color:var(--lime);animation:blinkdot 1.5s infinite}
 .ping-dot.err{background:var(--crimson);box-shadow:0 0 6px var(--crimson);border-color:var(--crimson);animation:blinkdot 1.5s infinite}
 .ping-dot.checking{background:var(--amber);box-shadow:0 0 6px var(--amber);border-color:var(--amber);animation:blinkdot 0.5s infinite}
 @keyframes blinkdot{0%,100%{opacity:1}50%{opacity:0.15}}
@@ -177,7 +177,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .tc-ping{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--text2);
   cursor:pointer;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1);margin-right:2px}
 .tc-ping:hover{transform:scale(1.3)}
-.tc-ping.ok{background:var(--lime);box-shadow:0 0 5px var(--lime);border-color:var(--lime)}
+.tc-ping.ok{background:var(--lime);box-shadow:0 0 5px var(--lime);border-color:var(--lime);animation:blinkdot 1.5s infinite}
 .tc-ping.err{background:var(--crimson);box-shadow:0 0 5px var(--crimson);animation:blinkdot 1.5s infinite}
 .tc-ping.checking{background:var(--amber);box-shadow:0 0 5px var(--amber);animation:blinkdot 0.5s infinite}
 
@@ -193,8 +193,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .msb-item span{font-weight:700;margin-left:4px;color:var(--accent)}
 .msb-sep{color:rgba(255,255,255,0.1)}
 .cmarker{width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
-  border:2.5px solid;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  border:2.5px solid;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
 .cmarker-inner{transform:rotate(45deg);display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:15px}
+.cmarker-status{position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:50%;
+  background:rgba(122,155,191,0.35);border:2px solid rgba(7,9,14,0.9);
+  transform:rotate(45deg);z-index:10;transition:background 0.3s,box-shadow 0.3s}
+.cmarker-status.ok{background:#00e676;box-shadow:0 0 7px #00e676;animation:blinkdot 1.5s infinite}
+.cmarker-status.err{background:#ff1744;box-shadow:0 0 7px #ff1744;animation:blinkdot 1.5s infinite}
+.cmarker-status.partial{background:#ff9100;box-shadow:0 0 7px #ff9100}
 .leaflet-popup-content-wrapper{background:rgba(7,9,14,0.97) !important;border:1px solid rgba(41,121,255,0.3) !important;
   border-radius:13px !important;box-shadow:0 12px 48px rgba(0,0,0,0.8),0 0 24px rgba(41,121,255,0.15) !important;
   padding:0 !important;min-width:300px;max-width:380px;overflow:hidden}
@@ -484,6 +490,34 @@ async function pingDevice(ip, dot) {
   dot.title = ok ? '✓ Risponde' : '✗ Non risponde';
 }
 
+// ── AUTO PING ────────────────────────────────────────────────
+function cinemaId(name) { return 'ms_' + name.replace(/[^a-zA-Z0-9]/g,'_'); }
+
+function updateMapStatus(cinemaName) {
+  const dots = document.querySelectorAll(`.ping-dot[data-cinema="${cinemaName}"]`);
+  if (!dots.length) return;
+  let ok=0, err=0;
+  dots.forEach(d => { if(d.classList.contains('ok')) ok++; else if(d.classList.contains('err')) err++; });
+  const el = document.getElementById(cinemaId(cinemaName));
+  if (!el) return;
+  el.className = 'cmarker-status';
+  if (ok+err === 0) return;
+  if (err === 0) el.classList.add('ok');
+  else if (ok === 0) el.classList.add('err');
+  else el.classList.add('partial');
+}
+
+async function autoPing() {
+  const dots = [...document.querySelectorAll('[data-ip]')];
+  for (let i = 0; i < dots.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 80));
+    const dot = dots[i];
+    pingDevice(dot.dataset.ip, dot).then(() => {
+      if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
+    });
+  }
+}
+
 // ── COPIA IP ─────────────────────────────────────────────────
 function copyIP(ip, el) {
   navigator.clipboard.writeText(ip).then(() => {
@@ -566,7 +600,7 @@ function buildDashboard() {
         const [tc,tl] = devType(d.label);
         const safe = d.label.replace(/'/g,'').substring(0,40);
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this)"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <span class="dev-type ${tc}">${tl}</span>
@@ -629,7 +663,7 @@ function buildByType() {
           <div class="tc-cinema" style="color:${color}">${c.name} — ${c.city}</div>
           <div class="tc-name" title="${room}: ${d.label}">${room}: ${d.label}</div>
           <div class="tc-btns">
-            <div class="tc-ping" title="Clicca per verificare"
+            <div class="tc-ping" data-ip="${d.ip}" title="Clicca per verificare"
               onclick="pingDevice('${d.ip}',this)"></div>
             ${devBtnsHTML(d.ip, d.label)}
           </div>`;
@@ -656,6 +690,7 @@ function buildPopupHTML(c) {
       const [tc,tl] = devType(d.label);
       const safe = d.label.replace(/'/g,'').substring(0,40);
       devRows += `<div class="popup-dev-row">
+        <div class="ping-dot" data-ip="${d.ip}" title="Clicca per verificare" onclick="pingDevice('${d.ip}',this)" style="flex-shrink:0"></div>
         <div class="pdev-name" title="${d.label}">${d.label}</div>
         <div class="pdev-btns">
           <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
@@ -725,7 +760,7 @@ async function buildMap() {
   const FALLBACK = {
     'Grosseto':[42.7629,11.1121],'Chiusi':[43.0146,11.9454],
     'Montecatini Terme':[43.8847,10.7728],'Pisa':[43.7228,10.4017],
-    'San Sepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],
+    'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],
   };
 
   for (let i=0; i<cinemas.length; i++) {
@@ -738,7 +773,7 @@ async function buildMap() {
     else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
 
     const icon=L.divIcon({
-      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div></div>`,
+      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div><div class="cmarker-status" id="${cinemaId(c.name)}"></div></div>`,
       className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
     });
     const marker=L.marker([lat,lng],{icon}).addTo(map);
@@ -749,6 +784,12 @@ async function buildMap() {
     marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     marker.on('popupopen',()=>{
       const el=marker.getPopup().getElement(); if(!el) return;
+      el.querySelectorAll('.ping-dot[data-ip]').forEach(dot=>{
+        const src=document.querySelector(`.ping-dot[data-cinema][data-ip="${dot.dataset.ip}"]`);
+        if(!src) return;
+        ['ok','err','checking'].forEach(cls=>dot.classList.toggle(cls,src.classList.contains(cls)));
+        dot.title=src.title;
+      });
       el.addEventListener('mouseenter',()=>clearTimeout(ct));
       el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     });
@@ -756,6 +797,7 @@ async function buildMap() {
       `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
       {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
     );
+    updateMapStatus(c.name);
   }
 }
 
@@ -805,6 +847,8 @@ buildDashboard();
 buildByType();
 renderHistory();
 switchView('map');
+autoPing();
+setInterval(autoPing, 5 * 60 * 1000);
 </script>
 </body>
 </html>
