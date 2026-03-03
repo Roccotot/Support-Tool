@@ -265,7 +265,32 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   .cinemas-grid{grid-template-columns:1fr}
   header{padding:0 12px}
 }
-@media(max-width:600px){.logo-text,.logo-div{display:none}}
+/* ── SEARCH ── */
+.search-input{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:7px 13px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);
+  width:230px;outline:none;transition:all 0.2s}
+.search-input::placeholder{color:var(--text2)}
+.search-input:focus{border-color:rgba(41,121,255,0.5);box-shadow:var(--glow)}
+/* ── GLOBAL STATUS BAR ── */
+.global-status-bar{position:relative;z-index:1;display:flex;align-items:center;gap:10px;
+  padding:10px 28px 0;max-width:1600px;margin:0 auto;width:100%;flex-wrap:wrap}
+.gs-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);
+  display:inline-flex;align-items:center;gap:5px}
+.gs-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block}
+.gs-dot.ok{background:var(--lime);box-shadow:0 0 4px var(--lime)}
+.gs-dot.err{background:var(--crimson);box-shadow:0 0 4px var(--crimson)}
+.gs-sep{color:rgba(255,255,255,0.12);font-family:'Share Tech Mono',monospace;font-size:10px}
+.gs-spacer{flex:1}
+.action-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  padding:5px 13px;border-radius:6px;border:1px solid var(--border);background:var(--panel);
+  color:var(--text);cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.action-btn.refresh:hover{border-color:rgba(41,121,255,0.5);color:#fff;background:rgba(41,121,255,0.1)}
+.action-btn.export:hover{border-color:rgba(0,230,118,0.4);color:var(--lime);background:rgba(0,230,118,0.07)}
+.action-btn:disabled{opacity:0.5;cursor:not-allowed}
+.no-results{grid-column:1/-1;text-align:center;padding:40px 20px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);display:none}
+@media(max-width:900px){.global-status-bar{padding:8px 12px 0}}
+@media(max-width:600px){.logo-text,.logo-div{display:none}.search-input{width:130px}}
 </style>
 </head>
 <body>
@@ -278,6 +303,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <div class="logo-div"></div>
     <div class="logo-text">NOC DASHBOARD<br><b>di Rocco Totaro</b> — V3.1</div>
   </div>
+  <input type="text" class="search-input" id="searchInput"
+    placeholder="Cerca cinema, IP, dispositivo..." oninput="filterDevices(this.value)">
   <div class="header-right">
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia tema">
       <span id="themeIcon">☀️</span>
@@ -322,6 +349,16 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <div class="stat-tile"><div class="st-label">Host Totali</div><div class="st-value" id="statDevices">—</div></div>
     <div class="stat-tile"><div class="st-label">Gruppi Sala</div><div class="st-value" id="statRooms">—</div></div>
   </div>
+  <div class="global-status-bar">
+    <span class="gs-item"><span class="gs-dot ok"></span><span id="gs-online-count">—</span> online</span>
+    <span class="gs-sep">|</span>
+    <span class="gs-item"><span class="gs-dot err"></span><span id="gs-offline-count">—</span> offline</span>
+    <span class="gs-sep">|</span>
+    <span class="gs-item"><span id="gs-unknown-count">—</span> non verificati</span>
+    <span class="gs-spacer"></span>
+    <button class="action-btn refresh" id="refreshBtn" onclick="autoPing()" title="Verifica tutti i dispositivi">⟳ Refresh All</button>
+    <button class="action-btn export" onclick="exportCSV()" title="Scarica lista dispositivi CSV">↓ Export CSV</button>
+  </div>
   <div class="main">
     <div class="section-hdr">
       <div class="section-title">Cinema — Dispositivi Monitorati</div>
@@ -329,6 +366,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       <div class="section-title" id="lastUpdate" style="white-space:nowrap">—</div>
     </div>
     <div class="cinemas-grid" id="cinemasGrid"></div>
+    <div class="no-results" id="noResults">Nessun risultato per "<span id="noResultsQuery"></span>"</div>
   </div>
 </div>
 
@@ -472,9 +510,28 @@ function devType(label) {
 }
 
 // ── PING ─────────────────────────────────────────────────────
+const pingStatusMap = {};
+
+function updateGlobalStatus() {
+  const vals = Object.values(pingStatusMap);
+  const online   = vals.filter(s=>s==='ok').length;
+  const offline  = vals.filter(s=>s==='err').length;
+  const checking = vals.filter(s=>s==='checking').length;
+  const total    = parseRaw(RAW).flatMap(c=>Object.values(c.rooms).flatMap(d=>d)).length;
+  const unknown  = Math.max(0, total - online - offline - checking);
+  const onEl  = document.getElementById('gs-online-count');
+  const offEl = document.getElementById('gs-offline-count');
+  const unkEl = document.getElementById('gs-unknown-count');
+  if(onEl)  onEl.textContent  = online;
+  if(offEl) offEl.textContent = offline;
+  if(unkEl) unkEl.textContent = unknown;
+}
+
 async function pingDevice(ip, dot) {
-  dot.className = dot.className.replace(/\bprev-class\b/,'') + ' checking';
-  dot.className = dot.className.replace('ok','').replace('err','') + ' checking';
+  const prev = pingStatusMap[ip];
+  pingStatusMap[ip] = 'checking';
+  updateGlobalStatus();
+  dot.className = dot.className.replace('ok','').replace('err','').replace('checking','') + ' checking';
   const ok = await new Promise(res => {
     const c = new AbortController();
     const t = setTimeout(() => { c.abort(); res(false); }, 3000);
@@ -482,11 +539,50 @@ async function pingDevice(ip, dot) {
       .then(() => { clearTimeout(t); res(true); })
       .catch(() => { clearTimeout(t); res(false); });
   });
+  pingStatusMap[ip] = ok ? 'ok' : 'err';
+  updateGlobalStatus();
   // reset classi e assegna risultato
   dot.className = dot.className.split(' ')
     .filter(c => !['checking','ok','err'].includes(c)).join(' ');
   dot.classList.add(ok ? 'ok' : 'err');
   dot.title = ok ? '✓ Risponde' : '✗ Non risponde';
+  if (prev === 'ok' && !ok) showToast('ALERT', ip + ' non risponde', 'err');
+}
+
+function filterDevices(q) {
+  q = q.toLowerCase().trim();
+  let visibleCinema = 0;
+  document.querySelectorAll('.cinema-card[data-search]').forEach(card => {
+    const show = !q || card.dataset.search.includes(q);
+    card.style.display = show ? '' : 'none';
+    if (show) visibleCinema++;
+  });
+  document.querySelectorAll('.type-card[data-search]').forEach(card => {
+    card.style.display = !q || card.dataset.search.includes(q) ? '' : 'none';
+  });
+  const noRes = document.getElementById('noResults');
+  const noResQ = document.getElementById('noResultsQuery');
+  if (noRes)  noRes.style.display  = q && visibleCinema === 0 ? '' : 'none';
+  if (noResQ) noResQ.textContent   = q;
+}
+
+function exportCSV() {
+  const cinemas = parseRaw(RAW);
+  const rows = [['Cinema','Città','Sala','Dispositivo','IP','Stato']];
+  cinemas.forEach(c => {
+    Object.entries(c.rooms).forEach(([room, devs]) => {
+      devs.forEach(d => {
+        rows.push([c.name, c.city, room, d.label, d.ip,
+          pingStatusMap[d.ip] || 'non verificato']);
+      });
+    });
+  });
+  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'noc-dispositivi.csv'; a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ── AUTO PING ────────────────────────────────────────────────
@@ -629,6 +725,9 @@ function buildDashboard() {
         </div>
       </div>
       <div class="card-body">${roomsHTML}</div>`;
+    card.dataset.search = [c.name, c.city,
+      ...rooms.flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])
+    ].join(' ').toLowerCase();
     grid.appendChild(card);
   });
 
@@ -666,6 +765,7 @@ function buildByType() {
               onclick="pingDevice('${d.ip}',this)"></div>
             ${devBtnsHTML(d.ip, d.label)}
           </div>`;
+        card.dataset.search = [c.name, c.city, room, d.label, d.ip].join(' ').toLowerCase();
         (tc === 'srv' ? gs : gp).appendChild(card);
         tc === 'srv' ? cs++ : cp++;
       });
@@ -846,6 +946,7 @@ buildDashboard();
 buildByType();
 renderHistory();
 switchView('map');
+updateGlobalStatus();
 autoPing();
 setInterval(autoPing, 5 * 60 * 1000);
 </script>
