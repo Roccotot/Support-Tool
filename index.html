@@ -689,6 +689,7 @@ function buildPopupHTML(c) {
       const [tc,tl] = devType(d.label);
       const safe = d.label.replace(/'/g,'').substring(0,40);
       devRows += `<div class="popup-dev-row">
+        <div class="ping-dot" data-ip="${d.ip}" title="Clicca per verificare" onclick="pingDevice('${d.ip}',this)" style="flex-shrink:0"></div>
         <div class="pdev-name" title="${d.label}">${d.label}</div>
         <div class="pdev-btns">
           <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
@@ -782,6 +783,12 @@ async function buildMap() {
     marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     marker.on('popupopen',()=>{
       const el=marker.getPopup().getElement(); if(!el) return;
+      el.querySelectorAll('.ping-dot[data-ip]').forEach(dot=>{
+        const src=document.querySelector(`.ping-dot[data-cinema][data-ip="${dot.dataset.ip}"]`);
+        if(!src) return;
+        ['ok','err','checking'].forEach(cls=>dot.classList.toggle(cls,src.classList.contains(cls)));
+        dot.title=src.title;
+      });
       el.addEventListener('mouseenter',()=>clearTimeout(ct));
       el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     });
@@ -789,6 +796,7 @@ async function buildMap() {
       `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
       {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
     );
+    updateMapStatus(c.name);
   }
 }
 
