@@ -300,6 +300,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .view-cycle-btn:active{background:rgba(41,121,255,0.18)}
 @media(max-width:600px){.logo-text,.logo-div{display:none}.search-input{width:130px}
   .view-toggle{display:none}.view-cycle-btn{display:flex}}
+@media(max-width:420px){
+  header{padding:0 8px;gap:8px}
+  .logo-wrap img{height:30px}
+  .search-input{width:80px;padding:6px 8px;font-size:10px}
+  .theme-toggle{padding:6px 8px;font-size:14px}
+  .view-cycle-btn{padding:6px 9px;font-size:11px;gap:4px}
+  .view-cycle-btn svg:last-child{display:none}
+}
 </style>
 </head>
 <body>
