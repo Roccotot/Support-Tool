@@ -533,13 +533,20 @@ function parseRaw(raw) {
     const name = parts[0].trim();
     const city = parts[1].trim().replace(/\s*-\s*[A-Z]{2}$/,'').trim();
     const room = parts[2] ? parts[2].trim() : 'Dispositivi';
-    const dev  = (parts.slice(3).join(' - ').trim() || 'Unità').replace(/\s+(IMS3000|IMS\s*\d+|Doremi|Barco)\b/gi, '');
+    const dev  = (parts.slice(3).join(' - ').trim() || 'Unità').replace(/\s+(IMS3000|IMS\s*\d+|Doremi|Barco)\b/gi, '').replace(/\s*-\s*$/, '');
     const key  = name + '|||' + city;
     if (!cinemas[key]) cinemas[key] = { name, city, rooms:{} };
     if (!cinemas[key].rooms[room]) cinemas[key].rooms[room] = [];
     cinemas[key].rooms[room].push({ label:dev, ip });
   });
-  return Object.values(cinemas).sort((a,b) => a.city.localeCompare(b.city));
+  const result = Object.values(cinemas).sort((a,b) => a.city.localeCompare(b.city));
+  result.forEach(c => Object.keys(c.rooms).forEach(r => {
+    c.rooms[r].sort((a,b) => {
+      const ta = devType(a.label)[0], tb = devType(b.label)[0];
+      return ta === tb ? 0 : ta === 'srv' ? -1 : 1;
+    });
+  }));
+  return result;
 }
 
 function devType(label) {
