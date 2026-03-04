@@ -534,7 +534,7 @@ function parseRaw(raw) {
     if (parts.length < 2) return;
     const name = parts[0].trim();
     const city = parts[1].trim().replace(/\s*-\s*[A-Z]{2}$/,'').trim();
-    const room = parts[2] ? parts[2].trim() : 'Dispositivi';
+    const room = (parts[2] ? parts[2].trim() : 'Dispositivi').replace(/^(Sala)\s+0*(\d+)$/, '$1 $2');
     const dev  = (parts.slice(3).join(' - ').trim() || 'Unità').replace(/\s+(IMS3000|IMS\s*\d+|Doremi|Barco)\b/gi, '').replace(/\s*-\s*$/, '');
     const key  = name + '|||' + city;
     if (!cinemas[key]) cinemas[key] = { name, city, rooms:{} };
