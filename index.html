@@ -831,6 +831,7 @@ function buildPopupHTML(c) {
   const devCount = Object.values(c.rooms).flat().length;
   const allIPs   = Object.values(c.rooms).flat().map(d => d.ip);
   const ipsJSON  = JSON.stringify(allIPs);
+  const tmsIP    = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
 
   let devRows = '';
   Object.entries(c.rooms).forEach(([room, devices]) => {
@@ -863,6 +864,7 @@ function buildPopupHTML(c) {
         <div class="popup-badges">
           <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
           <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).length} sale</span>
+          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" title="Apri TMS ${tmsIP}">TMS</a>` : ''}
         </div>
       </div>
     </div>
