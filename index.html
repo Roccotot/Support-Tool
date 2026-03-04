@@ -291,7 +291,15 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .no-results{grid-column:1/-1;text-align:center;padding:40px 20px;
   font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);display:none}
 @media(max-width:900px){.global-status-bar{padding:8px 12px 0}}
-@media(max-width:600px){.logo-text,.logo-div{display:none}.search-input{width:130px}}
+/* ── BOTTONE CICLO VISTE (mobile) ── */
+.view-cycle-btn{display:none;align-items:center;gap:6px;padding:9px 13px;
+  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.5px;
+  text-transform:uppercase;background:var(--panel);border:1px solid var(--border);
+  border-radius:9px;color:#c0d8f0;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.view-cycle-btn:hover{color:#fff;background:rgba(41,121,255,0.09)}
+.view-cycle-btn:active{background:rgba(41,121,255,0.18)}
+@media(max-width:600px){.logo-text,.logo-div{display:none}.search-input{width:130px}
+  .view-toggle{display:none}.view-cycle-btn{display:flex}}
 </style>
 </head>
 <body>
@@ -309,6 +317,16 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <div class="header-right">
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia tema">
       <span id="themeIcon">☀️</span>
+    </button>
+    <button class="view-cycle-btn" id="viewCycleBtn" onclick="cycleView()" title="Cambia vista">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+        <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+      </svg>
+      <span id="viewCycleLabel">Mappa</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
     </button>
     <div class="view-toggle">
       <button class="view-btn" id="tab-map" onclick="switchView('map')">
@@ -903,11 +921,22 @@ async function buildMap() {
 
 // ── VIEW SWITCHER ─────────────────────────────────────────────
 let mapBuilt=false;
+const _VIEWS=['map','dashboard','bytype'];
+const _VIEW_LABELS={map:'Mappa',dashboard:'Cinema',bytype:'Per tipo'};
+
+function cycleView(){
+  const cur=(document.querySelector('.view.active')||{id:'view-map'}).id.replace('view-','');
+  const next=_VIEWS[(_VIEWS.indexOf(cur)+1)%_VIEWS.length];
+  switchView(next);
+}
+
 function switchView(v) {
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.view-btn').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('tab-'+v).classList.add('active');
+  const lbl=document.getElementById('viewCycleLabel');
+  if(lbl) lbl.textContent=_VIEW_LABELS[v]||v;
   if(v==='map'){
     if(!mapBuilt){mapBuilt=true;buildMap();}
     else if(window._map) setTimeout(()=>window._map.invalidateSize(),50);
