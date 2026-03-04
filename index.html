@@ -111,6 +111,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .card-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:1.5px;color:#fff;text-transform:uppercase;line-height:1.2}
 .card-city{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;margin-top:2px}
 .card-actions{display:flex;align-items:center;gap:7px;position:relative;z-index:1}
+.tms-btn{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid #00bcd455;color:#00bcd4;text-decoration:none;background:#00bcd410;transition:background .15s}
+.tms-btn:hover{background:#00bcd430;color:#00e5ff}
 .tag{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;
   background:rgba(0,0,0,0.3);border:1px solid var(--border);color:#c0d8f0;white-space:nowrap}
 .chevron{width:16px;height:16px;color:#c0d8f0;transition:transform 0.3s;flex-shrink:0}
@@ -729,6 +731,7 @@ function buildDashboard() {
     totalDevs  += devCount;
     totalRooms += rooms.length;
     const allIPs   = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
+    const tmsIP    = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
 
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
@@ -764,6 +767,7 @@ function buildDashboard() {
           </div>
         </div>
         <div class="card-actions">
+          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" onclick="event.stopPropagation()" title="Apri TMS ${tmsIP}">TMS</a>` : ''}
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
