@@ -597,6 +597,22 @@ async function pingDevice(ip, dot) {
   if (prev === 'ok' && !ok) showToast('ALERT', ip + ' non risponde', 'err');
 }
 
+async function checkTMSBtn(btn) {
+  const url = btn.dataset.tmsUrl;
+  if (!url) return;
+  const ok = await new Promise(res => {
+    const c = new AbortController();
+    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
+    fetch(url, { signal:c.signal, mode:'no-cors', cache:'no-store' })
+      .then(() => { clearTimeout(t); res(true); })
+      .catch(() => { clearTimeout(t); res(false); });
+  });
+  if (ok) btn.style.display = '';
+}
+function checkAllTMSBtns(root) {
+  (root || document).querySelectorAll('.tms-btn[data-tms-url]').forEach(checkTMSBtn);
+}
+
 function filterDevices(q) {
   q = q.toLowerCase().trim();
   let visibleCinema = 0;
@@ -767,7 +783,7 @@ function buildDashboard() {
           </div>
         </div>
         <div class="card-actions">
-          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" onclick="event.stopPropagation()" title="Apri TMS ${tmsIP}">TMS</a>` : ''}
+          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" onclick="event.stopPropagation()" title="Apri TMS ${tmsIP}" style="display:none" data-tms-url="http://${tmsIP}:9000/tms/">TMS</a>` : ''}
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
@@ -864,7 +880,7 @@ function buildPopupHTML(c) {
         <div class="popup-badges">
           <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
           <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).length} sale</span>
-          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" title="Apri TMS ${tmsIP}">TMS</a>` : ''}
+          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" title="Apri TMS ${tmsIP}" style="display:none" data-tms-url="http://${tmsIP}:9000/tms/">TMS</a>` : ''}
         </div>
       </div>
     </div>
@@ -943,6 +959,7 @@ async function buildMap() {
       });
       el.addEventListener('mouseenter',()=>clearTimeout(ct));
       el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
+      checkAllTMSBtns(el);
     });
     marker.bindTooltip(
       `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
@@ -1006,6 +1023,7 @@ function toggleTheme() {
 
 // ── INIT ──────────────────────────────────────────────────────
 buildDashboard();
+checkAllTMSBtns();
 buildByType();
 renderHistory();
 switchView('map');
