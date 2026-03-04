@@ -94,7 +94,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 
 /* ── CINEMA GRID ── */
-.cinemas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:18px}
+.cinemas-grid{display:grid;grid-template-columns:1fr;gap:18px}
+.city-divider{display:flex;align-items:center;gap:14px;padding:22px 4px 6px;margin-top:4px}
+.city-divider-line{flex:1;height:1px;background:var(--border)}
+.city-divider-label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text2);white-space:nowrap}
 .cinema-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
   overflow:hidden;animation:fadeUp 0.6s ease both;transition:border-color 0.25s,box-shadow 0.25s,transform 0.2s}
 .cinema-card:hover{border-color:rgba(41,121,255,0.4);box-shadow:0 8px 36px rgba(0,0,0,0.5),var(--glow);transform:translateY(-1px)}
@@ -263,6 +266,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+@media(min-width:901px){
+  .card-name{font-size:22px}
+  .card-city{font-size:14px}
+  .room-sep-label{font-size:13px;letter-spacing:2.5px}
+  .dev-name{font-size:17px}
+  .dev-type{font-size:11px;padding:3px 9px}
+  .city-divider-label{font-size:20px}
+}
 @media(max-width:900px){
   .stats-strip{grid-template-columns:repeat(3,1fr);padding:12px}
   .main{padding:12px 12px 56px}
@@ -621,6 +632,10 @@ function filterDevices(q) {
     card.style.display = show ? '' : 'none';
     if (show) visibleCinema++;
   });
+  document.querySelectorAll('.city-divider[data-city-div]').forEach(div => {
+    const anyVisible = !!document.querySelector(`.cinema-card[data-city="${div.dataset.cityDiv}"][data-search]:not([style*="none"])`);
+    div.style.display = anyVisible || !q ? '' : 'none';
+  });
   document.querySelectorAll('.type-card[data-search]').forEach(card => {
     card.style.display = !q || card.dataset.search.includes(q) ? '' : 'none';
   });
@@ -739,8 +754,17 @@ function buildDashboard() {
   const grid = document.getElementById('cinemasGrid');
   grid.innerHTML = '';
   let totalDevs = 0, totalRooms = 0;
+  let lastCity = null;
 
   cinemas.forEach(c => {
+    if (c.city !== lastCity) {
+      const div = document.createElement('div');
+      div.className = 'city-divider';
+      div.dataset.cityDiv = c.city;
+      div.innerHTML = `<div class="city-divider-line"></div><div class="city-divider-label">📍 ${c.city}</div><div class="city-divider-line"></div>`;
+      grid.appendChild(div);
+      lastCity = c.city;
+    }
     const color    = cinemaColor(c.name);
     const rooms    = Object.entries(c.rooms);
     const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
@@ -794,6 +818,7 @@ function buildDashboard() {
     card.dataset.search = [c.name, c.city,
       ...rooms.flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])
     ].join(' ').toLowerCase();
+    card.dataset.city = c.city;
     grid.appendChild(card);
   });
 
