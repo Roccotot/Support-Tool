@@ -798,7 +798,7 @@ function buildDashboard() {
     const rooms    = Object.entries(c.rooms);
     const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
     totalDevs  += devCount;
-    totalRooms += rooms.length;
+    totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
     const allIPs   = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
     const tmsIP    = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
 
@@ -933,7 +933,7 @@ function buildPopupHTML(c) {
         ${addrLine}
         <div class="popup-badges">
           <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
-          <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).length} sale</span>
+          <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).filter(r => r !== 'Rete').length} sale</span>
           ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" title="Apri TMS ${tmsIP}" style="display:none" data-tms-url="http://${tmsIP}:9000/tms/">TMS</a>` : ''}
         </div>
       </div>
