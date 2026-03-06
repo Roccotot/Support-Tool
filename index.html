@@ -446,6 +446,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       </div>
       <div class="type-grid" id="grid-srv"></div>
     </div>
+    <div class="type-section">
+      <div class="type-hdr">
+        <div class="type-icon" style="background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.3)">🌐</div>
+        <div><div class="type-title" style="color:#ffb74d">MikroTik / Rete</div></div>
+        <div class="type-count" id="count-rtr">—</div>
+      </div>
+      <div class="type-grid" id="grid-rtr"></div>
+    </div>
   </div>
 </div>
 
@@ -865,12 +873,14 @@ function buildByType() {
   initColors(cinemas);
   const gp = document.getElementById('grid-proj');
   const gs = document.getElementById('grid-srv');
-  gp.innerHTML = ''; gs.innerHTML = '';
-  let cp=0, cs=0;
+  const gr = document.getElementById('grid-rtr');
+  gp.innerHTML = ''; gs.innerHTML = ''; gr.innerHTML = '';
+  let cp=0, cs=0, cr=0;
 
   cinemas.forEach(c => {
     const color = cinemaColor(c.name);
     Object.entries(c.rooms).forEach(([room, devices]) => {
+      const isRete = room === 'Rete';
       devices.forEach(d => {
         const [tc,tl] = devType(d.label);
         const safe = d.label.replace(/'/g,'').substring(0,40);
@@ -886,13 +896,15 @@ function buildByType() {
             ${devBtnsHTML(d.ip, d.label)}
           </div>`;
         card.dataset.search = [c.name, c.city, room, d.label, d.ip].join(' ').toLowerCase();
-        (tc === 'srv' ? gs : gp).appendChild(card);
-        tc === 'srv' ? cs++ : cp++;
+        if (isRete) { gr.appendChild(card); cr++; }
+        else if (tc === 'srv') { gs.appendChild(card); cs++; }
+        else { gp.appendChild(card); cp++; }
       });
     });
   });
   document.getElementById('count-proj').textContent = cp + ' dispositivi';
   document.getElementById('count-srv').textContent  = cs + ' dispositivi';
+  document.getElementById('count-rtr').textContent  = cr + ' dispositivi';
 }
 
 // ── MAP ───────────────────────────────────────────────────────
