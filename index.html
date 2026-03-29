@@ -726,11 +726,12 @@ async function pingDevice(ip, dot) {
         // TCP reachability via WebSocket timing: se la porta risponde → round-trip >50ms
         const t0 = Date.now();
         let done = false;
-        const fin = v => { if (!done) { done = true; try { ws.close(); } catch(e){} res(v); } };
+        const fin = v => { if (!done) { done = true; res(v); } };
         const ws = new WebSocket(`ws://${ip}:${tcpPort}`);
         setTimeout(() => fin(true), 3000);
-        ws.onopen  = () => fin(true);
-        ws.onerror = () => fin(Date.now() - t0 > 50);
+        ws.onopen  = () => { ws.close(); fin(true); };
+        ws.onerror = () => { /* seguito da onclose */ };
+        ws.onclose = () => fin(Date.now() - t0 > 50);
       })
     : new Promise(res => {
         const c = new AbortController();
