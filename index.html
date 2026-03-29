@@ -864,7 +864,7 @@ function devBtnsHTML(ip, label) {
   const vncBtn  = tc === 'srv'
     ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
     : '';
-  return copyBtn + webBtn + sshBtn + vncBtn;
+  return vncBtn + sshBtn + webBtn + copyBtn;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
