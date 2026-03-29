@@ -971,7 +971,6 @@ function buildDashboard() {
           <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this)"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
-          <span class="dev-type ${tc}">${tl}</span>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
         </div>`;
       });
