@@ -720,13 +720,25 @@ async function pingDevice(ip, dot) {
     d.className = d.className.split(' ')
       .filter(c => !['ok','err','checking'].includes(c)).join(' ') + ' checking';
   });
-  const ok = await new Promise(res => {
-    const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
-    fetch('http://' + ip, { signal:c.signal, mode:'no-cors', cache:'no-store' })
-      .then(() => { clearTimeout(t); res(true); })
-      .catch(() => { clearTimeout(t); res(false); });
-  });
+  const tcpPort = dot.dataset.port;
+  const ok = await (tcpPort
+    ? new Promise(res => {
+        // TCP reachability via WebSocket timing: se la porta risponde → round-trip >50ms
+        const t0 = Date.now();
+        let done = false;
+        const fin = v => { if (!done) { done = true; try { ws.close(); } catch(e){} res(v); } };
+        const ws = new WebSocket(`ws://${ip}:${tcpPort}`);
+        setTimeout(() => fin(true), 3000);
+        ws.onopen  = () => fin(true);
+        ws.onerror = () => fin(Date.now() - t0 > 50);
+      })
+    : new Promise(res => {
+        const c = new AbortController();
+        const t = setTimeout(() => { c.abort(); res(false); }, 3000);
+        fetch('http://' + ip, { signal:c.signal, mode:'no-cors', cache:'no-store' })
+          .then(() => { clearTimeout(t); res(true); })
+          .catch(() => { clearTimeout(t); res(false); });
+      }));
   pingStatusMap[ip] = ok ? 'ok' : 'err';
   updateGlobalStatus();
   document.querySelectorAll(`[data-ip="${ip}"]`).forEach(d => {
@@ -984,7 +996,7 @@ function buildDashboard() {
         const [tc,tl] = devType(d.label);
         const safe = d.label.replace(/'/g,'').substring(0,40);
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${tc==='aud'?'data-port="61408"':''} title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this)"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
@@ -1062,7 +1074,7 @@ function buildByType() {
           <div class="tc-cinema" style="color:${color}">${c.name} — ${c.city}</div>
           <div class="tc-name" title="${room}: ${d.label}">${room}: ${d.label}</div>
           <div class="tc-btns">
-            <div class="tc-ping" data-ip="${d.ip}" title="Clicca per verificare"
+            <div class="tc-ping" data-ip="${d.ip}" ${tc==='aud'?'data-port="61408"':''} title="Clicca per verificare"
               onclick="pingDevice('${d.ip}',this)"></div>
             ${devBtnsHTML(d.ip, d.label)}
           </div>`;
