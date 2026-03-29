@@ -476,6 +476,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       </div>
       <div class="type-grid" id="grid-rtr"></div>
     </div>
+    <div class="type-section">
+      <div class="type-hdr">
+        <div class="type-icon" style="background:rgba(165,214,167,0.15);border:1px solid rgba(165,214,167,0.3)">🔊</div>
+        <div><div class="type-title" style="color:#a5d6a7">Processori Audio</div></div>
+        <div class="type-count" id="count-aud">—</div>
+      </div>
+      <div class="type-grid" id="grid-aud"></div>
+    </div>
   </div>
 </div>
 
@@ -1028,8 +1036,9 @@ function buildByType() {
   const gp = document.getElementById('grid-proj');
   const gs = document.getElementById('grid-srv');
   const gr = document.getElementById('grid-rtr');
-  gp.innerHTML = ''; gs.innerHTML = ''; gr.innerHTML = '';
-  let cp=0, cs=0, cr=0;
+  const ga = document.getElementById('grid-aud');
+  gp.innerHTML = ''; gs.innerHTML = ''; gr.innerHTML = ''; ga.innerHTML = '';
+  let cp=0, cs=0, cr=0, ca=0;
 
   cinemas.forEach(c => {
     const color = cinemaColor(c.name);
@@ -1052,6 +1061,7 @@ function buildByType() {
         card.dataset.search = [c.name, c.city, room, d.label, d.ip].join(' ').toLowerCase();
         if (isRete) { gr.appendChild(card); cr++; }
         else if (tc === 'srv') { gs.appendChild(card); cs++; }
+        else if (tc === 'aud') { ga.appendChild(card); ca++; }
         else { gp.appendChild(card); cp++; }
       });
     });
@@ -1059,6 +1069,7 @@ function buildByType() {
   document.getElementById('count-proj').textContent = cp + ' dispositivi';
   document.getElementById('count-srv').textContent  = cs + ' dispositivi';
   document.getElementById('count-rtr').textContent  = cr + ' dispositivi';
+  document.getElementById('count-aud').textContent  = ca + ' dispositivi';
 }
 
 // ── MAP ───────────────────────────────────────────────────────
