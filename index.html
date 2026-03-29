@@ -720,15 +720,25 @@ async function pingDevice(ip, dot) {
     d.className = d.className.split(' ')
       .filter(c => !['ok','err','checking'].includes(c)).join(' ') + ' checking';
   });
-  const ok = await new Promise(res => {
-    const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
-    const port = dot.dataset.port || '80';
-    const url  = port === '80' ? 'http://' + ip : `http://${ip}:${port}`;
-    fetch(url, { signal:c.signal, mode:'no-cors', cache:'no-store' })
-      .then(() => { clearTimeout(t); res(true); })
-      .catch(() => { clearTimeout(t); res(false); });
-  });
+  const tcpPort = dot.dataset.port;
+  const ok = await (tcpPort
+    ? new Promise(res => {
+        // TCP reachability via WebSocket timing: se la porta risponde → round-trip >50ms
+        const t0 = Date.now();
+        let done = false;
+        const fin = v => { if (!done) { done = true; try { ws.close(); } catch(e){} res(v); } };
+        const ws = new WebSocket(`ws://${ip}:${tcpPort}`);
+        setTimeout(() => fin(true), 3000);
+        ws.onopen  = () => fin(true);
+        ws.onerror = () => fin(Date.now() - t0 > 50);
+      })
+    : new Promise(res => {
+        const c = new AbortController();
+        const t = setTimeout(() => { c.abort(); res(false); }, 3000);
+        fetch('http://' + ip, { signal:c.signal, mode:'no-cors', cache:'no-store' })
+          .then(() => { clearTimeout(t); res(true); })
+          .catch(() => { clearTimeout(t); res(false); });
+      }));
   pingStatusMap[ip] = ok ? 'ok' : 'err';
   updateGlobalStatus();
   document.querySelectorAll(`[data-ip="${ip}"]`).forEach(d => {
@@ -875,9 +885,7 @@ function devBtnsHTML(ip, label) {
   const [tc] = devType(label);
   const safe = label.replace(/'/g,'').replace(/"/g,'').substring(0,40);
   const copyBtn = `<button class="ip-btn" onclick="copyIP('${ip}',this)">${ip}</button>`;
-  const webBtn  = tc === 'aud'
-    ? `<a class="proto-btn web" href="http://${ip}:61408" target="_blank" onclick="addHistory('${ip}','${safe}')" title="Apri interfaccia web">WEB</a>`
-    : `<a class="proto-btn web" href="http://${ip}" target="_blank" onclick="addHistory('${ip}','${safe}')" title="Apri interfaccia web">WEB</a>`;
+  const webBtn  = tc === 'aud' ? '' : `<a class="proto-btn web" href="http://${ip}" target="_blank" onclick="addHistory('${ip}','${safe}')" title="Apri interfaccia web">WEB</a>`;
   const sshBtn  = (tc === 'srv' || tc === 'rtr')
     ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
     : '';
