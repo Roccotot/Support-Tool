@@ -94,8 +94,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 
 /* ── CINEMA GRID ── */
-.cinemas-grid{display:grid;grid-template-columns:1fr;gap:18px}
-.city-divider{display:flex;align-items:center;gap:14px;padding:22px 4px 6px;margin-top:4px}
+.cinemas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.city-divider{display:flex;align-items:center;gap:14px;padding:22px 4px 6px;margin-top:4px;grid-column:1/-1}
+.grid-filler{visibility:hidden;pointer-events:none}
 .city-divider-line{flex:1;height:1px;background:var(--border)}
 .city-divider-label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text2);white-space:nowrap}
 .cinema-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
@@ -299,6 +300,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   .stats-strip{grid-template-columns:repeat(3,1fr);padding:12px}
   .main{padding:12px 12px 56px}
   .cinemas-grid{grid-template-columns:1fr}
+  .grid-filler{display:none}
   header{padding:0 12px}
 }
 /* ── SEARCH ── */
@@ -884,7 +886,7 @@ function buildDashboard() {
 
   const tmsCard = document.createElement('div');
   tmsCard.className = 'cinema-card';
-  tmsCard.style.cssText = 'background:rgba(0,188,212,0.04);border-color:rgba(0,188,212,0.28)';
+  tmsCard.style.cssText = 'background:rgba(0,188,212,0.04);border-color:rgba(0,188,212,0.28);grid-column:1/-1';
   let tmsRowsHTML = '';
   cinemas.forEach(c => {
     const allIPs = Object.values(c.rooms).flat().map(d => d.ip);
@@ -923,14 +925,27 @@ function buildDashboard() {
     <div class="card-body">${tmsRowsHTML}</div>`;
   grid.appendChild(tmsCard);
 
+  let cityCardCount = 0;
+
+  const addFillers = () => {
+    while (cityCardCount % 3 !== 0) {
+      const f = document.createElement('div');
+      f.className = 'grid-filler';
+      grid.appendChild(f);
+      cityCardCount++;
+    }
+  };
+
   cinemas.forEach(c => {
     if (c.city !== lastCity) {
+      addFillers();
       const div = document.createElement('div');
       div.className = 'city-divider';
       div.dataset.cityDiv = c.city;
       div.innerHTML = `<div class="city-divider-line"></div><div class="city-divider-label">📍 ${c.city}</div><div class="city-divider-line"></div>`;
       grid.appendChild(div);
       lastCity = c.city;
+      cityCardCount = 0;
     }
     const color    = cinemaColor(c.name);
     const rooms    = Object.entries(c.rooms);
@@ -995,7 +1010,9 @@ function buildDashboard() {
     ].join(' ').toLowerCase();
     card.dataset.city = c.city;
     grid.appendChild(card);
+    cityCardCount++;
   });
+  addFillers();
 
   document.getElementById('statCinema').textContent  = cinemas.length;
   document.getElementById('statDevices').textContent = totalDevs;
