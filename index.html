@@ -861,7 +861,10 @@ function devBtnsHTML(ip, label) {
   const sshBtn  = (tc === 'srv' || tc === 'rtr')
     ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
     : '';
-  return copyBtn + webBtn + sshBtn;
+  const vncBtn  = tc === 'srv'
+    ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
+    : '';
+  return copyBtn + webBtn + sshBtn + vncBtn;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
