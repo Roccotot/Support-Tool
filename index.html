@@ -95,6 +95,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 
 /* ── CINEMA GRID ── */
 .cinemas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.city-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.city-col.span-2{grid-column:span 2}
+.city-col.span-3{grid-column:span 3}
+.city-col .cinema-cards{display:flex;gap:14px;align-items:flex-start}
+.city-col .cinema-cards .cinema-card{flex:1;min-width:0}
+.city-col-hdr{display:flex;align-items:center;gap:14px;padding:14px 4px 2px}
+.city-col-hdr-line{flex:1;height:1px;background:var(--border)}
+.city-col-hdr-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--text2);white-space:nowrap}
 .city-divider{display:flex;align-items:center;gap:14px;padding:22px 4px 6px;margin-top:4px;grid-column:1/-1}
 .grid-filler{visibility:hidden;pointer-events:none}
 .city-divider-line{flex:1;height:1px;background:var(--border)}
@@ -299,6 +307,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   .stats-strip{grid-template-columns:repeat(3,1fr);padding:12px}
   .main{padding:12px 12px 56px}
   .cinemas-grid{grid-template-columns:1fr}
+  .city-col,.city-col.span-2,.city-col.span-3{grid-column:1/-1}
+  .city-col .cinema-cards{flex-direction:column}
   .grid-filler{display:none}
   header{padding:0 12px}
 }
@@ -714,9 +724,9 @@ function filterDevices(q) {
     card.style.display = show ? '' : 'none';
     if (show) visibleCinema++;
   });
-  document.querySelectorAll('.city-divider[data-city-div]').forEach(div => {
-    const anyVisible = !!document.querySelector(`.cinema-card[data-city="${div.dataset.cityDiv}"][data-search]:not([style*="none"])`);
-    div.style.display = anyVisible || !q ? '' : 'none';
+  document.querySelectorAll('.city-col[data-city]').forEach(col => {
+    const anyVisible = !!col.querySelector('.cinema-card[data-search]:not([style*="none"])');
+    col.style.display = anyVisible || !q ? '' : 'none';
   });
   document.querySelectorAll('.type-card[data-search]').forEach(card => {
     card.style.display = !q || card.dataset.search.includes(q) ? '' : 'none';
@@ -842,8 +852,6 @@ function buildDashboard() {
   const grid = document.getElementById('cinemasGrid');
   grid.innerHTML = '';
   let totalDevs = 0, totalRooms = 0;
-  let lastCity = null;
-
   // ── SEZIONE TMS (in cima) ─────────────────────────────────
   const tmsDivider = document.createElement('div');
   tmsDivider.className = 'city-divider';
@@ -893,38 +901,22 @@ function buildDashboard() {
     <div class="card-body">${tmsRowsHTML}</div>`;
   grid.appendChild(tmsCard);
 
-  let cityCardCount = 0;
-
-  const addFillers = () => {
-    while (cityCardCount % 3 !== 0) {
-      const f = document.createElement('div');
-      f.className = 'grid-filler';
-      grid.appendChild(f);
-      cityCardCount++;
-    }
-  };
-
+  // Raggruppa cinema per città (preserva ordine del RAW)
+  const cityMap = new Map();
   cinemas.forEach(c => {
-    if (c.city !== lastCity) {
-      addFillers();
-      const div = document.createElement('div');
-      div.className = 'city-divider';
-      div.dataset.cityDiv = c.city;
-      div.innerHTML = `<div class="city-divider-line"></div><div class="city-divider-label">📍 ${c.city}</div><div class="city-divider-line"></div>`;
-      grid.appendChild(div);
-      lastCity = c.city;
-      cityCardCount = 0;
-    }
-    const color    = cinemaColor(c.name);
-    const rooms    = Object.entries(c.rooms);
-    const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
+    if (!cityMap.has(c.city)) cityMap.set(c.city, []);
+    cityMap.get(c.city).push(c);
+  });
+
+  const buildCard = (c) => {
+    const color     = cinemaColor(c.name);
+    const rooms     = Object.entries(c.rooms);
+    const devCount  = rooms.reduce((s,[,r]) => s+r.length, 0);
     totalDevs  += devCount;
     totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
-    const allIPs   = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
-    const tmsIP    = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
-    // Trova il MikroTik/router da mostrare nell'intestazione
+    const allIPs    = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
+    const tmsIP     = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
     const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
-
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
       roomsHTML += `<div class="room-sep">
@@ -933,8 +925,6 @@ function buildDashboard() {
         <div class="room-sep-line"></div>
       </div>`;
       devices.forEach(d => {
-        const [tc,tl] = devType(d.label);
-        const safe = d.label.replace(/'/g,'').substring(0,40);
         roomsHTML += `<div class="dev-row">
           <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this)"></div>
@@ -943,11 +933,9 @@ function buildDashboard() {
         </div>`;
       });
     });
-
     const card = document.createElement('div');
-    card.className = 'cinema-card collapsed';
+    card.className = 'cinema-card'; // aperta di default
     card.style.cssText = `background:${color}0d;border-color:${color}55`;
-    const ipsJSON = JSON.stringify(allIPs);
     card.innerHTML = `
       <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
         <div class="card-title-block">
@@ -976,10 +964,44 @@ function buildDashboard() {
       ...rooms.flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])
     ].join(' ').toLowerCase();
     card.dataset.city = c.city;
-    grid.appendChild(card);
-    cityCardCount++;
+    return card;
+  };
+
+  let colPos = 0;
+  cityMap.forEach((cityCinemas, city) => {
+    const span = Math.min(cityCinemas.length, 3);
+    // Se la città non entra nelle colonne rimanenti → vai a capo
+    if (colPos > 0 && colPos + span > 3) {
+      for (let i = colPos; i < 3; i++) {
+        const f = document.createElement('div');
+        f.className = 'city-col grid-filler';
+        grid.appendChild(f);
+      }
+      colPos = 0;
+    }
+    const col = document.createElement('div');
+    col.className = 'city-col' + (span > 1 ? \` span-${span}\` : '');
+    col.dataset.city = city;
+    const hdr = document.createElement('div');
+    hdr.className = 'city-col-hdr';
+    hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${city}</span><div class="city-col-hdr-line"></div>`;
+    col.appendChild(hdr);
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'cinema-cards';
+    cityCinemas.forEach(c => cardsWrap.appendChild(buildCard(c)));
+    col.appendChild(cardsWrap);
+    col.dataset.search = cityCinemas.flatMap(c =>
+      [c.name, c.city, ...Object.entries(c.rooms).flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])]
+    ).join(' ').toLowerCase();
+    grid.appendChild(col);
+    colPos = (colPos + span) % 3;
   });
-  addFillers();
+  // Fillers per completare l'ultima riga
+  for (let i = colPos; colPos > 0 && i < 3; i++) {
+    const f = document.createElement('div');
+    f.className = 'city-col grid-filler';
+    grid.appendChild(f);
+  }
 
   document.getElementById('statCinema').textContent  = cinemas.length;
   document.getElementById('statDevices').textContent = totalDevs;
