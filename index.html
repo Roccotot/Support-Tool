@@ -262,4 +262,1023 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .hist-item:hover{background:rgba(41,121,255,0.2);border-color:var(--accent);color:#fff}
 .hist-item-label{font-size:8px;color:rgba(255,255,255,0.6);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hist-empty{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);font-style:italic}
-.history-clear{font-family:'Share Tech Mono',monospace;font-size:9px
+.history-clear{font-family:'Share Tech Mono',monospace;font-size:9px;color:#c0d8f0;
+  padding:3px 8px;border-radius:4px;border:1px solid var(--border2);
+  background:none;cursor:pointer;transition:all 0.15s;flex-shrink:0}
+.history-clear:hover{color:var(--crimson);border-color:rgba(255,23,68,0.3)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:50px;right:20px;z-index:9999;background:var(--panel2);
+  border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;
+  padding:11px 17px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);
+  opacity:0;transform:translateX(20px);transition:all 0.3s;pointer-events:none;
+  max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(0)}
+.toast-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.toast-title.ok{color:var(--lime)}.toast-title.err{color:var(--crimson)}.toast-title.info{color:var(--accent)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(min-width:901px){
+  .card-name{font-size:22px}
+  .card-city{font-size:14px}
+  .room-sep-label{font-size:13px;letter-spacing:2.5px}
+  .dev-name{font-size:17px}
+  .dev-type{font-size:13px;padding:4px 12px}
+  .city-divider-label{font-size:20px}
+  .tag{font-size:13px;padding:5px 13px}
+  .ip-btn{font-size:13px;padding:4px 10px}
+  .proto-btn{font-size:12px;padding:4px 10px;letter-spacing:0.5px}
+  .dev-btns{gap:6px}
+  .dev-row{gap:13px;padding:8px 18px}
+  .ping-dot{width:11px;height:11px}
+  .chevron{width:20px;height:20px}
+  .action-btn{font-size:14px;padding:8px 20px}
+  .section-title{font-size:15px;letter-spacing:2px}
+  .history-bar{padding:10px 20px}
+  .history-label{font-size:13px}
+  .hist-item{font-size:13px;padding:5px 12px}
+  .hist-item-label{font-size:11px}
+  .history-clear{font-size:12px;padding:5px 10px}
+  .hist-empty{font-size:12px}
+}
+@media(max-width:900px){
+  .stats-strip{grid-template-columns:repeat(3,1fr);padding:12px}
+  .main{padding:12px 12px 56px}
+  .cinemas-grid{grid-template-columns:1fr}
+  .city-col,.city-col.span-2,.city-col.span-3{grid-column:1/-1}
+  .city-col .cinema-cards{flex-direction:column;align-items:stretch}
+  .city-col .cinema-cards .cinema-card{flex:none}
+  .grid-filler{display:none}
+  header{padding:0 12px}
+}
+/* ── SEARCH ── */
+.search-input{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:7px 13px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);
+  width:230px;outline:none;transition:all 0.2s}
+.search-input::placeholder{color:var(--text2)}
+.search-input:focus{border-color:rgba(41,121,255,0.5);box-shadow:var(--glow)}
+/* ── GLOBAL STATUS BAR ── */
+.global-status-bar{position:relative;z-index:1;display:flex;align-items:center;gap:10px;
+  padding:10px 28px 0;max-width:1600px;margin:0 auto;width:100%;flex-wrap:wrap}
+.gs-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);
+  display:inline-flex;align-items:center;gap:5px}
+.gs-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block}
+.gs-dot.ok{background:var(--lime);box-shadow:0 0 4px var(--lime)}
+.gs-dot.err{background:var(--crimson);box-shadow:0 0 4px var(--crimson)}
+.gs-sep{color:rgba(255,255,255,0.12);font-family:'Share Tech Mono',monospace;font-size:10px}
+.gs-spacer{flex:1}
+.action-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  padding:5px 13px;border-radius:6px;border:1px solid var(--border);background:var(--panel);
+  color:var(--text);cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.action-btn.refresh:hover{border-color:rgba(41,121,255,0.5);color:#fff;background:rgba(41,121,255,0.1)}
+.action-btn.export:hover{border-color:rgba(0,230,118,0.4);color:var(--lime);background:rgba(0,230,118,0.07)}
+.action-btn:disabled{opacity:0.5;cursor:not-allowed}
+.no-results{grid-column:1/-1;text-align:center;padding:40px 20px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);display:none}
+@media(max-width:900px){.global-status-bar{padding:8px 12px 0}}
+/* ── BOTTONE CICLO VISTE (mobile) ── */
+.view-cycle-btn{display:none;align-items:center;gap:6px;padding:9px 13px;
+  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.5px;
+  text-transform:uppercase;background:var(--panel);border:1px solid var(--border);
+  border-radius:9px;color:#c0d8f0;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.view-cycle-btn:hover{color:#fff;background:rgba(41,121,255,0.09)}
+.view-cycle-btn:active{background:rgba(41,121,255,0.18)}
+@media(max-width:600px){.logo-text,.logo-div{display:none}.search-input{width:130px}
+  .view-toggle{display:none}.view-cycle-btn{display:flex}}
+@media(max-width:420px){
+  header{padding:0 8px;gap:8px}
+  .logo-wrap img{height:30px}
+  .search-input{width:80px;padding:6px 8px;font-size:10px}
+  .theme-toggle{padding:6px 8px;font-size:14px}
+  .view-cycle-btn{padding:6px 9px;font-size:11px;gap:4px}
+  .view-cycle-btn svg:last-child{display:none}
+}
+
+/* ── TMS ping dots + pulsanti (sezione Cinema) ── */
+.tms-ping-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  background:var(--text2);cursor:pointer;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1)}
+.tms-ping-dot:hover{transform:scale(1.3)}
+.tms-ping-dot.ok{background:var(--lime);box-shadow:0 0 6px var(--lime);border-color:var(--lime);animation:blinkdot 1.5s infinite}
+.tms-ping-dot.err{background:var(--crimson);box-shadow:0 0 6px var(--crimson);border-color:var(--crimson);animation:blinkdot 1.5s infinite}
+.tms-ping-dot.checking{background:var(--amber);box-shadow:0 0 6px var(--amber);border-color:var(--amber);animation:blinkdot 0.5s infinite}
+.proto-btn.tms-web{color:#4dd0e1;border-color:rgba(77,208,225,0.3);background:rgba(77,208,225,0.07)}
+.proto-btn.tms-web:hover{background:rgba(77,208,225,0.2);border-color:#4dd0e1;color:#fff}
+.proto-btn.putty{color:#64b5f6;border-color:rgba(100,181,246,0.3);background:rgba(100,181,246,0.07)}
+.proto-btn.putty:hover{background:rgba(100,181,246,0.2);border-color:#64b5f6;color:#fff}
+.proto-btn.winscp{color:#80cbc4;border-color:rgba(128,203,196,0.3);background:rgba(128,203,196,0.07)}
+.proto-btn.winscp:hover{background:rgba(128,203,196,0.2);border-color:#80cbc4;color:#fff}
+@media(min-width:901px){.tms-ping-dot{width:11px;height:11px}}
+</style>
+</head>
+<body>
+
+<div class="rb-bar"></div>
+
+<header>
+  <div class="logo-wrap">
+    <img src="data:image/png;base64,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" alt="Sigra Film">
+    <div class="logo-div"></div>
+    <div class="logo-text">SUPPORT TOOL<br><b>di Rocco Totaro</b> — V3.1</div>
+  </div>
+  <input type="text" class="search-input" id="searchInput"
+    placeholder="Cerca cinema, IP, dispositivo..." oninput="filterDevices(this.value)">
+  <div class="header-right">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia tema">
+      <span id="themeIcon">☀️</span>
+    </button>
+    <button class="view-cycle-btn" id="viewCycleBtn" onclick="cycleView()" title="Cambia vista">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+        <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+      </svg>
+      <span id="viewCycleLabel">Mappa</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+    <div class="view-toggle">
+      <button class="view-btn" id="tab-map" onclick="switchView('map')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+          <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+        </svg>Mappa
+      </button>
+      <button class="view-btn" id="tab-dashboard" onclick="switchView('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>Cinema
+      </button>
+      <button class="view-btn" id="tab-bytype" onclick="switchView('bytype')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="6" height="18"/><rect x="9" y="3" width="6" height="12"/>
+          <rect x="16" y="3" width="6" height="8"/>
+        </svg>Per tipo
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MAP -->
+<div class="view active" id="view-map">
+  <div id="map"></div>
+  <div class="map-stats-bar">
+    <div class="msb-item">CINEMA <span id="msb-cinema">—</span></div>
+    <div class="msb-sep">|</div>
+    <div class="msb-item">HOST <span id="msb-host">—</span></div>
+  </div>
+</div>
+
+<!-- DASHBOARD per cinema -->
+<div class="view" id="view-dashboard">
+  <div class="stats-strip">
+    <div class="stat-tile"><div class="st-label">Cinema</div><div class="st-value" id="statCinema">—</div></div>
+    <div class="stat-tile"><div class="st-label">Host Totali</div><div class="st-value" id="statDevices">—</div></div>
+    <div class="stat-tile"><div class="st-label">Gruppi Sala</div><div class="st-value" id="statRooms">—</div></div>
+  </div>
+  <div class="global-status-bar">
+    <span class="gs-item"><span class="gs-dot ok"></span><span id="gs-online-count">—</span> online</span>
+    <span class="gs-sep">|</span>
+    <span class="gs-item"><span class="gs-dot err"></span><span id="gs-offline-count">—</span> offline</span>
+    <span class="gs-sep">|</span>
+    <span class="gs-item"><span id="gs-unknown-count">—</span> non verificati</span>
+    <span class="gs-spacer"></span>
+    <button class="action-btn refresh" id="refreshBtn" onclick="autoPing()" title="Verifica tutti i dispositivi">⟳ Refresh All</button>
+    <button class="action-btn export" onclick="exportCSV()" title="Scarica lista dispositivi CSV">↓ Export CSV</button>
+  </div>
+  <div class="main">
+    <div class="section-hdr">
+      <div class="section-title">Cinema — Dispositivi Monitorati</div>
+      <div class="section-line"></div>
+      <div class="section-title" id="lastUpdate" style="white-space:nowrap">—</div>
+    </div>
+    <div class="cinemas-grid" id="cinemasGrid"></div>
+    <div class="no-results" id="noResults">Nessun risultato per "<span id="noResultsQuery"></span>"</div>
+  </div>
+</div>
+
+<!-- PER TIPO -->
+<div class="view" id="view-bytype">
+  <div class="main">
+    <div class="type-section">
+      <div class="type-hdr">
+        <div class="type-icon" style="background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.3)">🌐</div>
+        <div><div class="type-title" style="color:#ffb74d">MikroTik / Rete</div></div>
+        <div class="type-count" id="count-rtr">—</div>
+      </div>
+      <div class="type-grid" id="grid-rtr"></div>
+    </div>
+    <div class="type-section">
+      <div class="type-hdr">
+        <div class="type-icon" style="background:rgba(179,157,219,0.15);border:1px solid rgba(179,157,219,0.3)">🎥</div>
+        <div><div class="type-title" style="color:#b39ddb">Proiettori</div></div>
+        <div class="type-count" id="count-proj">—</div>
+      </div>
+      <div class="type-grid" id="grid-proj"></div>
+    </div>
+    <div class="type-section">
+      <div class="type-hdr">
+        <div class="type-icon" style="background:rgba(144,202,249,0.15);border:1px solid rgba(144,202,249,0.3)">🖥️</div>
+        <div><div class="type-title" style="color:#90caf9">Server / IMS</div></div>
+        <div class="type-count" id="count-srv">—</div>
+      </div>
+      <div class="type-grid" id="grid-srv"></div>
+    </div>
+    <div class="type-section">
+      <div class="type-hdr">
+        <div class="type-icon" style="background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.3)">🌐</div>
+        <div><div class="type-title" style="color:#ffb74d">MikroTik / Rete</div></div>
+        <div class="type-count" id="count-rtr">—</div>
+      </div>
+      <div class="type-grid" id="grid-rtr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CRONOLOGIA -->
+<div class="history-bar">
+  <div class="history-label">Recenti</div>
+  <div class="history-items" id="historyItems">
+    <span class="hist-empty">Nessun dispositivo visitato</span>
+  </div>
+  <button class="history-clear" onclick="clearHistory()">✕</button>
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-title info" id="toastTitle"></div>
+  <div id="toastMsg"></div>
+</div>
+
+<script>
+// ── DATI ─────────────────────────────────────────────────────
+const RAW = `Aurelia Antica - Grosseto - Rete - MikroTik\t10.57.91.1:161\tSNMP
+Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP\t10.57.91.12:161\tSNMP
+Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP\t10.57.91.22:161\tSNMP
+Aurelia Antica - Grosseto - Sala 3 - Proiettore e ICMP\t10.57.91.32:161\tSNMP
+Aurelia Antica - Grosseto - Sala 4 - Proiettore e ICMP\t10.57.91.42:161\tSNMP
+Clev Village - Chiusi -SI - Rete - MikroTik\t10.56.70.1:161\tSNMP
+Clev Village - Chiusi -SI - Sala 01 - Proiettore\t10.56.70.12:161\tSNMP
+Clev Village - Chiusi -SI - Sala 01 - Server\t10.56.70.10:161\tSNMP
+Clev Village - Chiusi -SI - Sala 02 - Proiettore\t10.56.70.22:161\tSNMP
+Clev Village - Chiusi -SI - Sala 02 - Server\t10.56.70.20:161\tSNMP
+Clev Village - Chiusi -SI - Sala 03 - Proiettore\t10.56.70.32:161\tSNMP
+Clev Village - Chiusi -SI - Sala 03 - Server\t10.56.70.30:161\tSNMP
+Clev Village - Chiusi -SI - Sala 04 - Proiettore\t10.56.70.42:161\tSNMP
+Clev Village - Chiusi -SI - Sala 04 - Server\t10.56.70.40:161\tSNMP
+Clev Village - Chiusi -SI - Sala 05 - Proiettore\t10.56.70.52:161\tSNMP
+Clev Village - Chiusi -SI - Sala 05 - Server\t10.56.70.50:161\tSNMP
+Clev Village - Chiusi -SI - Sala 06 - Proiettore\t10.56.70.62:161\tSNMP
+Clev Village - Chiusi -SI - Sala 06 - Server\t10.56.70.60:161\tSNMP
+Imperiale - Montecatini Terme - Rete - MikroTik\t10.57.97.1:161\tSNMP
+Imperiale - Montecatini Terme - Sala 1 - Proiettore\t10.57.97.12:161\tSNMP
+Imperiale - Montecatini Terme - Sala 1 - Server - IMS3000\t10.57.97.10:161\tSNMP
+Imperiale - Montecatini Terme - Sala 2 - Proiettore\t10.57.97.22:161\tSNMP
+Imperiale - Montecatini Terme - Sala 2 - Server - IMS3000\t10.57.97.20:161\tSNMP
+Imperiale - Montecatini Terme - Sala 3 - Proiettore e Server\t10.57.97.32:161\tSNMP
+Imperiale - Montecatini Terme - Sala 4 - Proiettore e Server\t10.57.97.42:161\tSNMP
+Isola Verde - Pisa - Rete - MikroTik\t10.58.70.1:161\tSNMP
+Isola Verde - Pisa - Sala 01 - Proiettore\t10.58.70.12:161\tSNMP
+Isola Verde - Pisa - Sala 01 - Server\t10.58.70.10:161\tSNMP
+Isola Verde - Pisa - Sala 02 - Proiettore\t10.58.70.22:161\tSNMP
+Isola Verde - Pisa - Sala 02 - Server\t10.58.70.20:161\tSNMP
+Isola Verde - Pisa - Sala 03 - Proiettore\t10.58.70.32:161\tSNMP
+Isola Verde - Pisa - Sala 03 - Server\t10.58.70.30:161\tSNMP
+Multisala Odeon - Pisa - Rete - MikroTik\t10.55.76.1:161\tSNMP
+Multisala Odeon - Pisa - Sala 1 Venezia - Proiettore\t10.55.76.12:161\tSNMP
+Multisala Odeon - Pisa - Sala 1 Venezia - Server IMS3000\t10.55.76.10:161\tSNMP
+Multisala Odeon - Pisa - Sala 2 Amalfi - Proiettore\t10.55.76.22:161\tSNMP
+Multisala Odeon - Pisa - Sala 2 Amalfi - Server IMS3000\t10.55.76.20:161\tSNMP
+Multisala Odeon - Pisa - Sala 3 Pisa - Proiettore\t10.55.76.32:161\tSNMP
+Multisala Odeon - Pisa - Sala 3 Pisa - Server IMS3000\t10.55.76.30:161\tSNMP
+Multisala Odeon - Pisa - Sala 4 Genova - Proiettore\t10.55.76.42:161\tSNMP
+Multisala Odeon - Pisa - Sala 4 Genova - Server IMS3000\t10.55.76.40:161\tSNMP
+Multisala Odeon - Pisa - Sala 5 Kinzica - Proiettore\t10.55.76.52:161\tSNMP
+Multisala Odeon - Pisa - Sala 5 Kinzica - Server IMS3000\t10.55.76.50:161\tSNMP
+Cinema Scipione Ammirato - Montaione - Rete - MikroTik\t10.58.76.1:161\tSNMP
+Cinema Scipione Ammirato - Montaione - Sala 1 - Server\t10.58.76.10:161\tSNMP
+Cinema Scipione Ammirato - Montaione - Sala 1 - Proiettore\t10.58.76.12:161\tSNMP
+Odeon - Firenze - Rete - MikroTik\t10.58.79.1:161\tSNMP
+Odeon - Firenze - Sala 1 - Proiettore e ICMP\t10.58.79.12:161\tSNMP
+Spazio Alfieri - Firenze - Rete - MikroTik\t10.58.77.1:161\tSNMP
+Spazio Alfieri - Firenze - Sala 1 - Server\t10.58.77.10:161\tSNMP
+Spazio Alfieri - Firenze - Sala 1 - Proiettore\t10.58.77.12:161\tSNMP
+Excelsior - Empoli - Rete - MikroTik\t10.58.75.1:161\tSNMP
+Excelsior - Empoli - Sala 1 - Proiettore\t10.58.75.12:161\tSNMP
+Excelsior - Empoli - Sala 1 - Server Doremi\t10.58.75.10:161\tSNMP
+Excelsior - Empoli - Sala 2 - Proiettore\t10.58.75.22:161\tSNMP
+Excelsior - Empoli - Sala 2 - Server Doremi\t10.58.75.20:161\tSNMP
+Excelsior - Empoli - Sala 3 - Proiettore\t10.58.75.32:161\tSNMP
+Excelsior - Empoli - Sala 3 - Server Doremi\t10.58.75.30:161\tSNMP
+Nuova Aurora - Sansepolcro - Rete - MikroTik\t10.58.78.1:161\tSNMP
+Nuova Aurora - Sansepolcro - Sala 1 - Proiettore\t10.58.78.12:161\tSNMP
+Nuova Aurora - Sansepolcro - Sala 1 - Server Doremi\t10.58.78.10:161\tSNMP
+Splendor - Massa - Rete - MikroTik\t10.58.71.1:161\tSNMP
+Splendor - Massa - Sala 01 - Proiettore\t10.58.71.12:161\tSNMP
+Splendor - Massa - Sala 01 - Server\t10.58.71.10:161\tSNMP
+Splendor - Massa - Sala 02 - Proiettore\t10.58.71.22:161\tSNMP
+Splendor - Massa - Sala 02 - Server\t10.58.71.20:161\tSNMP
+Splendor - Massa - Sala 03 - Proiettore\t10.58.71.32:161\tSNMP
+Splendor - Massa - Sala 03 - Server\t10.58.71.30:161\tSNMP
+Splendor - Massa - Sala 04 - Proiettore\t10.58.71.42:161\tSNMP
+Splendor - Massa - Sala 04 - Server\t10.58.71.40:161\tSNMP
+Splendor - Massa - Sala 05 - Proiettore\t10.58.71.52:161\tSNMP
+Splendor - Massa - Sala 05 - Server\t10.58.71.50:161\tSNMP
+Splendor - Massa - Sala 06 - Proiettore\t10.58.71.62:161\tSNMP
+Splendor - Massa - Sala 06 - Server\t10.58.71.60:161\tSNMP
+Splendor - Massa - Sala 07 - Proiettore\t10.58.71.72:161\tSNMP
+Splendor - Massa - Sala 07 - Server\t10.58.71.70:161\tSNMP
+Teatro Giotto - Borgo San Lorenzo - Rete - MikroTik\t10.58.82.1:161\tSNMP
+Teatro Giotto - Borgo San Lorenzo - Sala 1 - Proiettore\t10.58.82.12:161\tSNMP
+Teatro Giotto - Borgo San Lorenzo - Sala 1 - Server Doremi\t10.58.82.10:161\tSNMP
+4 Mori - Livorno - Rete - MikroTik\t10.58.84.1:161\tSNMP
+4 Mori - Livorno - Sala 1 - Server\t10.58.84.10:161\tSNMP
+4 Mori - Livorno - Sala 1 - Proiettore\t10.58.84.12:161\tSNMP
+4 Mori - Livorno - Sala 2 - Server\t10.58.84.20:161\tSNMP
+4 Mori - Livorno - Sala 2 - Proiettore\t10.58.84.22:161\tSNMP`;
+
+// ── PALETTE ───────────────────────────────────────────────────
+// 15 colori distinti e vividi — un colore unico per ogni cinema fino a 15
+const PALETTE = [
+  '#ff6b6b','#ffa552','#ffd166','#c8f060','#06d6a0',
+  '#1db954','#00b4d8','#4cc9f0','#4361ee','#9b5de5',
+  '#e040fb','#f72585','#43d9ad','#f9c74f','#ff6090'
+];
+
+const _colorMap = {};
+
+function initColors(cinemas) {
+  // Reset completo ad ogni init
+  Object.keys(_colorMap).forEach(k => delete _colorMap[k]);
+  // Assegna in ordine di indice: i primi 15 prendono colori tutti diversi,
+  // oltre 15 si ricicla (per forza maggiore)
+  cinemas.forEach((c, i) => {
+    _colorMap[c.name] = PALETTE[i % PALETTE.length];
+  });
+}
+
+function cinemaColor(name) {
+  return _colorMap[name] || PALETTE[0];
+}
+
+// ── PARSE ─────────────────────────────────────────────────────
+function parseRaw(raw) {
+  const cinemas = {};
+  raw.split('\n').forEach(line => {
+    line = line.trim();
+    if (!line || !line.includes(':161')) return;
+    const cols  = line.split('\t');
+    const full  = cols[0];
+    const ip    = (cols[1]||'').replace(':161','');
+    const parts = full.split(' - ');
+    if (parts.length < 2) return;
+    const name = parts[0].trim();
+    const city = parts[1].trim().replace(/\s*-\s*[A-Z]{2}$/,'').trim();
+    const room = (parts[2] ? parts[2].trim() : 'Dispositivi').replace(/^(Sala)\s+0*(\d+)$/, '$1 $2');
+    const dev  = (parts.slice(3).join(' - ').trim() || 'Unità').replace(/\s+(IMS3000|IMS\s*\d+|Doremi|Barco)\b/gi, '').replace(/\s*-\s*$/, '');
+    const key  = name + '|||' + city;
+    if (!cinemas[key]) cinemas[key] = { name, city, rooms:{} };
+    if (!cinemas[key].rooms[room]) cinemas[key].rooms[room] = [];
+    cinemas[key].rooms[room].push({ label:dev, ip });
+  });
+  const result = Object.values(cinemas).sort((a,b) => a.city.localeCompare(b.city));
+  result.forEach(c => Object.keys(c.rooms).forEach(r => {
+    c.rooms[r].sort((a,b) => {
+      const ta = devType(a.label)[0], tb = devType(b.label)[0];
+      return ta === tb ? 0 : ta === 'srv' ? -1 : 1;
+    });
+  }));
+  return result;
+}
+
+function devType(label) {
+  if (/mikrotik|router/i.test(label))                         return ['rtr','ROUTER'];
+  if (/server|ims|doremi|srv/i.test(label))                   return ['srv','SERVER'];
+  if (/proiettore|barco|christie|nec|projector/i.test(label)) return ['proj','PROIETT.'];
+  return ['proj','UNITÀ'];
+}
+
+// ── PING ─────────────────────────────────────────────────────
+const pingStatusMap = {};
+
+function updateGlobalStatus() {
+  const vals = Object.values(pingStatusMap);
+  const online   = vals.filter(s=>s==='ok').length;
+  const offline  = vals.filter(s=>s==='err').length;
+  const checking = vals.filter(s=>s==='checking').length;
+  const total    = parseRaw(RAW).flatMap(c=>Object.values(c.rooms).flatMap(d=>d)).length;
+  const unknown  = Math.max(0, total - online - offline - checking);
+  const onEl  = document.getElementById('gs-online-count');
+  const offEl = document.getElementById('gs-offline-count');
+  const unkEl = document.getElementById('gs-unknown-count');
+  if(onEl)  onEl.textContent  = online;
+  if(offEl) offEl.textContent = offline;
+  if(unkEl) unkEl.textContent = unknown;
+}
+
+async function pingDevice(ip, dot) {
+  const prev = pingStatusMap[ip];
+  pingStatusMap[ip] = 'checking';
+  updateGlobalStatus();
+  // Aggiorna TUTTI i pallini con questo IP (header + body sincronizzati)
+  document.querySelectorAll(`[data-ip="${ip}"]`).forEach(d => {
+    d.className = d.className.split(' ')
+      .filter(c => !['ok','err','checking'].includes(c)).join(' ') + ' checking';
+  });
+  const ok = await new Promise(res => {
+    const c = new AbortController();
+    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
+    fetch('http://' + ip, { signal:c.signal, mode:'no-cors', cache:'no-store' })
+      .then(() => { clearTimeout(t); res(true); })
+      .catch(() => { clearTimeout(t); res(false); });
+  });
+  pingStatusMap[ip] = ok ? 'ok' : 'err';
+  updateGlobalStatus();
+  document.querySelectorAll(`[data-ip="${ip}"]`).forEach(d => {
+    d.className = d.className.split(' ')
+      .filter(c => !['checking','ok','err'].includes(c)).join(' ');
+    d.classList.add(ok ? 'ok' : 'err');
+    d.title = ok ? '✓ Risponde' : '✗ Non risponde';
+  });
+  if (prev === 'ok' && !ok) showToast('ALERT', ip + ' non risponde', 'err');
+}
+
+async function checkTMSBtn(btn) {
+  const url = btn.dataset.tmsUrl;
+  if (!url) return;
+  const ok = await new Promise(res => {
+    const c = new AbortController();
+    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
+    fetch(url, { signal:c.signal, mode:'no-cors', cache:'no-store' })
+      .then(() => { clearTimeout(t); res(true); })
+      .catch(() => { clearTimeout(t); res(false); });
+  });
+  if (ok) btn.style.display = '';
+}
+function checkAllTMSBtns(root) {
+  (root || document).querySelectorAll('.tms-btn[data-tms-url]').forEach(checkTMSBtn);
+}
+
+function filterDevices(q) {
+  q = q.toLowerCase().trim();
+  let visibleCinema = 0;
+  document.querySelectorAll('.cinema-card[data-search]').forEach(card => {
+    const show = !q || card.dataset.search.includes(q);
+    card.style.display = show ? '' : 'none';
+    if (show) visibleCinema++;
+  });
+  document.querySelectorAll('.city-col[data-city]').forEach(col => {
+    const anyVisible = !!col.querySelector('.cinema-card[data-search]:not([style*="none"])');
+    col.style.display = anyVisible || !q ? '' : 'none';
+  });
+  document.querySelectorAll('.type-card[data-search]').forEach(card => {
+    card.style.display = !q || card.dataset.search.includes(q) ? '' : 'none';
+  });
+  const noRes = document.getElementById('noResults');
+  const noResQ = document.getElementById('noResultsQuery');
+  if (noRes)  noRes.style.display  = q && visibleCinema === 0 ? '' : 'none';
+  if (noResQ) noResQ.textContent   = q;
+}
+
+function exportCSV() {
+  const cinemas = parseRaw(RAW);
+  const rows = [['Cinema','Città','Sala','Dispositivo','IP','Stato']];
+  cinemas.forEach(c => {
+    Object.entries(c.rooms).forEach(([room, devs]) => {
+      devs.forEach(d => {
+        rows.push([c.name, c.city, room, d.label, d.ip,
+          pingStatusMap[d.ip] || 'non verificato']);
+      });
+    });
+  });
+  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'noc-dispositivi.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── AUTO PING ────────────────────────────────────────────────
+function cinemaId(name) { return 'ms_' + name.replace(/[^a-zA-Z0-9]/g,'_'); }
+
+function updateMapStatus(cinemaName) {
+  const dots = document.querySelectorAll(`.ping-dot[data-cinema="${cinemaName}"]`);
+  if (!dots.length) return;
+  let ok=0, err=0;
+  dots.forEach(d => { if(d.classList.contains('ok')) ok++; else if(d.classList.contains('err')) err++; });
+  const el = document.getElementById(cinemaId(cinemaName));
+  if (!el) return;
+  el.className = 'cmarker-status';
+  if (ok+err === 0) return;
+  if (err === 0) el.classList.add('ok');
+  else if (ok === 0) el.classList.add('err');
+  else el.classList.add('partial');
+}
+
+async function autoPing() {
+  // Deduplica: un solo ping per IP, aggiorna tutti i pallini con quell'IP
+  const seen = new Set();
+  const dots = [...document.querySelectorAll('[data-ip]')].filter(d => {
+    if (seen.has(d.dataset.ip)) return false;
+    seen.add(d.dataset.ip);
+    return true;
+  });
+  for (let i = 0; i < dots.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 80));
+    const dot = dots[i];
+    pingDevice(dot.dataset.ip, dot).then(() => {
+      if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
+    });
+  }
+}
+
+// ── COPIA IP ─────────────────────────────────────────────────
+function copyIP(ip, el) {
+  navigator.clipboard.writeText(ip).then(() => {
+    const orig = el.textContent;
+    el.classList.add('copied'); el.textContent = '✓ copiato';
+    setTimeout(() => { el.classList.remove('copied'); el.textContent = orig; }, 1500);
+  }).catch(() => showToast('ERRORE','Copia non disponibile','err'));
+}
+
+// ── CRONOLOGIA ────────────────────────────────────────────────
+let histList = [];
+try { histList = JSON.parse(localStorage.getItem('noc_hist') || '[]'); } catch(e){}
+
+function addHistory(ip, label) {
+  histList = histList.filter(h => h.ip !== ip);
+  histList.unshift({ ip, label: label.substring(0,30) });
+  if (histList.length > 8) histList = histList.slice(0,8);
+  try { localStorage.setItem('noc_hist', JSON.stringify(histList)); } catch(e){}
+  renderHistory();
+}
+function clearHistory() {
+  histList = [];
+  try { localStorage.removeItem('noc_hist'); } catch(e){}
+  renderHistory();
+}
+function renderHistory() {
+  const el = document.getElementById('historyItems');
+  if (!histList.length) {
+    el.innerHTML = '<span class="hist-empty">Nessun dispositivo visitato</span>';
+    return;
+  }
+  el.innerHTML = histList.map(h =>
+    `<a class="hist-item" href="http://${h.ip}" target="_blank"
+       onclick="addHistory('${h.ip}','${h.label.replace(/'/g,'')}')">
+       <span>${h.ip}</span>
+       <span class="hist-item-label">${h.label}</span>
+     </a>`
+  ).join('');
+}
+
+// ── COSTRUISCE PULSANTI DISPOSITIVO ──────────────────────────
+function devBtnsHTML(ip, label) {
+  const [tc] = devType(label);
+  const safe = label.replace(/'/g,'').replace(/"/g,'').substring(0,40);
+  const copyBtn = `<button class="ip-btn" onclick="copyIP('${ip}',this)">${ip}</button>`;
+  const webBtn  = `<a class="proto-btn web" href="http://${ip}" target="_blank" onclick="addHistory('${ip}','${safe}')" title="Apri interfaccia web">WEB</a>`;
+  const sshBtn  = (tc === 'srv' || tc === 'rtr')
+    ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
+    : '';
+  const vncBtn  = tc === 'srv'
+    ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
+    : '';
+  return vncBtn + sshBtn + webBtn + copyBtn;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function buildDashboard() {
+  const cinemas = parseRaw(RAW);
+  initColors(cinemas);
+  const grid = document.getElementById('cinemasGrid');
+  grid.innerHTML = '';
+  let totalDevs = 0, totalRooms = 0;
+  // ── SEZIONE TMS (in cima) ─────────────────────────────────
+  const tmsDivider = document.createElement('div');
+  tmsDivider.className = 'city-divider';
+  tmsDivider.innerHTML = `<div class="city-divider-line"></div>
+    <div class="city-divider-label">🖥 TMS</div>
+    <div class="city-divider-line"></div>`;
+  grid.appendChild(tmsDivider);
+
+  const tmsCard = document.createElement('div');
+  tmsCard.className = 'cinema-card';
+  tmsCard.style.cssText = 'background:rgba(0,188,212,0.04);border-color:rgba(0,188,212,0.28);grid-column:1/-1';
+  let tmsRowsHTML = '';
+  cinemas.forEach(c => {
+    const allIPs = Object.values(c.rooms).flat().map(d => d.ip);
+    if (!allIPs.length) return;
+    const tmsIP  = allIPs[0].replace(/\.\d+$/, '.2');
+    const tmsUrl = `http://${tmsIP}:9000/tms/`;
+    tmsRowsHTML += `<div class="dev-row" data-tms-row="${tmsIP}">
+      <div class="tms-ping-dot" data-tms-ip="${tmsIP}" title="Clicca per verificare TMS"
+        onclick="pingTMSDevice('${tmsIP}',this)"></div>
+      <div class="dev-name">TMS ${c.name} — <span style="color:var(--text2)">${c.city}</span></div>
+      <span class="dev-type srv" style="color:#4dd0e1;border-color:rgba(77,208,225,0.3)">TMS</span>
+      <div class="dev-btns">
+        <a class="proto-btn tms-web" href="${tmsUrl}" target="_blank" title="Apri interfaccia TMS (porta 9000)">WEB</a>
+        <a class="proto-btn putty" href="ssh://${tmsIP}" title="Apri SSH con PuTTY">PuTTY SSH</a>
+        <a class="proto-btn winscp" href="winscp://root@${tmsIP}/" title="Apri SFTP con WinSCP">WinSCP</a>
+      </div>
+    </div>`;
+  });
+  tmsCard.innerHTML = `
+    <div class="card-hdr" style="background:linear-gradient(135deg,rgba(0,188,212,0.12),rgba(0,188,212,0.06))"
+      onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
+      <div class="card-title-block">
+        <div class="card-icon" style="background:rgba(0,188,212,0.15);border-color:rgba(0,188,212,0.35)">🖥</div>
+        <div>
+          <div class="card-name" style="color:#4dd0e1">Theatre Management System</div>
+          <div class="card-city" style="color:#4dd0e1">PuTTY SSH · WinSCP · Web</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <span class="tag" style="color:#4dd0e1;border-color:rgba(0,188,212,0.3)" id="tmsOnlineTag">${cinemas.length} TMS</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card-body">${tmsRowsHTML}</div>`;
+  grid.appendChild(tmsCard);
+
+  // Raggruppa cinema per città (preserva ordine del RAW)
+  const cityMap = new Map();
+  cinemas.forEach(c => {
+    if (!cityMap.has(c.city)) cityMap.set(c.city, []);
+    cityMap.get(c.city).push(c);
+  });
+
+  const buildCard = (c) => {
+    const color     = cinemaColor(c.name);
+    const rooms     = Object.entries(c.rooms);
+    const devCount  = rooms.reduce((s,[,r]) => s+r.length, 0);
+    totalDevs  += devCount;
+    totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
+    const allIPs    = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
+    const tmsIP     = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
+    const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
+    let roomsHTML = '';
+    rooms.forEach(([roomName, devices]) => {
+      roomsHTML += `<div class="room-sep">
+        <div class="room-sep-dot" style="background:${color}"></div>
+        <div class="room-sep-label">${roomName}</div>
+        <div class="room-sep-line"></div>
+      </div>`;
+      devices.forEach(d => {
+        roomsHTML += `<div class="dev-row">
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
+            onclick="pingDevice('${d.ip}',this)"></div>
+          <div class="dev-name" title="${d.label}">${d.label}</div>
+          <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
+        </div>`;
+      });
+    });
+    const card = document.createElement('div');
+    card.className = 'cinema-card'; // aperta di default
+    card.style.cssText = `background:${color}0d;border-color:${color}55`;
+    card.innerHTML = `
+      <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
+        <div class="card-title-block">
+          <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
+          <div>
+            <div class="card-name">${c.name}</div>
+            <div class="card-city" style="color:${color}">📍 ${c.city}</div>
+            ${routerDev ? `<div class="card-rtr">
+              <div class="ping-dot" data-ip="${routerDev.ip}" data-cinema="${c.name}"
+                title="MikroTik — clicca per verificare"
+                onclick="event.stopPropagation();pingDevice('${routerDev.ip}',this)"></div>
+              <span>MikroTik&ensp;${routerDev.ip}</span>
+            </div>` : ''}
+          </div>
+        </div>
+        <div class="card-actions">
+          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" onclick="event.stopPropagation()" title="Apri TMS ${tmsIP}" style="display:none" data-tms-url="http://${tmsIP}:9000/tms/">TMS</a>` : ''}
+          <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body">${roomsHTML}</div>`;
+    card.dataset.search = [c.name, c.city,
+      ...rooms.flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])
+    ].join(' ').toLowerCase();
+    card.dataset.city = c.city;
+    return card;
+  };
+
+  let colPos = 0;
+  cityMap.forEach((cityCinemas, city) => {
+    const span = Math.min(cityCinemas.length, 3);
+    // Se la città non entra nelle colonne rimanenti → vai a capo
+    if (colPos > 0 && colPos + span > 3) {
+      for (let i = colPos; i < 3; i++) {
+        const f = document.createElement('div');
+        f.className = 'city-col grid-filler';
+        grid.appendChild(f);
+      }
+      colPos = 0;
+    }
+    const col = document.createElement('div');
+    col.className = 'city-col' + (span > 1 ? ` span-${span}` : '');
+    col.dataset.city = city;
+    const hdr = document.createElement('div');
+    hdr.className = 'city-col-hdr';
+    hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${city}</span><div class="city-col-hdr-line"></div>`;
+    col.appendChild(hdr);
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'cinema-cards';
+    cityCinemas.forEach(c => cardsWrap.appendChild(buildCard(c)));
+    col.appendChild(cardsWrap);
+    col.dataset.search = cityCinemas.flatMap(c =>
+      [c.name, c.city, ...Object.entries(c.rooms).flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])]
+    ).join(' ').toLowerCase();
+    grid.appendChild(col);
+    colPos = (colPos + span) % 3;
+  });
+  // Fillers per completare l'ultima riga
+  for (let i = colPos; colPos > 0 && i < 3; i++) {
+    const f = document.createElement('div');
+    f.className = 'city-col grid-filler';
+    grid.appendChild(f);
+  }
+
+  document.getElementById('statCinema').textContent  = cinemas.length;
+  document.getElementById('statDevices').textContent = totalDevs;
+  document.getElementById('statRooms').textContent   = totalRooms;
+  const now = new Date();
+  document.getElementById('lastUpdate').textContent  =
+    now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── PER TIPO ──────────────────────────────────────────────────
+function buildByType() {
+  const cinemas = parseRaw(RAW);
+  initColors(cinemas);
+  const gp = document.getElementById('grid-proj');
+  const gs = document.getElementById('grid-srv');
+  const gr = document.getElementById('grid-rtr');
+  gp.innerHTML = ''; gs.innerHTML = ''; gr.innerHTML = '';
+  let cp=0, cs=0, cr=0;
+
+  cinemas.forEach(c => {
+    const color = cinemaColor(c.name);
+    Object.entries(c.rooms).forEach(([room, devices]) => {
+      const isRete = room === 'Rete';
+      devices.forEach(d => {
+        const [tc,tl] = devType(d.label);
+        const safe = d.label.replace(/'/g,'').substring(0,40);
+        const card = document.createElement('div');
+        card.className = 'type-card';
+        card.style.cssText = `background:${color}0d;border-color:${color}44`;
+        card.innerHTML = `
+          <div class="tc-cinema" style="color:${color}">${c.name} — ${c.city}</div>
+          <div class="tc-name" title="${room}: ${d.label}">${room}: ${d.label}</div>
+          <div class="tc-btns">
+            <div class="tc-ping" data-ip="${d.ip}" title="Clicca per verificare"
+              onclick="pingDevice('${d.ip}',this)"></div>
+            ${devBtnsHTML(d.ip, d.label)}
+          </div>`;
+        card.dataset.search = [c.name, c.city, room, d.label, d.ip].join(' ').toLowerCase();
+        if (isRete) { gr.appendChild(card); cr++; }
+        else if (tc === 'srv') { gs.appendChild(card); cs++; }
+        else { gp.appendChild(card); cp++; }
+      });
+    });
+  });
+  document.getElementById('count-proj').textContent = cp + ' dispositivi';
+  document.getElementById('count-srv').textContent  = cs + ' dispositivi';
+  document.getElementById('count-rtr').textContent  = cr + ' dispositivi';
+}
+
+// ── MAP ───────────────────────────────────────────────────────
+function buildPopupHTML(c) {
+  const color    = cinemaColor(c.name);
+  const devCount = Object.values(c.rooms).flat().length;
+  const allIPs   = Object.values(c.rooms).flat().map(d => d.ip);
+  const ipsJSON  = JSON.stringify(allIPs);
+  const tmsIP    = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
+
+  let devRows = '';
+  Object.entries(c.rooms).forEach(([room, devices]) => {
+    devRows += `<div class="popup-room-lbl">${room}</div>`;
+    devices.forEach(d => {
+      const [tc,tl] = devType(d.label);
+      const safe = d.label.replace(/'/g,'').substring(0,40);
+      devRows += `<div class="popup-dev-row">
+        <div class="ping-dot" data-ip="${d.ip}" title="Clicca per verificare" onclick="pingDevice('${d.ip}',this)" style="flex-shrink:0"></div>
+        <div class="pdev-name" title="${d.label}">${d.label}</div>
+        <div class="pdev-btns">
+          <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
+          <a class="proto-btn web" href="http://${d.ip}" target="_blank" onclick="addHistory('${d.ip}','${safe}')" style="font-size:8px">WEB</a>
+          ${tc==='srv' ? `<a class="proto-btn ssh" href="ssh://${d.ip}" style="font-size:8px">SSH</a>
+          <a class="proto-btn vnc" href="vnc://${d.ip}" onclick="addHistory('${d.ip}','${safe}')" style="font-size:8px">VNC</a>` : ''}
+        </div>
+      </div>`;
+    });
+  });
+
+  const addrLine = c._address ? `<div class="popup-addr">📍 ${c._address}</div>` : '';
+  return `<div style="background:${color}0d;border-radius:13px;overflow:hidden">
+    <div class="popup-rb" style="background:${color}"></div>
+    <div class="popup-hdr" style="background:${color}12">
+      <div class="popup-ico" style="background:${color}20;border-color:${color}55">🎬</div>
+      <div style="flex:1;min-width:0">
+        <div class="popup-title">${c.name}</div>
+        <div class="popup-city" style="color:${color}">📍 ${c.city}</div>
+        ${addrLine}
+        <div class="popup-badges">
+          <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
+          <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).filter(r => r !== 'Rete').length} sale</span>
+          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" title="Apri TMS ${tmsIP}" style="display:none" data-tms-url="http://${tmsIP}:9000/tms/">TMS</a>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="popup-devs">${devRows}</div>
+  </div>`;
+}
+
+async function geocodeCinema(name, city) {
+  const queries = [`${name} ${city} Italia`,`cinema ${name} ${city}`,`${city}, Italia`,`${city} Italia`];
+  for (const q of queries) {
+    try {
+      const r = await fetch(
+        'https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=it&q=' + encodeURIComponent(q),
+        { headers:{'Accept-Language':'it','User-Agent':'SigraFilmNOC/3.1'} }
+      );
+      const d = await r.json();
+      if (!d||!d.length) continue;
+      const best = d.sort((a,b) => {
+        const s = x => /cinema|theatre/i.test((x.type||'')+(x.class||'')) ? 3
+          : /building|amenity/i.test(x.class||'') ? 2 : /city|town/i.test(x.type||'') ? 1 : 0;
+        return s(b)-s(a);
+      })[0];
+      return { lat:parseFloat(best.lat), lng:parseFloat(best.lon),
+               address:best.display_name.split(',').slice(0,3).join(', ') };
+    } catch(e){}
+  }
+  return null;
+}
+
+async function buildMap() {
+  const map = L.map('map',{center:[43.5,11.2],zoom:8,zoomControl:false,attributionControl:false});
+  window._map = map;
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+  L.control.zoom({position:'bottomright'}).addTo(map);
+  const s = document.createElement('style');
+  s.textContent='.leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important;padding:0 !important}';
+  document.head.appendChild(s);
+
+  const cinemas = parseRaw(RAW);
+  initColors(cinemas);
+  document.getElementById('msb-cinema').textContent = cinemas.length;
+  document.getElementById('msb-host').textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
+
+  const FALLBACK = {
+    'Grosseto':[42.7629,11.1121],'Chiusi':[43.0146,11.9454],
+    'Montecatini Terme':[43.8847,10.7728],'Pisa':[43.7228,10.4017],
+    'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],'Empoli':[43.7193,10.9497],'Firenze':[43.7696,11.2558],
+  };
+
+  for (let i=0; i<cinemas.length; i++) {
+    const c=cinemas[i], color=cinemaColor(c.name);
+    if (i>0) await new Promise(r=>setTimeout(r,1150));
+    const geo=await geocodeCinema(c.name,c.city);
+    let lat,lng;
+    if (geo){lat=geo.lat;lng=geo.lng;c._address=geo.address;}
+    else if(FALLBACK[c.city]){[lat,lng]=FALLBACK[c.city];c._address=null;}
+    else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
+
+    const icon=L.divIcon({
+      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div><div class="cmarker-status" id="${cinemaId(c.name)}"></div></div>`,
+      className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
+    });
+    const marker=L.marker([lat,lng],{icon}).addTo(map);
+    const popup=L.popup({closeButton:false,autoClose:false,closeOnClick:false}).setContent(buildPopupHTML(c));
+    marker.bindPopup(popup);
+    let ct;
+    marker.on('mouseover',()=>{clearTimeout(ct);marker.openPopup()});
+    marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
+    marker.on('popupopen',()=>{
+      const el=marker.getPopup().getElement(); if(!el) return;
+      el.querySelectorAll('.ping-dot[data-ip]').forEach(dot=>{
+        const src=document.querySelector(`.ping-dot[data-cinema][data-ip="${dot.dataset.ip}"]`);
+        if(!src) return;
+        ['ok','err','checking'].forEach(cls=>dot.classList.toggle(cls,src.classList.contains(cls)));
+        dot.title=src.title;
+      });
+      el.addEventListener('mouseenter',()=>clearTimeout(ct));
+      el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
+      checkAllTMSBtns(el);
+    });
+    marker.bindTooltip(
+      `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
+      {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
+    );
+    updateMapStatus(c.name);
+  }
+}
+
+// ── TMS ───────────────────────────────────────────────────────
+async function pingTMSDevice(ip, dot) {
+  const url = `http://${ip}:9000/tms/`;
+  dot.className = dot.className.split(' ')
+    .filter(c => !['ok','err','checking'].includes(c)).join(' ') + ' checking';
+  const ok = await new Promise(res => {
+    const c = new AbortController();
+    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
+    fetch(url, { signal:c.signal, mode:'no-cors', cache:'no-store' })
+      .then(() => { clearTimeout(t); res(true); })
+      .catch(() => { clearTimeout(t); res(false); });
+  });
+  dot.className = dot.className.split(' ')
+    .filter(c => !['ok','err','checking'].includes(c)).join(' ');
+  dot.classList.add(ok ? 'ok' : 'err');
+  dot.title = ok ? `✓ TMS risponde — ${ip}:9000` : `✗ TMS non risponde — ${ip}:9000`;
+  // Nascondi riga se offline
+  const row = dot.closest('.dev-row[data-tms-row]');
+  if (row) row.style.display = ok ? '' : 'none';
+  // Aggiorna counter nel tag intestazione
+  const online = document.querySelectorAll('.tms-ping-dot.ok').length;
+  const tag = document.getElementById('tmsOnlineTag');
+  if (tag) tag.textContent = online + ' online';
+}
+
+async function autoPingTMS() {
+  const dots = [...document.querySelectorAll('.tms-ping-dot[data-tms-ip]')];
+  for (let i = 0; i < dots.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 100));
+    pingTMSDevice(dots[i].dataset.tmsIp, dots[i]);
+  }
+}
+
+// ── VIEW SWITCHER ─────────────────────────────────────────────
+let mapBuilt=false;
+const _VIEWS=['map','dashboard','bytype'];
+const _VIEW_LABELS={map:'Mappa',dashboard:'Cinema',bytype:'Per tipo'};
+
+function cycleView(){
+  const cur=(document.querySelector('.view.active')||{id:'view-map'}).id.replace('view-','');
+  const next=_VIEWS[(_VIEWS.indexOf(cur)+1)%_VIEWS.length];
+  switchView(next);
+}
+
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.view-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('tab-'+v).classList.add('active');
+  const lbl=document.getElementById('viewCycleLabel');
+  if(lbl) lbl.textContent=_VIEW_LABELS[v]||v;
+  if(v==='map'){
+    if(!mapBuilt){mapBuilt=true;buildMap();}
+    else if(window._map) setTimeout(()=>window._map.invalidateSize(),50);
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+let _tt;
+function showToast(title,msg,type){
+  const t=document.getElementById('toast'),tl=document.getElementById('toastTitle');
+  tl.textContent=title;tl.className='toast-title '+(type||'info');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+// ── THEME ────────────────────────────────────────────────────
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle('light');
+  document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
+  try { localStorage.setItem('noc_theme', isLight ? 'light' : 'dark'); } catch(e){}
+}
+// Ripristina tema salvato
+(function(){
+  try {
+    if (localStorage.getItem('noc_theme') === 'light') {
+      document.documentElement.classList.add('light');
+      document.addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('themeIcon');
+        if (el) el.textContent = '🌙';
+      });
+    }
+  } catch(e){}
+})();
+
+// ── INIT ──────────────────────────────────────────────────────
+buildDashboard();
+checkAllTMSBtns();
+buildByType();
+renderHistory();
+switchView('dashboard');
+updateGlobalStatus();
+autoPing();
+autoPingTMS();
+setInterval(autoPing, 5 * 60 * 1000);
+setInterval(autoPingTMS, 5 * 60 * 1000);
+</script>
+</body>
+</html>
