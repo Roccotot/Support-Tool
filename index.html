@@ -514,6 +514,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 <script>
 // ── DATI ─────────────────────────────────────────────────────
 const RAW = `Aurelia Antica - Grosseto - Rete - MikroTik\t10.57.91.1:161\tSNMP
+Aurelia Antica - Grosseto - Rete - TMS\t10.57.91.2:161\tSNMP
 Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP\t10.57.91.12:161\tSNMP
 Aurelia Antica - Grosseto - Sala 1 - Processore Audio\t10.57.91.14:161\tICMP
 Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP\t10.57.91.22:161\tSNMP
@@ -548,6 +549,7 @@ Clev Village - Chiusi -SI - Sala 06 - Processore Audio\t10.56.70.64:161\tICMP
 // ─────────────────────────────────────────────────────────
 
 Imperiale - Montecatini Terme - Rete - MikroTik\t10.57.97.1:161\tSNMP
+Imperiale - Montecatini Terme - Rete - TMS\t10.57.97.2:161\tSNMP
 Imperiale - Montecatini Terme - Sala 1 - Server - IMS3000\t10.57.97.10:161\tSNMP
 Imperiale - Montecatini Terme - Sala 1 - Proiettore\t10.57.97.12:161\tSNMP
 Imperiale - Montecatini Terme - Sala 1 - Processore Audio\t10.57.97.14:161\tICMP
@@ -575,6 +577,7 @@ Isola Verde - Pisa - Sala 03 - Processore Audio\t10.58.70.34:161\tICMP
 // ─────────────────────────────────────────────────────────
 
 Multisala Odeon - Pisa - Rete - MikroTik\t10.55.76.1:161\tSNMP
+Multisala Odeon - Pisa - Rete - TMS\t10.55.76.2:161\tSNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Server IMS3000\t10.55.76.10:161\tSNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Proiettore\t10.55.76.12:161\tSNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Processore Audio\t10.55.76.14:161\tICMP
@@ -737,6 +740,7 @@ function parseRaw(raw) {
 
 function devType(label) {
   if (/mikrotik|router/i.test(label))                         return ['rtr','ROUTER'];
+  if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/server|ims|doremi|srv/i.test(label))                   return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|cp750/i.test(label))                  return ['aud','AUDIO'];
@@ -761,7 +765,7 @@ function updateGlobalStatus() {
   if(unkEl) unkEl.textContent = unknown;
 }
 
-async function pingDevice(ip, dot) {
+async function pingDevice(ip, dot, port) {
   const prev = pingStatusMap[ip];
   pingStatusMap[ip] = 'checking';
   updateGlobalStatus();
@@ -773,7 +777,7 @@ async function pingDevice(ip, dot) {
   const ok = await new Promise(res => {
     const c = new AbortController();
     const t = setTimeout(() => { c.abort(); res(false); }, 3000);
-    fetch('http://' + ip, { signal:c.signal, mode:'no-cors', cache:'no-store' })
+    fetch('http://' + ip + (port ? ':' + port : ''), { signal:c.signal, mode:'no-cors', cache:'no-store' })
       .then(() => { clearTimeout(t); res(true); })
       .catch(() => { clearTimeout(t); res(false); });
   });
@@ -788,21 +792,6 @@ async function pingDevice(ip, dot) {
   if (prev === 'ok' && !ok) showToast('ALERT', ip + ' non risponde', 'err');
 }
 
-async function checkTMSBtn(btn) {
-  const url = btn.dataset.tmsUrl;
-  if (!url) return;
-  const ok = await new Promise(res => {
-    const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
-    fetch(url, { signal:c.signal, mode:'no-cors', cache:'no-store' })
-      .then(() => { clearTimeout(t); res(true); })
-      .catch(() => { clearTimeout(t); res(false); });
-  });
-  if (ok) btn.style.display = '';
-}
-function checkAllTMSBtns(root) {
-  (root || document).querySelectorAll('.tms-btn[data-tms-url]').forEach(checkTMSBtn);
-}
 
 function filterDevices(q) {
   q = q.toLowerCase().trim();
@@ -931,6 +920,11 @@ function devBtnsHTML(ip, label) {
     ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
     : '';
   if (tc === 'aud') return copyBtn;
+  if (tc === 'tms') {
+    const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
+    const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/tms/" target="_blank" title="Apri TMS porta 9000">WEB</a>`;
+    return tmsSsh + tmsWeb + copyBtn;
+  }
   return vncBtn + sshBtn + webBtn + copyBtn;
 }
 
@@ -941,54 +935,6 @@ function buildDashboard() {
   const grid = document.getElementById('cinemasGrid');
   grid.innerHTML = '';
   let totalDevs = 0, totalRooms = 0;
-  // ── SEZIONE TMS (in cima) ─────────────────────────────────
-  const tmsDivider = document.createElement('div');
-  tmsDivider.className = 'city-divider';
-  tmsDivider.innerHTML = `<div class="city-divider-line"></div>
-    <div class="city-divider-label">🖥 TMS</div>
-    <div class="city-divider-line"></div>`;
-  grid.appendChild(tmsDivider);
-
-  const tmsCard = document.createElement('div');
-  tmsCard.className = 'cinema-card';
-  tmsCard.style.cssText = 'background:rgba(0,188,212,0.04);border-color:rgba(0,188,212,0.28);grid-column:1/-1';
-  let tmsRowsHTML = '';
-  cinemas.forEach(c => {
-    const allIPs = Object.values(c.rooms).flat().map(d => d.ip);
-    if (!allIPs.length) return;
-    const tmsIP  = allIPs[0].replace(/\.\d+$/, '.2');
-    const tmsUrl = `http://${tmsIP}:9000/tms/`;
-    tmsRowsHTML += `<div class="dev-row" data-tms-row="${tmsIP}">
-      <div class="tms-ping-dot" data-tms-ip="${tmsIP}" title="Clicca per verificare TMS"
-        onclick="pingTMSDevice('${tmsIP}',this)"></div>
-      <div class="dev-name">TMS ${c.name} — <span style="color:var(--text2)">${c.city}</span></div>
-      <span class="dev-type srv" style="color:#4dd0e1;border-color:rgba(77,208,225,0.3)">TMS</span>
-      <div class="dev-btns">
-        <a class="proto-btn tms-web" href="${tmsUrl}" target="_blank" title="Apri interfaccia TMS (porta 9000)">WEB</a>
-        <a class="proto-btn putty" href="ssh://${tmsIP}" title="Apri SSH con PuTTY">PuTTY SSH</a>
-        <a class="proto-btn winscp" href="winscp://root@${tmsIP}/" title="Apri SFTP con WinSCP">WinSCP</a>
-      </div>
-    </div>`;
-  });
-  tmsCard.innerHTML = `
-    <div class="card-hdr" style="background:linear-gradient(135deg,rgba(0,188,212,0.12),rgba(0,188,212,0.06))"
-      onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
-      <div class="card-title-block">
-        <div class="card-icon" style="background:rgba(0,188,212,0.15);border-color:rgba(0,188,212,0.35)">🖥</div>
-        <div>
-          <div class="card-name" style="color:#4dd0e1">Theatre Management System</div>
-          <div class="card-city" style="color:#4dd0e1">PuTTY SSH · WinSCP · Web</div>
-        </div>
-      </div>
-      <div class="card-actions">
-        <span class="tag" style="color:#4dd0e1;border-color:rgba(0,188,212,0.3)" id="tmsOnlineTag">${cinemas.length} TMS</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </div>
-    </div>
-    <div class="card-body">${tmsRowsHTML}</div>`;
-  grid.appendChild(tmsCard);
 
   // Raggruppa cinema per città (preserva ordine del RAW)
   const cityMap = new Map();
@@ -1004,7 +950,6 @@ function buildDashboard() {
     totalDevs  += devCount;
     totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
     const allIPs    = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
-    const tmsIP     = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
     const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
@@ -1014,9 +959,10 @@ function buildDashboard() {
         <div class="room-sep-line"></div>
       </div>`;
       devices.forEach(d => {
+        const dPort = devType(d.label)[0] === 'tms' ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
           <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
-            onclick="pingDevice('${d.ip}',this)"></div>
+            onclick="pingDevice('${d.ip}',this${dPort})"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
         </div>`;
@@ -1041,7 +987,6 @@ function buildDashboard() {
           </div>
         </div>
         <div class="card-actions">
-          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" onclick="event.stopPropagation()" title="Apri TMS ${tmsIP}" style="display:none" data-tms-url="http://${tmsIP}:9000/tms/">TMS</a>` : ''}
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
@@ -1259,7 +1204,6 @@ async function buildMap() {
       });
       el.addEventListener('mouseenter',()=>clearTimeout(ct));
       el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
-      checkAllTMSBtns(el);
     });
     marker.bindTooltip(
       `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
@@ -1270,37 +1214,7 @@ async function buildMap() {
 }
 
 // ── TMS ───────────────────────────────────────────────────────
-async function pingTMSDevice(ip, dot) {
-  const url = `http://${ip}:9000/tms/`;
-  dot.className = dot.className.split(' ')
-    .filter(c => !['ok','err','checking'].includes(c)).join(' ') + ' checking';
-  const ok = await new Promise(res => {
-    const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
-    fetch(url, { signal:c.signal, mode:'no-cors', cache:'no-store' })
-      .then(() => { clearTimeout(t); res(true); })
-      .catch(() => { clearTimeout(t); res(false); });
-  });
-  dot.className = dot.className.split(' ')
-    .filter(c => !['ok','err','checking'].includes(c)).join(' ');
-  dot.classList.add(ok ? 'ok' : 'err');
-  dot.title = ok ? `✓ TMS risponde — ${ip}:9000` : `✗ TMS non risponde — ${ip}:9000`;
-  // Nascondi riga se offline
-  const row = dot.closest('.dev-row[data-tms-row]');
-  if (row) row.style.display = ok ? '' : 'none';
-  // Aggiorna counter nel tag intestazione
-  const online = document.querySelectorAll('.tms-ping-dot.ok').length;
-  const tag = document.getElementById('tmsOnlineTag');
-  if (tag) tag.textContent = online + ' online';
-}
 
-async function autoPingTMS() {
-  const dots = [...document.querySelectorAll('.tms-ping-dot[data-tms-ip]')];
-  for (let i = 0; i < dots.length; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 100));
-    pingTMSDevice(dots[i].dataset.tmsIp, dots[i]);
-  }
-}
 
 // ── VIEW SWITCHER ─────────────────────────────────────────────
 let mapBuilt=false;
@@ -1356,15 +1270,12 @@ function toggleTheme() {
 
 // ── INIT ──────────────────────────────────────────────────────
 buildDashboard();
-checkAllTMSBtns();
 buildByType();
 renderHistory();
 switchView('dashboard');
 updateGlobalStatus();
 autoPing();
-autoPingTMS();
 setInterval(autoPing, 5 * 60 * 1000);
-setInterval(autoPingTMS, 5 * 60 * 1000);
 </script>
 </body>
 </html>
