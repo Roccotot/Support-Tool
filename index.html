@@ -597,7 +597,45 @@ Teatro Giotto - Borgo San Lorenzo - Sala 1 - Server Doremi\t10.58.82.10:161\tSNM
 4 Mori - Livorno - Sala 1 - Server\t10.58.84.10:161\tSNMP
 4 Mori - Livorno - Sala 1 - Proiettore Christie\t10.58.84.12:161\tSNMP
 4 Mori - Livorno - Sala 2 - Server\t10.58.84.20:161\tSNMP
-4 Mori - Livorno - Sala 2 - Proiettore\t10.58.84.22:161\tSNMP`;
+4 Mori - Livorno - Sala 2 - Proiettore\t10.58.84.22:161\tSNMP
+Aurelia Antica - Grosseto - Sala 1 - Processore Audio\t10.57.91.14:161\tICMP
+Aurelia Antica - Grosseto - Sala 2 - Processore Audio\t10.57.91.24:161\tICMP
+Aurelia Antica - Grosseto - Sala 3 - Processore Audio\t10.57.91.34:161\tICMP
+Aurelia Antica - Grosseto - Sala 4 - Processore Audio\t10.57.91.44:161\tICMP
+Clev Village - Chiusi -SI - Sala 01 - Processore Audio\t10.56.70.14:161\tICMP
+Clev Village - Chiusi -SI - Sala 02 - Processore Audio\t10.56.70.24:161\tICMP
+Clev Village - Chiusi -SI - Sala 03 - Processore Audio\t10.56.70.34:161\tICMP
+Clev Village - Chiusi -SI - Sala 04 - Processore Audio\t10.56.70.44:161\tICMP
+Clev Village - Chiusi -SI - Sala 05 - Processore Audio\t10.56.70.54:161\tICMP
+Clev Village - Chiusi -SI - Sala 06 - Processore Audio\t10.56.70.64:161\tICMP
+Imperiale - Montecatini Terme - Sala 1 - Processore Audio\t10.57.97.14:161\tICMP
+Imperiale - Montecatini Terme - Sala 2 - Processore Audio\t10.57.97.24:161\tICMP
+Imperiale - Montecatini Terme - Sala 3 - Processore Audio\t10.57.97.34:161\tICMP
+Imperiale - Montecatini Terme - Sala 4 - Processore Audio\t10.57.97.44:161\tICMP
+Isola Verde - Pisa - Sala 01 - Processore Audio\t10.58.70.14:161\tICMP
+Isola Verde - Pisa - Sala 02 - Processore Audio\t10.58.70.24:161\tICMP
+Isola Verde - Pisa - Sala 03 - Processore Audio\t10.58.70.34:161\tICMP
+Multisala Odeon - Pisa - Sala 1 Venezia - Processore Audio\t10.55.76.14:161\tICMP
+Multisala Odeon - Pisa - Sala 2 Amalfi - Processore Audio\t10.55.76.24:161\tICMP
+Multisala Odeon - Pisa - Sala 3 Pisa - Processore Audio\t10.55.76.34:161\tICMP
+Multisala Odeon - Pisa - Sala 4 Genova - Processore Audio\t10.55.76.44:161\tICMP
+Multisala Odeon - Pisa - Sala 5 Kinzica - Processore Audio\t10.55.76.54:161\tICMP
+Cinema Scipione Ammirato - Montaione - Sala 1 - Processore Audio\t10.58.76.14:161\tICMP
+Odeon - Firenze - Sala 1 - Processore Audio\t10.58.79.14:161\tICMP
+Spazio Alfieri - Firenze - Sala 1 - Processore Audio\t10.58.77.14:161\tICMP
+Excelsior - Empoli - Sala 1 - Processore Audio\t10.58.75.14:161\tICMP
+Excelsior - Empoli - Sala 2 - Processore Audio\t10.58.75.24:161\tICMP
+Excelsior - Empoli - Sala 3 - Processore Audio\t10.58.75.34:161\tICMP
+Nuova Aurora - Sansepolcro - Sala 1 - Processore Audio\t10.58.78.14:161\tICMP
+Splendor - Massa - Sala 01 - Processore Audio\t10.58.71.14:161\tICMP
+Splendor - Massa - Sala 02 - Processore Audio\t10.58.71.24:161\tICMP
+Splendor - Massa - Sala 03 - Processore Audio\t10.58.71.34:161\tICMP
+Splendor - Massa - Sala 04 - Processore Audio\t10.58.71.44:161\tICMP
+Splendor - Massa - Sala 05 - Processore Audio\t10.58.71.54:161\tICMP
+Splendor - Massa - Sala 06 - Processore Audio\t10.58.71.64:161\tICMP
+Splendor - Massa - Sala 07 - Processore Audio\t10.58.71.74:161\tICMP
+4 Mori - Livorno - Sala 1 - Processore Audio\t10.58.84.14:161\tICMP
+4 Mori - Livorno - Sala 2 - Processore Audio\t10.58.84.24:161\tICMP`;
 
 // ── PALETTE ───────────────────────────────────────────────────
 // 15 colori distinti e vividi — un colore unico per ogni cinema fino a 15
@@ -657,6 +695,7 @@ function devType(label) {
   if (/mikrotik|router/i.test(label))                         return ['rtr','ROUTER'];
   if (/server|ims|doremi|srv/i.test(label))                   return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector/i.test(label)) return ['proj','PROIETT.'];
+  if (/processore audio|cp750/i.test(label))                  return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
 }
 
@@ -847,6 +886,7 @@ function devBtnsHTML(ip, label) {
   const vncBtn  = tc === 'srv'
     ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
     : '';
+  if (tc === 'aud') return copyBtn;
   return vncBtn + sshBtn + webBtn + copyBtn;
 }
 
