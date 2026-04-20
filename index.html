@@ -861,7 +861,7 @@ async function autoPing() {
   for (let i = 0; i < dots.length; i++) {
     if (i > 0) await new Promise(r => setTimeout(r, 80));
     const dot = dots[i];
-    pingDevice(dot.dataset.ip, dot).then(() => {
+    pingDevice(dot.dataset.ip, dot, dot.dataset.port || '').then(() => {
       if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
     });
   }
@@ -959,9 +959,10 @@ function buildDashboard() {
         <div class="room-sep-line"></div>
       </div>`;
       devices.forEach(d => {
-        const dPort = devType(d.label)[0] === 'tms' ? ',9000' : '';
+        const isTms = devType(d.label)[0] === 'tms';
+        const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this${dPort})"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
