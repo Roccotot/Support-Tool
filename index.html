@@ -857,11 +857,28 @@ function updateMapStatus(cinemaName) {
   else el.classList.add('partial');
 }
 
+function openCard(hdr) {
+  const card = hdr.closest('.cinema-card');
+  const opening = card.classList.contains('collapsed');
+  card.classList.toggle('collapsed');
+  if (opening) {
+    card.querySelectorAll('.ping-dot[data-ip]').forEach(dot => {
+      if (!pingStatusMap[dot.dataset.ip]) {
+        pingDevice(dot.dataset.ip, dot, dot.dataset.port || '').then(() => {
+          if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
+        });
+      }
+    });
+  }
+}
+
 async function autoPing() {
-  // Deduplica: un solo ping per IP, aggiorna tutti i pallini con quell'IP
+  // Deduplica: un solo ping per IP, salta carte chiuse
   const seen = new Set();
   const dots = [...document.querySelectorAll('[data-ip]')].filter(d => {
     if (seen.has(d.dataset.ip)) return false;
+    const card = d.closest('.cinema-card');
+    if (card && card.classList.contains('collapsed')) return false;
     seen.add(d.dataset.ip);
     return true;
   });
@@ -977,10 +994,10 @@ function buildDashboard() {
       });
     });
     const card = document.createElement('div');
-    card.className = 'cinema-card'; // aperta di default
+    card.className = 'cinema-card collapsed';
     card.style.cssText = `background:${color}0d;border-color:${color}55`;
     card.innerHTML = `
-      <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="this.closest('.cinema-card').classList.toggle('collapsed')">
+      <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="openCard(this)">
         <div class="card-title-block">
           <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
           <div>
