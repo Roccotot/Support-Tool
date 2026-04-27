@@ -878,7 +878,8 @@ async function autoPing() {
   const dots = [...document.querySelectorAll('[data-ip]')].filter(d => {
     if (seen.has(d.dataset.ip)) return false;
     const card = d.closest('.cinema-card');
-    if (card && card.classList.contains('collapsed')) return false;
+    const isRouter = d.dataset.router === '1';
+    if (card && card.classList.contains('collapsed') && !isRouter) return false;
     seen.add(d.dataset.ip);
     return true;
   });
@@ -984,9 +985,10 @@ function buildDashboard() {
       </div>`;
       devices.forEach(d => {
         const isTms = devType(d.label)[0] === 'tms';
+        const isRtr = devType(d.label)[0] === 'rtr';
         const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} ${isRtr ? 'data-router="1"' : ''} title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this${dPort})"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
