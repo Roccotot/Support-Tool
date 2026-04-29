@@ -855,15 +855,18 @@ function cinemaId(name) { return 'ms_' + name.replace(/[^a-zA-Z0-9]/g,'_'); }
 function updateMapStatus(cinemaName) {
   const allDots = [...document.querySelectorAll(`.ping-dot[data-cinema="${cinemaName}"]`)];
   if (!allDots.length) return;
-  // Considera solo dispositivi cinema (non router/TMS che hanno data-router)
-  const devDots = allDots.filter(d => !d.dataset.router);
-  const okCount = devDots.filter(d => d.classList.contains('ok')).length;
   const el = document.getElementById(cinemaId(cinemaName));
   if (!el) return;
   el.className = 'cmarker-status';
-  // Nessun dispositivo cinema risponde → rosso
+  // MikroTik non ancora online → nessun colore
+  const rtrDot = allDots.find(d => d.dataset.rtr === '1');
+  if (!rtrDot || !rtrDot.classList.contains('ok')) return;
+  // MikroTik online: conta solo dispositivi cinema (no router, no TMS)
+  const devDots = allDots.filter(d => !d.dataset.router);
+  const okCount = devDots.filter(d => d.classList.contains('ok')).length;
+  // Solo MikroTik online → rosso
   if (okCount === 0)               { el.classList.add('err');     return; }
-  // Tutti i dispositivi cinema rispondono → verde
+  // Tutti i dispositivi online → verde
   if (okCount === devDots.length)  { el.classList.add('ok');      return; }
   // Alcuni sì, alcuni no → arancione
   el.classList.add('partial');
@@ -1001,7 +1004,7 @@ function buildDashboard() {
         const isRtr = devType(d.label)[0] === 'rtr';
         const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} ${(isRtr || isTms) ? 'data-router="1"' : ''} title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} ${(isRtr || isTms) ? 'data-router="1"' : ''} ${isRtr ? 'data-rtr="1"' : ''} title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this${dPort})"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
