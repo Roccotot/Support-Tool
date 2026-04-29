@@ -1120,9 +1120,16 @@ function buildByType() {
             ${devBtnsHTML(d.ip, d.label)}
           </div>`;
         card.dataset.search = [c.name, c.city, room, d.label, d.ip].join(' ').toLowerCase();
-        const bucket = grids[tc] ? tc : 'proj';
-        grids[bucket].appendChild(card);
-        counts[bucket]++;
+        const buckets = grids[tc] ? [tc] : ['proj'];
+        // Unità combinate (Proiettore e ICMP / Proiettore e Server) → anche in srv
+        if (tc === 'proj' && /proiettore e (icmp|server)/i.test(d.label)) {
+          buckets.push('srv');
+        }
+        buckets.forEach(b => {
+          const node = buckets.length > 1 ? card.cloneNode(true) : card;
+          grids[b].appendChild(node);
+          counts[b]++;
+        });
       });
     });
   });
