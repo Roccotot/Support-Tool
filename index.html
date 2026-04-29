@@ -988,6 +988,7 @@ function buildDashboard() {
     totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
     const allIPs    = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
     const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
+    const tmsDev    = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'tms');
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
       roomsHTML += `<div class="room-sep">
@@ -1026,6 +1027,7 @@ function buildDashboard() {
           </div>
         </div>
         <div class="card-actions">
+          ${tmsDev ? `<a class="proto-btn tms-web" href="http://${tmsDev.ip}:9000/?redirect=/tms/" target="_blank" onclick="event.stopPropagation()" title="Apri TMS">TMS</a>` : ''}
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
