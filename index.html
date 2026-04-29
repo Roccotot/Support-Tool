@@ -853,25 +853,20 @@ function exportCSV() {
 function cinemaId(name) { return 'ms_' + name.replace(/[^a-zA-Z0-9]/g,'_'); }
 
 function updateMapStatus(cinemaName) {
-  const dots = document.querySelectorAll(`.ping-dot[data-cinema="${cinemaName}"]`);
-  if (!dots.length) return;
-  let ok=0, err=0, routerOnly=true;
-  dots.forEach(d => {
-    const isOk = d.classList.contains('ok');
-    const isErr = d.classList.contains('err');
-    if (isOk) ok++;
-    if (isErr) err++;
-    if ((isOk || isErr) && !d.dataset.router) routerOnly = false;
-  });
+  const allDots = [...document.querySelectorAll(`.ping-dot[data-cinema="${cinemaName}"]`)];
+  if (!allDots.length) return;
+  // Considera solo dispositivi cinema (non router/TMS che hanno data-router)
+  const devDots = allDots.filter(d => !d.dataset.router);
+  const okCount = devDots.filter(d => d.classList.contains('ok')).length;
   const el = document.getElementById(cinemaId(cinemaName));
   if (!el) return;
   el.className = 'cmarker-status';
-  if (ok+err === 0) return;
-  // Solo MikroTik risponde → rosso (cinema non raggiungibile nel dettaglio)
-  if (ok > 0 && routerOnly) { el.classList.add('err'); return; }
-  if (err === 0) el.classList.add('ok');
-  else if (ok === 0) el.classList.add('err');
-  else el.classList.add('partial');
+  // Nessun dispositivo cinema risponde → rosso
+  if (okCount === 0)               { el.classList.add('err');     return; }
+  // Tutti i dispositivi cinema rispondono → verde
+  if (okCount === devDots.length)  { el.classList.add('ok');      return; }
+  // Alcuni sì, alcuni no → arancione
+  el.classList.add('partial');
 }
 
 function openCard(hdr) {
