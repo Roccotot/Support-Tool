@@ -658,7 +658,7 @@ Splendor - Massa - Sala 03 - Proiettore\t10.58.71.32:161\tSNMP
 Splendor - Massa - Sala 03 - CP750\t10.58.71.34:161\tICMP
 Splendor - Massa - Sala 04 - Server\t10.58.71.40:161\tSNMP
 Splendor - Massa - Sala 04 - Proiettore\t10.58.71.42:161\tSNMP
-Splendor - Massa - Sala 04 - CP750\t10.58.71.44:161\tICMP
+Splendor - Massa - Sala 04 - CP650\t10.58.71.44:161\tICMP
 Splendor - Massa - Sala 05 - Server\t10.58.71.50:161\tSNMP
 Splendor - Massa - Sala 05 - Proiettore\t10.58.71.52:161\tSNMP
 Splendor - Massa - Sala 05 - CP750\t10.58.71.54:161\tICMP
@@ -667,7 +667,7 @@ Splendor - Massa - Sala 06 - Proiettore\t10.58.71.62:161\tSNMP
 Splendor - Massa - Sala 06 - CP750\t10.58.71.64:161\tICMP
 Splendor - Massa - Sala 07 - Server\t10.58.71.70:161\tSNMP
 Splendor - Massa - Sala 07 - Proiettore\t10.58.71.72:161\tSNMP
-Splendor - Massa - Sala 07 - CP750\t10.58.71.74:161\tICMP
+Splendor - Massa - Sala 07 - CP650\t10.58.71.74:161\tICMP
 
 // ─────────────────────────────────────────────────────────
 
@@ -792,7 +792,8 @@ async function pingDevice(ip, dot, port) {
   const ok = await new Promise(res => {
     const c = new AbortController();
     const t = setTimeout(() => { c.abort(); res(false); }, 3000);
-    fetch('http://' + ip + (port ? ':' + port : ''), { signal:c.signal, mode:'no-cors', cache:'no-store' })
+    const path = port == 9000 ? '/?redirect=/tms/' : '';
+    fetch('http://' + ip + (port ? ':' + port : '') + path, { signal:c.signal, mode:'no-cors', cache:'no-store' })
       .then(() => { clearTimeout(t); res(true); })
       .catch(() => { clearTimeout(t); res(false); });
   });
@@ -963,7 +964,7 @@ function devBtnsHTML(ip, label) {
   if (tc === 'aud') return copyBtn;
   if (tc === 'tms') {
     const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
-    const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/tms/" target="_blank" title="Apri TMS porta 9000">WEB</a>`;
+    const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/?redirect=/tms/" target="_blank" title="Apri TMS porta 9000">WEB</a>`;
     return tmsSsh + tmsWeb + copyBtn;
   }
   return vncBtn + sshBtn + webBtn + copyBtn;
@@ -1004,7 +1005,7 @@ function buildDashboard() {
         const isRtr = devType(d.label)[0] === 'rtr';
         const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} ${isRtr ? 'data-router="1"' : ''} title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} ${(isRtr || isTms) ? 'data-router="1"' : ''} title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this${dPort})"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
@@ -1101,6 +1102,14 @@ function buildByType() {
   };
   Object.values(grids).forEach(g => { if(g) g.innerHTML = ''; });
   const counts = {rtr:0, tms:0, srv:0, proj:0, aud:0};
+  const lastCinema = {rtr:'', tms:'', srv:'', proj:'', aud:''};
+
+  const addSep = (grid, c, color) => {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:4px 0 2px;opacity:.7';
+    sep.innerHTML = `<div style="flex:1;height:1px;background:${color}44"></div><span style="font-size:10px;color:${color};white-space:nowrap">${c.name} — ${c.city}</span><div style="flex:1;height:1px;background:${color}44"></div>`;
+    grid.appendChild(sep);
+  };
 
   cinemas.forEach(c => {
     const color = cinemaColor(c.name);
@@ -1112,7 +1121,6 @@ function buildByType() {
         card.className = 'type-card';
         card.style.cssText = `background:${color}0d;border-color:${color}44`;
         card.innerHTML = `
-          <div class="tc-cinema" style="color:${color}">${c.name} — ${c.city}</div>
           <div class="tc-name" title="${room}: ${d.label}">${room}: ${d.label}</div>
           <div class="tc-btns">
             <div class="tc-ping" data-ip="${d.ip}" title="Clicca per verificare"
@@ -1120,9 +1128,20 @@ function buildByType() {
             ${devBtnsHTML(d.ip, d.label)}
           </div>`;
         card.dataset.search = [c.name, c.city, room, d.label, d.ip].join(' ').toLowerCase();
-        const bucket = grids[tc] ? tc : 'proj';
-        grids[bucket].appendChild(card);
-        counts[bucket]++;
+        const buckets = grids[tc] ? [tc] : ['proj'];
+        // Unità combinate (Proiettore e ICMP / Proiettore e Server) → anche in srv
+        if (tc === 'proj' && /proiettore e (icmp|server)/i.test(d.label)) {
+          buckets.push('srv');
+        }
+        buckets.forEach(b => {
+          if (lastCinema[b] !== c.name) {
+            addSep(grids[b], c, color);
+            lastCinema[b] = c.name;
+          }
+          const node = buckets.length > 1 ? card.cloneNode(true) : card;
+          grids[b].appendChild(node);
+          counts[b]++;
+        });
       });
     });
   });
