@@ -370,12 +370,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .proto-btn.winscp{color:#80cbc4;border-color:rgba(128,203,196,0.3);background:rgba(128,203,196,0.07)}
 .proto-btn.winscp:hover{background:rgba(128,203,196,0.2);border-color:#80cbc4;color:#fff}
 @media(min-width:901px){.tms-ping-dot{width:11px;height:11px}}
-.vpn-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:4px 11px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap;cursor:default;transition:border-color .3s}
-.vpn-badge:hover{border-color:rgba(255,255,255,0.25)}
-.vpn-dot{width:8px;height:8px;border-radius:50%;background:#555;flex-shrink:0;transition:background .4s,box-shadow .4s}
-.vpn-dot.ok{background:#00e676;box-shadow:0 0 6px #00e676;animation:blinkdot 2s infinite}
-.vpn-dot.busy{background:#ff9100;box-shadow:0 0 6px #ff9100;animation:blinkdot 1s infinite}
-.vpn-dot.err{background:#ff1744;box-shadow:0 0 5px #ff1744}
 </style>
 </head>
 <body>
@@ -391,10 +385,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <input type="text" class="search-input" id="searchInput"
     placeholder="Cerca cinema, IP, dispositivo..." oninput="filterDevices(this.value)">
   <div class="header-right">
-    <div class="vpn-badge" id="vpnBadge" title="Utenti VPN attivi">
-      <div class="vpn-dot" id="vpnDot"></div>
-      <span id="vpnLabel">VPN —</span>
-    </div>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia tema">
       <span id="themeIcon">☀️</span>
     </button>
@@ -530,10 +520,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 </div>
 
 <script>
-// ── CONFIGURAZIONE VPN ────────────────────────────────────────
-// Il browser legge dal proxy locale (vpn_monitor.py).
-// Avviare vpn_monitor.py sul PC prima di usare la spia VPN.
-const VPN_PROXY = 'http://localhost:5005/vpn';
 // ── DATI ─────────────────────────────────────────────────────
 const RAW = `Aurelia Antica - Grosseto - Rete - MikroTik\t10.57.91.1:161\tSNMP
 Aurelia Antica - Grosseto - Rete - TMS\t10.57.91.2:161\tSNMP
@@ -921,24 +907,6 @@ async function autoPing() {
   }
 }
 
-// ── VPN MONITOR ───────────────────────────────────────────────
-// Legge dal proxy locale vpn_monitor.py (http://localhost:5005/vpn)
-async function fetchVpnUsers() {
-  const dot   = document.getElementById('vpnDot');
-  const label = document.getElementById('vpnLabel');
-  if (!dot || !label) return;
-  try {
-    const resp = await fetch(VPN_PROXY, { signal: AbortSignal.timeout(3000) });
-    if (!resp.ok) throw new Error(resp.status);
-    const { count } = await resp.json();
-    if (count < 0) throw new Error('proxy error');
-    dot.className     = 'vpn-dot ' + (count === 0 ? 'ok' : 'busy');
-    label.textContent = `VPN: ${count} utent${count === 1 ? 'e' : 'i'}`;
-  } catch {
-    dot.className     = 'vpn-dot err';
-    label.textContent = 'VPN: N/D';
-  }
-}
 
 // ── COPIA IP ─────────────────────────────────────────────────
 function copyIP(ip, el) {
@@ -1376,8 +1344,6 @@ switchView('dashboard');
 updateGlobalStatus();
 autoPing();
 setInterval(autoPing, 5 * 60 * 1000);
-fetchVpnUsers();
-setInterval(fetchVpnUsers, 30 * 1000);
 </script>
 </body>
 </html>
