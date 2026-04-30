@@ -531,10 +531,14 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 
 <script>
 // ── CONFIGURAZIONE VPN ────────────────────────────────────────
+// WireGuard su MikroTik — server 91.187.215.2:13001
+// Quando sei in VPN il gateway è tipicamente 172.31.1.1
 const VPN_CONFIG = {
-  ip:   '0.0.0.0',  // ← IP del MikroTik che gestisce la VPN
-  user: 'admin',     // ← username API REST MikroTik
-  pass: '',          // ← password API REST MikroTik
+  ip:   '172.31.1.1',  // IP MikroTik VPN (gateway subnet 172.31.1.0/24)
+  user: 'admin',        // ← username API REST MikroTik
+  pass: '',             // ← password API REST MikroTik
+  // Un peer WireGuard è "connesso" se last-handshake < 3 minuti
+  activeThresholdSec: 180,
 };
 // ── DATI ─────────────────────────────────────────────────────
 const RAW = `Aurelia Antica - Grosseto - Rete - MikroTik\t10.57.91.1:161\tSNMP
@@ -923,25 +927,37 @@ async function autoPing() {
   }
 }
 
-// ── VPN MONITOR ───────────────────────────────────────────────
+// ── VPN MONITOR (WireGuard su MikroTik) ───────────────────────
+// Converte "1h30m20s" → secondi totali
+function parseMtTime(t) {
+  if (!t || t === 'never') return Infinity;
+  let s = 0;
+  const h = t.match(/(\d+)h/);   if (h)   s += +h[1]   * 3600;
+  const m = t.match(/(\d+)m(?!s)/); if (m) s += +m[1]   * 60;
+  const sc = t.match(/(\d+)s/);  if (sc)  s += +sc[1];
+  return s;
+}
+
 async function fetchVpnUsers() {
   const dot   = document.getElementById('vpnDot');
   const label = document.getElementById('vpnLabel');
   if (!dot || !label) return;
-  if (VPN_CONFIG.ip === '0.0.0.0') { label.textContent = 'VPN —'; return; }
   try {
-    const resp = await fetch(`http://${VPN_CONFIG.ip}/rest/ppp/active`, {
+    const resp = await fetch(`http://${VPN_CONFIG.ip}/rest/interface/wireguard/peers`, {
       headers: { 'Authorization': 'Basic ' + btoa(`${VPN_CONFIG.user}:${VPN_CONFIG.pass}`) },
-      signal: AbortSignal.timeout(4000)
+      signal: AbortSignal.timeout(5000)
     });
     if (!resp.ok) throw new Error(resp.status);
-    const data = await resp.json();
-    const n = Array.isArray(data) ? data.length : 0;
-    dot.className   = 'vpn-dot ' + (n === 0 ? 'ok' : 'busy');
-    label.textContent = `VPN: ${n} utet${n === 1 ? 'e' : 'i'}`;
+    const peers = await resp.json();
+    // Conta peer con handshake recente (< soglia = connessi attivamente)
+    const n = (Array.isArray(peers) ? peers : []).filter(p =>
+      parseMtTime(p['last-handshake']) < VPN_CONFIG.activeThresholdSec
+    ).length;
+    dot.className     = 'vpn-dot ' + (n === 0 ? 'ok' : 'busy');
+    label.textContent = `VPN: ${n} utent${n === 1 ? 'e' : 'i'}`;
   } catch {
-    dot.className   = 'vpn-dot err';
-    label.textContent = 'VPN: errore';
+    dot.className     = 'vpn-dot err';
+    label.textContent = 'VPN: N/D';
   }
 }
 
