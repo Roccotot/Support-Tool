@@ -370,6 +370,12 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .proto-btn.winscp{color:#80cbc4;border-color:rgba(128,203,196,0.3);background:rgba(128,203,196,0.07)}
 .proto-btn.winscp:hover{background:rgba(128,203,196,0.2);border-color:#80cbc4;color:#fff}
 @media(min-width:901px){.tms-ping-dot{width:11px;height:11px}}
+.vpn-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:4px 11px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap;cursor:default;transition:border-color .3s}
+.vpn-badge:hover{border-color:rgba(255,255,255,0.25)}
+.vpn-dot{width:8px;height:8px;border-radius:50%;background:#555;flex-shrink:0;transition:background .4s,box-shadow .4s}
+.vpn-dot.ok{background:#00e676;box-shadow:0 0 6px #00e676;animation:blinkdot 2s infinite}
+.vpn-dot.busy{background:#ff9100;box-shadow:0 0 6px #ff9100;animation:blinkdot 1s infinite}
+.vpn-dot.err{background:#ff1744;box-shadow:0 0 5px #ff1744}
 </style>
 </head>
 <body>
@@ -385,6 +391,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <input type="text" class="search-input" id="searchInput"
     placeholder="Cerca cinema, IP, dispositivo..." oninput="filterDevices(this.value)">
   <div class="header-right">
+    <div class="vpn-badge" id="vpnBadge" title="Utenti VPN attivi">
+      <div class="vpn-dot" id="vpnDot"></div>
+      <span id="vpnLabel">VPN —</span>
+    </div>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia tema">
       <span id="themeIcon">☀️</span>
     </button>
@@ -520,6 +530,16 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 </div>
 
 <script>
+// ── CONFIGURAZIONE VPN ────────────────────────────────────────
+// WireGuard su MikroTik — server 91.187.215.2:13001
+// Quando sei in VPN il gateway è tipicamente 172.31.1.1
+const VPN_CONFIG = {
+  ip:   '172.31.1.1',  // IP MikroTik VPN (gateway subnet 172.31.1.0/24)
+  user: 'admin',        // ← username API REST MikroTik
+  pass: '',             // ← password API REST MikroTik
+  // Un peer WireGuard è "connesso" se last-handshake < 3 minuti
+  activeThresholdSec: 180,
+};
 // ── DATI ─────────────────────────────────────────────────────
 const RAW = `Aurelia Antica - Grosseto - Rete - MikroTik\t10.57.91.1:161\tSNMP
 Aurelia Antica - Grosseto - Rete - TMS\t10.57.91.2:161\tSNMP
@@ -907,6 +927,40 @@ async function autoPing() {
   }
 }
 
+// ── VPN MONITOR (WireGuard su MikroTik) ───────────────────────
+// Converte "1h30m20s" → secondi totali
+function parseMtTime(t) {
+  if (!t || t === 'never') return Infinity;
+  let s = 0;
+  const h = t.match(/(\d+)h/);   if (h)   s += +h[1]   * 3600;
+  const m = t.match(/(\d+)m(?!s)/); if (m) s += +m[1]   * 60;
+  const sc = t.match(/(\d+)s/);  if (sc)  s += +sc[1];
+  return s;
+}
+
+async function fetchVpnUsers() {
+  const dot   = document.getElementById('vpnDot');
+  const label = document.getElementById('vpnLabel');
+  if (!dot || !label) return;
+  try {
+    const resp = await fetch(`http://${VPN_CONFIG.ip}/rest/interface/wireguard/peers`, {
+      headers: { 'Authorization': 'Basic ' + btoa(`${VPN_CONFIG.user}:${VPN_CONFIG.pass}`) },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!resp.ok) throw new Error(resp.status);
+    const peers = await resp.json();
+    // Conta peer con handshake recente (< soglia = connessi attivamente)
+    const n = (Array.isArray(peers) ? peers : []).filter(p =>
+      parseMtTime(p['last-handshake']) < VPN_CONFIG.activeThresholdSec
+    ).length;
+    dot.className     = 'vpn-dot ' + (n === 0 ? 'ok' : 'busy');
+    label.textContent = `VPN: ${n} utent${n === 1 ? 'e' : 'i'}`;
+  } catch {
+    dot.className     = 'vpn-dot err';
+    label.textContent = 'VPN: N/D';
+  }
+}
+
 // ── COPIA IP ─────────────────────────────────────────────────
 function copyIP(ip, el) {
   navigator.clipboard.writeText(ip).then(() => {
@@ -1012,7 +1066,7 @@ function buildDashboard() {
       });
     });
     const card = document.createElement('div');
-    card.className = 'cinema-card collapsed';
+    card.className = 'cinema-card';
     card.style.cssText = `background:${color}0d;border-color:${color}55`;
     card.innerHTML = `
       <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="openCard(this)">
@@ -1343,6 +1397,8 @@ switchView('dashboard');
 updateGlobalStatus();
 autoPing();
 setInterval(autoPing, 5 * 60 * 1000);
+fetchVpnUsers();
+setInterval(fetchVpnUsers, 30 * 1000);
 </script>
 </body>
 </html>
