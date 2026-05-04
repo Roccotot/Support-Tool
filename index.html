@@ -595,6 +595,7 @@ Multisala Odeon - Pisa - Sala 2 Amalfi - CP750\t10.55.76.24:161\tICMP
 Multisala Odeon - Pisa - Sala 3 Pisa - Server IMS3000\t10.55.76.30:161\tSNMP
 Multisala Odeon - Pisa - Sala 3 Pisa - Proiettore\t10.55.76.32:161\tSNMP
 Multisala Odeon - Pisa - Sala 3 Pisa - CP750\t10.55.76.34:161\tICMP
+Multisala Odeon - Pisa - Sala 3 Pisa - PC Lucilla	10.55.76.209:161	SNMP
 Multisala Odeon - Pisa - Sala 4 Genova - Server IMS3000\t10.55.76.40:161\tSNMP
 Multisala Odeon - Pisa - Sala 4 Genova - Proiettore\t10.55.76.42:161\tSNMP
 Multisala Odeon - Pisa - Sala 4 Genova - CP750\t10.55.76.44:161\tICMP
@@ -756,6 +757,7 @@ function parseRaw(raw) {
 function devType(label) {
   if (/mikrotik|router/i.test(label))                         return ['rtr','ROUTER'];
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
+  if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
   if (/server|ims|doremi|srv/i.test(label))                   return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|cp[0-9]|cpi[0-9]/i.test(label))       return ['aud','AUDIO'];
@@ -961,6 +963,7 @@ function devBtnsHTML(ip, label) {
     ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
     : '';
   if (tc === 'aud') return copyBtn;
+  if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`;
   if (tc === 'tms') {
     const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
     const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/?redirect=/tms/" target="_blank" title="Apri TMS porta 9000">WEB</a>`;
