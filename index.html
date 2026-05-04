@@ -963,7 +963,7 @@ function devBtnsHTML(ip, label) {
     ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
     : '';
   if (tc === 'aud') return copyBtn;
-  if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`;
+  if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>` + copyBtn;
   if (tc === 'tms') {
     const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
     const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/?redirect=/tms/" target="_blank" title="Apri TMS porta 9000">WEB</a>`;
