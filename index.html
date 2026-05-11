@@ -788,6 +788,10 @@ const MODEL_IMG = {
   ims3000:  'https://professional.dolby.com/siteassets/products/ims3000/ims3000-m1.jpg',
   dcp2000:  'https://www.danieletrevisan.it/wp-content/uploads/dcp2000.jpg',
   showvault:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0n1MkIShbTsc2SIExYi5U6MSZKKCxcbsUg&s',
+  cp650:    'https://www.lubianitecnologie.it/wp-content/uploads/2012/02/remoto-dolby-650x433.png',
+  cp750:    'https://i.ebayimg.com/images/g/BWsAAOSwO~VnNijg/s-l1200.jpg',
+  cp850:    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr0vSWudXvBEQ66XA7_cvB1o2Y25UMndD_fQ&s',
+  cpi2000:  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGHUP25MpMXKjFLQGa4FeK_xTuk2Xck8rpVg&s',
 };
 
 function getModelImage(label) {
@@ -802,6 +806,10 @@ function getModelImage(label) {
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
   if (/showvault/.test(l))          return MODEL_IMG.showvault;
+  if (/cp850/.test(l))              return MODEL_IMG.cp850;
+  if (/cp750/.test(l))              return MODEL_IMG.cp750;
+  if (/cp650/.test(l))              return MODEL_IMG.cp650;
+  if (/cpi2000/.test(l))            return MODEL_IMG.cpi2000;
   return null;
 }
 
