@@ -793,12 +793,19 @@ function devType(label) {
 }
 
 const PROJ_AGE = {
-  'cmc4':1, 'dp-2000':2, 'dp2000':2,
-  'dpc-80':3, 'dpc80':3,
-  'dp2k-20c':4, 'dp2k-19b':5,
-  'dp2k-10s':6, 'dp2k-8s':7, 'dp2k-15c':8,
-  'dp4k-19b':9, 'dp2k-6e':10,
-  'sp2k-9':11, 'sp2k-11':12,
+  'cmc4':      1000,
+  'dp-2000':   2000, 'dp2000':   2000,
+  'dpc-80':    3000, 'dpc80':    3000,
+  // Serie B (Bright): DP2K-19B, DP4K-19B
+  'dp2k-19b':  4000, 'dp4k-19b': 4100,
+  // Serie C (Compact): DP2K-20C, DP2K-15C, DP2K-12C
+  'dp2k-20c':  5000, 'dp2k-15c': 5100, 'dp2k-12c': 5200,
+  // Serie S (Small): DP2K-10S, DP2K-8S
+  'dp2k-10s':  6000, 'dp2k-8s':  6100,
+  // Serie E (Entry): DP2K-6E
+  'dp2k-6e':   7000,
+  // SP2K Series 4
+  'sp2k-11':   8000, 'sp2k-9':   8100,
 };
 function projModelAge(label) {
   const l = label.toLowerCase();
@@ -807,6 +814,7 @@ function projModelAge(label) {
 }
 
 const MODEL_IMG = {
+  cmc4:     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoWWr0FZOzt6eMvb4WvHQs6nWuf1qJvDDX3Q&s',
   tms:      'https://scontent.fflr2-1.fna.fbcdn.net/v/t39.30808-6/424618581_916060460519155_7035170290504294318_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=sSSxH6IFbkkQ7kNvwFmV_BF&_nc_oc=Adq0zgeq8XnEWnDCEjFikW9njC9JQs4WjhR8NGc7zWSQFJKL9ou3QRHxhUyzFbBKSho&_nc_zt=23&_nc_ht=scontent.fflr2-1.fna&_nc_gid=C9lBCa8xVlUQ3MG1RA6VPg&_nc_ss=7b2a8&oh=00_Af64T1JoIWjqJbbgCU1M6jTMgHOO-un0HvP74CtHX_8uzw&oe=6A07B596',
   dp4k:     'https://assets.barco.com/transform/738c0903-4c8c-4cff-873e-dbaba2f625ab/DP4K-32B-right-low-angle',
   icmp:     'https://assets.barco.com/transform/2e29e139-a17e-4b1b-8f04-acfeec3b4f96/ICMP-board-front-2',
@@ -816,7 +824,7 @@ const MODEL_IMG = {
   dp2k_e:   'https://assets.barco.com/transform/29bc20c4-9703-4388-9b72-8901d557c383/DP2K-6E-3-4-Right-Low-onwhite-jpg',
   dp2000:   'https://assets.barco.com/transform/078fbcc0-7dbc-440a-96dc-335bb6b6683d/DP-2000',
   ims3000:  'https://professional.dolby.com/siteassets/products/ims3000/ims3000-m1.jpg',
-  christie: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTscog0dk7yzKCTvcBkMwpgYxbhSTJzS6v2Lw&s',
+  christie: 'https://www.christiedigital.com/globalassets/.catalog/products/images/christie-cp2210/_0031_christie-cp2210-digital-cinema-projector-hero1.png',
   dpc80:    'https://www.danieletrevisan.it/wp-content/uploads/DPC-80.jpg',
   dcp2000:  'https://www.danieletrevisan.it/wp-content/uploads/dcp2000.jpg',
   showvault:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0n1MkIShbTsc2SIExYi5U6MSZKKCxcbsUg&s',
@@ -828,6 +836,7 @@ const MODEL_IMG = {
 
 function getModelImage(label) {
   const l = label.toLowerCase();
+  if (/cmc4/.test(l))               return MODEL_IMG.cmc4;
   if (/\btms\b/.test(l))            return MODEL_IMG.tms;
   if (/dp4k/.test(l))               return MODEL_IMG.dp4k;
   if (/sp2k/.test(l))               return MODEL_IMG.sp2k;
