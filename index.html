@@ -202,6 +202,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .tc-ping.checking{background:var(--amber);box-shadow:0 0 5px var(--amber);animation:blinkdot 0.5s infinite}
 .model-group-header{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:0}
 .model-group-header .mgh-line{flex:1;height:1px;background:rgba(255,255,255,0.08)}
+.model-group-header .mgh-img{width:60px;height:38px;object-fit:contain;border-radius:5px;background:rgba(255,255,255,0.04);flex-shrink:0;padding:2px}
 .model-group-header .mgh-label{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#c0d8f0;white-space:nowrap;text-transform:uppercase}
 .model-group-header .mgh-count{font-size:9px;color:var(--text2);background:rgba(255,255,255,0.06);border-radius:10px;padding:1px 8px;letter-spacing:.5px}
 
@@ -623,20 +624,20 @@ Giunti Odeon - Firenze - Sala 1 - CP750\t10.58.79.14:161\tICMP
 // ─────────────────────────────────────────────────────────
 
 Spazio Alfieri - Firenze - Rete - MikroTik\t10.58.77.1:161\tSNMP
-Spazio Alfieri - Firenze - Sala 1 - Server Show Vault\t10.58.77.10:161\tSNMP
+Spazio Alfieri - Firenze - Sala 1 - Server ShowVault\t10.58.77.10:161\tSNMP
 Spazio Alfieri - Firenze - Sala 1 - Barco DP2K-12C\t10.58.77.12:161\tSNMP
 Spazio Alfieri - Firenze - Sala 1 - CPI2000\t10.58.77.14:161\tICMP
 
 // ─────────────────────────────────────────────────────────
 
 Excelsior - Empoli - Rete - MikroTik\t10.58.75.1:161\tSNMP
-Excelsior - Empoli - Sala 1 - Server Show Vault\t10.58.75.10:161\tSNMP
+Excelsior - Empoli - Sala 1 - Server ShowVault\t10.58.75.10:161\tSNMP
 Excelsior - Empoli - Sala 1 - Barco DP2K-10S\t10.58.75.12:161\tSNMP
 Excelsior - Empoli - Sala 1 - CP650\t10.58.75.14:161\tICMP
 Excelsior - Empoli - Sala 2 - Server DCP2000\t10.58.75.20:161\tSNMP
 Excelsior - Empoli - Sala 2 - NEC 2210\t10.58.75.22:161\tSNMP
 Excelsior - Empoli - Sala 2 - CP650\t10.58.75.24:161\tICMP
-Excelsior - Empoli - Sala 3 - Server Show Vault\t10.58.75.30:161\tSNMP
+Excelsior - Empoli - Sala 3 - Server ShowVault\t10.58.75.30:161\tSNMP
 Excelsior - Empoli - Sala 3 - Barco DP2K-8S\t10.58.75.32:161\tSNMP
 Excelsior - Empoli - Sala 3 - CP650\t10.58.75.34:161\tICMP
 
@@ -700,8 +701,8 @@ Centro Pecci - Prato - Sala 1 - CP750\t10.58.81.14:161\tICMP
 // ─────────────────────────────────────────────────────────
 
 Roma AB - Figline e Incisa Valdarno - Rete - MikroTik\t10.56.89.1:161\tSNMP
-Roma AB - Figline e Incisa Valdarno - Sala 1 - Server Doremi\t10.56.89.10:161\tSNMP
-Roma AB - Figline e Incisa Valdarno - Sala 1 - Proiettore\t10.56.89.12:161\tSNMP
+Roma AB - Figline e Incisa Valdarno - Sala 1 - Server ShowVault\t10.56.89.10:161\tSNMP
+Roma AB - Figline e Incisa Valdarno - Sala 1 - Barco DP2K-20C\t10.56.89.12:161\tSNMP
 Roma AB - Figline e Incisa Valdarno - Sala 1 - CP750	10.56.89.14:161	ICMP
 
 // ─────────────────────────────────────────────────────────
@@ -770,10 +771,38 @@ function devType(label) {
   if (/mikrotik|router/i.test(label))                         return ['rtr','ROUTER'];
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
-  if (/server|ims|doremi|srv/i.test(label))                   return ['srv','SERVER'];
+  if (/server|ims|doremi|srv|showvault/i.test(label))         return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|cp[0-9]|cpi[0-9]/i.test(label))       return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
+}
+
+const MODEL_IMG = {
+  tms:      'https://scontent.fflr2-1.fna.fbcdn.net/v/t39.30808-6/424618581_916060460519155_7035170290504294318_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=sSSxH6IFbkkQ7kNvwFmV_BF&_nc_oc=Adq0zgeq8XnEWnDCEjFikW9njC9JQs4WjhR8NGc7zWSQFJKL9ou3QRHxhUyzFbBKSho&_nc_zt=23&_nc_ht=scontent.fflr2-1.fna&_nc_gid=C9lBCa8xVlUQ3MG1RA6VPg&_nc_ss=7b2a8&oh=00_Af64T1JoIWjqJbbgCU1M6jTMgHOO-un0HvP74CtHX_8uzw&oe=6A07B596',
+  dp4k:     'https://assets.barco.com/transform/738c0903-4c8c-4cff-873e-dbaba2f625ab/DP4K-32B-right-low-angle',
+  sp2k:     'https://shop.cinemanext.com/web/image/product.template/10756/image_1024?unique=651fdb0',
+  dp2k_c:   'https://assets.barco.com/transform/4bcd93f0-0ad7-412a-beb2-53aae3c21227/DP2K-20c-right-std-angle-with-outlet-jpg',
+  dp2k_s:   'https://assets.barco.com/transform/7e65034e-1598-4601-99dc-3060720b3ff2/DP2K-10S-right-low-angle-jpg',
+  dp2k_e:   'https://assets.barco.com/transform/29bc20c4-9703-4388-9b72-8901d557c383/DP2K-6E-3-4-Right-Low-onwhite-jpg',
+  dp2000:   'https://assets.barco.com/transform/078fbcc0-7dbc-440a-96dc-335bb6b6683d/DP-2000',
+  ims3000:  'https://professional.dolby.com/siteassets/products/ims3000/ims3000-m1.jpg',
+  dcp2000:  'https://www.danieletrevisan.it/wp-content/uploads/dcp2000.jpg',
+  showvault:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0n1MkIShbTsc2SIExYi5U6MSZKKCxcbsUg&s',
+};
+
+function getModelImage(label) {
+  const l = label.toLowerCase();
+  if (/\btms\b/.test(l))            return MODEL_IMG.tms;
+  if (/dp4k/.test(l))               return MODEL_IMG.dp4k;
+  if (/sp2k/.test(l))               return MODEL_IMG.sp2k;
+  if (/dp2k-\d+c\b/.test(l))       return MODEL_IMG.dp2k_c;
+  if (/dp2k-\d+e\b/.test(l))       return MODEL_IMG.dp2k_e;
+  if (/dp2k-\d+[sb]\b/.test(l))    return MODEL_IMG.dp2k_s;
+  if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
+  if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
+  if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
+  if (/showvault/.test(l))          return MODEL_IMG.showvault;
+  return null;
 }
 
 // ── PING ─────────────────────────────────────────────────────
@@ -1144,9 +1173,10 @@ function buildByType() {
       counts[bucket] += entries.length;
 
       // Model group header
+      const imgUrl = getModelImage(label);
       const hdr = document.createElement('div');
       hdr.className = 'model-group-header';
-      hdr.innerHTML = `<div class="mgh-line"></div><span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
+      hdr.innerHTML = `<div class="mgh-line"></div>${imgUrl ? `<img class="mgh-img" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
       grid.appendChild(hdr);
 
       // One card per cinema/sala
