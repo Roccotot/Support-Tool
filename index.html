@@ -786,6 +786,8 @@ const MODEL_IMG = {
   dp2k_e:   'https://assets.barco.com/transform/29bc20c4-9703-4388-9b72-8901d557c383/DP2K-6E-3-4-Right-Low-onwhite-jpg',
   dp2000:   'https://assets.barco.com/transform/078fbcc0-7dbc-440a-96dc-335bb6b6683d/DP-2000',
   ims3000:  'https://professional.dolby.com/siteassets/products/ims3000/ims3000-m1.jpg',
+  christie: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTscog0dk7yzKCTvcBkMwpgYxbhSTJzS6v2Lw&s',
+  dpc80:    'https://www.danieletrevisan.it/wp-content/uploads/DPC-80.jpg',
   dcp2000:  'https://www.danieletrevisan.it/wp-content/uploads/dcp2000.jpg',
   showvault:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0n1MkIShbTsc2SIExYi5U6MSZKKCxcbsUg&s',
   cp650:    'https://www.lubianitecnologie.it/wp-content/uploads/2012/02/remoto-dolby-650x433.png',
@@ -801,9 +803,12 @@ function getModelImage(label) {
   if (/sp2k/.test(l))               return MODEL_IMG.sp2k;
   if (/dp2k-\d+c\b/.test(l))       return MODEL_IMG.dp2k_c;
   if (/dp2k-\d+e\b/.test(l))       return MODEL_IMG.dp2k_e;
-  if (/dp2k-\d+[sb]\b/.test(l))    return MODEL_IMG.dp2k_s;
+  if (/dp2k-\d+b\b/.test(l))       return MODEL_IMG.dp4k;
+  if (/dp2k-\d+s\b/.test(l))       return MODEL_IMG.dp2k_s;
   if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
+  if (/christie/.test(l))           return MODEL_IMG.christie;
+  if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
   if (/showvault/.test(l))          return MODEL_IMG.showvault;
   if (/cp850/.test(l))              return MODEL_IMG.cp850;
