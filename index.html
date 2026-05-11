@@ -200,6 +200,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .tc-ping.ok{background:var(--lime);box-shadow:0 0 5px var(--lime);border-color:var(--lime);animation:blinkdot 1.5s infinite}
 .tc-ping.err{background:var(--crimson);box-shadow:0 0 5px var(--crimson);animation:blinkdot 1.5s infinite}
 .tc-ping.checking{background:var(--amber);box-shadow:0 0 5px var(--amber);animation:blinkdot 0.5s infinite}
+.model-group-header{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:0}
+.model-group-header .mgh-line{flex:1;height:1px;background:rgba(255,255,255,0.08)}
+.model-group-header .mgh-label{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#c0d8f0;white-space:nowrap;text-transform:uppercase}
+.model-group-header .mgh-count{font-size:9px;color:var(--text2);background:rgba(255,255,255,0.06);border-radius:10px;padding:1px 8px;letter-spacing:.5px}
 
 /* ── MAP ── */
 #view-map{position:relative}
@@ -1106,57 +1110,66 @@ function buildByType() {
   const cinemas = parseRaw(RAW);
   initColors(cinemas);
   const grids = {
-    rtr: document.getElementById('grid-rtr'),
-    tms: document.getElementById('grid-tms'),
-    srv: document.getElementById('grid-srv'),
+    rtr:  document.getElementById('grid-rtr'),
+    tms:  document.getElementById('grid-tms'),
+    srv:  document.getElementById('grid-srv'),
     proj: document.getElementById('grid-proj'),
-    aud: document.getElementById('grid-aud'),
+    aud:  document.getElementById('grid-aud'),
   };
   Object.values(grids).forEach(g => { if(g) g.innerHTML = ''; });
-  const counts = {rtr:0, tms:0, srv:0, proj:0, aud:0};
-  const lastCinema = {rtr:'', tms:'', srv:'', proj:'', aud:''};
 
-  const addSep = (grid, c, color) => {
-    const sep = document.createElement('div');
-    sep.style.cssText = 'grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:4px 0 2px;opacity:.7';
-    sep.innerHTML = `<div style="flex:1;height:1px;background:${color}44"></div><span style="font-size:10px;color:${color};white-space:nowrap">${c.name} — ${c.city}</span><div style="flex:1;height:1px;background:${color}44"></div>`;
-    grid.appendChild(sep);
-  };
-
+  // Collect: modelMap[bucket][label] = [{cinema, city, room, ip, label}]
+  const modelMap = {rtr:{}, tms:{}, srv:{}, proj:{}, aud:{}};
   cinemas.forEach(c => {
-    const color = cinemaColor(c.name);
     Object.entries(c.rooms).forEach(([room, devices]) => {
       devices.forEach(d => {
         const [tc] = devType(d.label);
-        const pingPort = tc === 'tms' ? ',9000' : '';
-        const card = document.createElement('div');
-        card.className = 'type-card';
-        card.style.cssText = `background:${color}0d;border-color:${color}44`;
-        card.innerHTML = `
-          <div class="tc-name" title="${room}: ${d.label}">${room}: ${d.label}</div>
-          <div class="tc-btns">
-            <div class="tc-ping" data-ip="${d.ip}" title="Clicca per verificare"
-              onclick="pingDevice('${d.ip}',this${pingPort})"></div>
-            ${devBtnsHTML(d.ip, d.label)}
-          </div>`;
-        card.dataset.search = [c.name, c.city, room, d.label, d.ip].join(' ').toLowerCase();
-        const buckets = grids[tc] ? [tc] : ['proj'];
-        // Unità combinate (Proiettore e ICMP / Proiettore e Server) → anche in srv
-        if (tc === 'proj' && / e (icmp|server)\b/i.test(d.label)) {
-          buckets.push('srv');
-        }
+        const buckets = (tc in modelMap) ? [tc] : ['proj'];
+        if (tc === 'proj' && / e (icmp|server)\b/i.test(d.label)) buckets.push('srv');
         buckets.forEach(b => {
-          if (lastCinema[b] !== c.name) {
-            addSep(grids[b], c, color);
-            lastCinema[b] = c.name;
-          }
-          const node = buckets.length > 1 ? card.cloneNode(true) : card;
-          grids[b].appendChild(node);
-          counts[b]++;
+          if (!modelMap[b][d.label]) modelMap[b][d.label] = [];
+          modelMap[b][d.label].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label});
         });
       });
     });
   });
+
+  const counts = {rtr:0, tms:0, srv:0, proj:0, aud:0};
+  Object.entries(modelMap).forEach(([bucket, models]) => {
+    const grid = grids[bucket];
+    if (!grid) return;
+    const sortedLabels = Object.keys(models).sort((a,b) => a.localeCompare(b));
+    sortedLabels.forEach(label => {
+      const entries = models[label];
+      counts[bucket] += entries.length;
+
+      // Model group header
+      const hdr = document.createElement('div');
+      hdr.className = 'model-group-header';
+      hdr.innerHTML = `<div class="mgh-line"></div><span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
+      grid.appendChild(hdr);
+
+      // One card per cinema/sala
+      entries.forEach(e => {
+        const color = cinemaColor(e.cinema);
+        const pingPort = bucket === 'tms' ? ',9000' : '';
+        const card = document.createElement('div');
+        card.className = 'type-card';
+        card.style.cssText = `background:${color}0d;border-color:${color}44`;
+        card.innerHTML = `
+          <div class="tc-cinema">${e.cinema}</div>
+          <div class="tc-name" title="${e.room}">${e.room}</div>
+          <div class="tc-btns">
+            <div class="tc-ping" data-ip="${e.ip}" title="Clicca per verificare"
+              onclick="pingDevice('${e.ip}',this${pingPort})"></div>
+            ${devBtnsHTML(e.ip, e.label)}
+          </div>`;
+        card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip].join(' ').toLowerCase();
+        grid.appendChild(card);
+      });
+    });
+  });
+
   document.getElementById('count-rtr').textContent  = counts.rtr  + ' dispositivi';
   document.getElementById('count-tms').textContent  = counts.tms  + ' dispositivi';
   document.getElementById('count-srv').textContent  = counts.srv  + ' dispositivi';
