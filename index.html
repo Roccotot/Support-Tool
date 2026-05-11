@@ -772,7 +772,11 @@ function parseRaw(raw) {
   result.forEach(c => Object.keys(c.rooms).forEach(r => {
     c.rooms[r].sort((a,b) => {
       const ta = devType(a.label)[0], tb = devType(b.label)[0];
-      return ta === tb ? 0 : ta === 'srv' ? -1 : 1;
+      const TYPE_ORDER = {proj:0,srv:1,aud:2,pc:3,tms:4,rtr:5};
+      const oa = TYPE_ORDER[ta]??9, ob = TYPE_ORDER[tb]??9;
+      if (oa !== ob) return oa - ob;
+      if (ta === 'proj') return projModelAge(a.label) - projModelAge(b.label);
+      return 0;
     });
   }));
   return result;
@@ -786,6 +790,20 @@ function devType(label) {
   if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|cp[0-9]|cpi[0-9]/i.test(label))       return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
+}
+
+const PROJ_AGE = {
+  'cmc4':1, 'dp-2000':2, 'dp2000':2,
+  'dpc-80':3, 'dpc80':3,
+  'dp2k-20c':4, 'dp2k-19b':5,
+  'dp2k-10s':6, 'dp2k-8s':7, 'dp2k-15c':8,
+  'dp4k-19b':9, 'dp2k-6e':10,
+  'sp2k-9':11, 'sp2k-11':12,
+};
+function projModelAge(label) {
+  const l = label.toLowerCase();
+  for (const [k,v] of Object.entries(PROJ_AGE)) if (l.includes(k)) return v;
+  return 99;
 }
 
 const MODEL_IMG = {
@@ -1194,7 +1212,11 @@ function buildByType() {
   Object.entries(modelMap).forEach(([bucket, models]) => {
     const grid = grids[bucket];
     if (!grid) return;
-    const sortedLabels = Object.keys(models).sort((a,b) => a.localeCompare(b));
+    const sortedLabels = Object.keys(models).sort((a,b) =>
+      bucket === 'proj'
+        ? (projModelAge(a) - projModelAge(b)) || a.localeCompare(b)
+        : a.localeCompare(b)
+    );
     sortedLabels.forEach(label => {
       const entries = models[label];
       counts[bucket] += entries.length;
