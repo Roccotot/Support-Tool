@@ -793,12 +793,19 @@ function devType(label) {
 }
 
 const PROJ_AGE = {
-  'cmc4':1, 'dp-2000':2, 'dp2000':2,
-  'dpc-80':3, 'dpc80':3,
-  'dp2k-20c':4, 'dp2k-19b':5,
-  'dp2k-10s':6, 'dp2k-8s':7, 'dp2k-15c':8,
-  'dp4k-19b':9, 'dp2k-6e':10,
-  'sp2k-9':11, 'sp2k-11':12,
+  'cmc4':      1000,
+  'dp-2000':   2000, 'dp2000':   2000,
+  'dpc-80':    3000, 'dpc80':    3000,
+  // Serie B (Bright): DP2K-19B, DP4K-19B
+  'dp2k-19b':  4000, 'dp4k-19b': 4100,
+  // Serie C (Compact): DP2K-20C, DP2K-15C, DP2K-12C
+  'dp2k-20c':  5000, 'dp2k-15c': 5100, 'dp2k-12c': 5200,
+  // Serie S (Small): DP2K-10S, DP2K-8S
+  'dp2k-10s':  6000, 'dp2k-8s':  6100,
+  // Serie E (Entry): DP2K-6E
+  'dp2k-6e':   7000,
+  // SP2K Series 4
+  'sp2k-11':   8000, 'sp2k-9':   8100,
 };
 function projModelAge(label) {
   const l = label.toLowerCase();
