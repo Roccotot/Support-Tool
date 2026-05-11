@@ -1168,7 +1168,10 @@ function buildByType() {
         const [tc] = devType(d.label);
         const buckets = (tc in modelMap) ? [tc] : ['proj'];
         if (tc === 'proj' && / e (icmp|server)\b/i.test(d.label)) buckets.push('srv');
-        const key = d.label.replace(/\s+e\s+(icmp|server)\b.*/i, '').trim();
+        const key = d.label
+          .replace(/\s+e\s+(icmp|server)\b.*/i, '')
+          .replace(/^(proiettore|barco|christie|nec|cinemeccanica|server|doremi)\s+/gi, '')
+          .trim() || d.label;
         buckets.forEach(b => {
           if (!modelMap[b][key]) modelMap[b][key] = [];
           modelMap[b][key].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label});
