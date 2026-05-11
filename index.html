@@ -807,6 +807,7 @@ function projModelAge(label) {
 }
 
 const MODEL_IMG = {
+  cmc4:     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoWWr0FZOzt6eMvb4WvHQs6nWuf1qJvDDX3Q&s',
   tms:      'https://scontent.fflr2-1.fna.fbcdn.net/v/t39.30808-6/424618581_916060460519155_7035170290504294318_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=sSSxH6IFbkkQ7kNvwFmV_BF&_nc_oc=Adq0zgeq8XnEWnDCEjFikW9njC9JQs4WjhR8NGc7zWSQFJKL9ou3QRHxhUyzFbBKSho&_nc_zt=23&_nc_ht=scontent.fflr2-1.fna&_nc_gid=C9lBCa8xVlUQ3MG1RA6VPg&_nc_ss=7b2a8&oh=00_Af64T1JoIWjqJbbgCU1M6jTMgHOO-un0HvP74CtHX_8uzw&oe=6A07B596',
   dp4k:     'https://assets.barco.com/transform/738c0903-4c8c-4cff-873e-dbaba2f625ab/DP4K-32B-right-low-angle',
   icmp:     'https://assets.barco.com/transform/2e29e139-a17e-4b1b-8f04-acfeec3b4f96/ICMP-board-front-2',
@@ -828,6 +829,7 @@ const MODEL_IMG = {
 
 function getModelImage(label) {
   const l = label.toLowerCase();
+  if (/cmc4/.test(l))               return MODEL_IMG.cmc4;
   if (/\btms\b/.test(l))            return MODEL_IMG.tms;
   if (/dp4k/.test(l))               return MODEL_IMG.dp4k;
   if (/sp2k/.test(l))               return MODEL_IMG.sp2k;
