@@ -1190,7 +1190,7 @@ function buildByType() {
       const imgUrl = getModelImage(label);
       const hdr = document.createElement('div');
       hdr.className = 'model-group-header';
-      hdr.innerHTML = `<div class="mgh-line"></div>${imgUrl ? `<img class="mgh-img" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
+      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
       grid.appendChild(hdr);
 
       // One card per cinema/sala
