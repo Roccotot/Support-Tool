@@ -202,7 +202,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .tc-ping.checking{background:var(--amber);box-shadow:0 0 5px var(--amber);animation:blinkdot 0.5s infinite}
 .model-group-header{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:0}
 .model-group-header .mgh-line{flex:1;height:1px;background:rgba(255,255,255,0.08)}
-.model-group-header .mgh-img{width:60px;height:38px;object-fit:contain;border-radius:5px;background:rgba(255,255,255,0.04);flex-shrink:0;padding:2px}
+.model-group-header .mgh-img{width:240px;height:152px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.04);flex-shrink:0;padding:4px}
 .model-group-header .mgh-label{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#c0d8f0;white-space:nowrap;text-transform:uppercase}
 .model-group-header .mgh-count{font-size:9px;color:var(--text2);background:rgba(255,255,255,0.06);border-radius:10px;padding:1px 8px;letter-spacing:.5px}
 
@@ -788,6 +788,10 @@ const MODEL_IMG = {
   ims3000:  'https://professional.dolby.com/siteassets/products/ims3000/ims3000-m1.jpg',
   dcp2000:  'https://www.danieletrevisan.it/wp-content/uploads/dcp2000.jpg',
   showvault:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0n1MkIShbTsc2SIExYi5U6MSZKKCxcbsUg&s',
+  cp650:    'https://www.lubianitecnologie.it/wp-content/uploads/2012/02/remoto-dolby-650x433.png',
+  cp750:    'https://i.ebayimg.com/images/g/BWsAAOSwO~VnNijg/s-l1200.jpg',
+  cp850:    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr0vSWudXvBEQ66XA7_cvB1o2Y25UMndD_fQ&s',
+  cpi2000:  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGHUP25MpMXKjFLQGa4FeK_xTuk2Xck8rpVg&s',
 };
 
 function getModelImage(label) {
@@ -802,6 +806,10 @@ function getModelImage(label) {
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
   if (/showvault/.test(l))          return MODEL_IMG.showvault;
+  if (/cp850/.test(l))              return MODEL_IMG.cp850;
+  if (/cp750/.test(l))              return MODEL_IMG.cp750;
+  if (/cp650/.test(l))              return MODEL_IMG.cp650;
+  if (/cpi2000/.test(l))            return MODEL_IMG.cpi2000;
   return null;
 }
 
