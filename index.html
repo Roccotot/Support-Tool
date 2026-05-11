@@ -801,7 +801,8 @@ function getModelImage(label) {
   if (/sp2k/.test(l))               return MODEL_IMG.sp2k;
   if (/dp2k-\d+c\b/.test(l))       return MODEL_IMG.dp2k_c;
   if (/dp2k-\d+e\b/.test(l))       return MODEL_IMG.dp2k_e;
-  if (/dp2k-\d+[sb]\b/.test(l))    return MODEL_IMG.dp2k_s;
+  if (/dp2k-\d+b\b/.test(l))       return MODEL_IMG.dp4k;
+  if (/dp2k-\d+s\b/.test(l))       return MODEL_IMG.dp2k_s;
   if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
