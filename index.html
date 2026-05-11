@@ -1160,7 +1160,7 @@ function buildByType() {
   };
   Object.values(grids).forEach(g => { if(g) g.innerHTML = ''; });
 
-  // Collect: modelMap[bucket][label] = [{cinema, city, room, ip, label}]
+  // Collect: modelMap[bucket][normalizedLabel] = [{cinema, city, room, ip, label}]
   const modelMap = {rtr:{}, tms:{}, srv:{}, proj:{}, aud:{}};
   cinemas.forEach(c => {
     Object.entries(c.rooms).forEach(([room, devices]) => {
@@ -1168,9 +1168,10 @@ function buildByType() {
         const [tc] = devType(d.label);
         const buckets = (tc in modelMap) ? [tc] : ['proj'];
         if (tc === 'proj' && / e (icmp|server)\b/i.test(d.label)) buckets.push('srv');
+        const key = d.label.replace(/\s+e\s+(icmp|server)\b.*/i, '').trim();
         buckets.forEach(b => {
-          if (!modelMap[b][d.label]) modelMap[b][d.label] = [];
-          modelMap[b][d.label].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label});
+          if (!modelMap[b][key]) modelMap[b][key] = [];
+          modelMap[b][key].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label});
         });
       });
     });
