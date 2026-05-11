@@ -523,13 +523,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 // ── DATI ─────────────────────────────────────────────────────
 const RAW = `Aurelia Antica - Grosseto - Rete - MikroTik\t10.57.91.1:161\tSNMP
 Aurelia Antica - Grosseto - Rete - TMS\t10.57.91.2:161\tSNMP
-Aurelia Antica - Grosseto - Sala 1 - Proiettore e ICMP\t10.57.91.12:161\tSNMP
+Aurelia Antica - Grosseto - Sala 1 - Barco DP4K-19B e ICMP\t10.57.91.12:161\tSNMP
 Aurelia Antica - Grosseto - Sala 1 - CP850\t10.57.91.14:161\tICMP
-Aurelia Antica - Grosseto - Sala 2 - Proiettore e ICMP\t10.57.91.22:161\tSNMP
+Aurelia Antica - Grosseto - Sala 2 - Barco DP2K-10S e ICMP\t10.57.91.22:161\tSNMP
 Aurelia Antica - Grosseto - Sala 2 - CP750\t10.57.91.24:161\tICMP
-Aurelia Antica - Grosseto - Sala 3 - Proiettore e ICMP\t10.57.91.32:161\tSNMP
+Aurelia Antica - Grosseto - Sala 3 - Barco DP2K-10S e ICMP\t10.57.91.32:161\tSNMP
 Aurelia Antica - Grosseto - Sala 3 - CP750\t10.57.91.34:161\tICMP
-Aurelia Antica - Grosseto - Sala 4 - Proiettore e ICMP\t10.57.91.42:161\tSNMP
+Aurelia Antica - Grosseto - Sala 4 - Barco DP2K-10S e ICMP\t10.57.91.42:161\tSNMP
 Aurelia Antica - Grosseto - Sala 4 - CP750\t10.57.91.44:161\tICMP
 
 // ─────────────────────────────────────────────────────────
@@ -767,7 +767,7 @@ function devType(label) {
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
   if (/server|ims|doremi|srv/i.test(label))                   return ['srv','SERVER'];
-  if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
+  if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|cp[0-9]|cpi[0-9]/i.test(label))       return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
 }
