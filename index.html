@@ -755,7 +755,12 @@ function parseRaw(raw) {
     const key  = name + '|||' + city;
     if (!cinemas[key]) cinemas[key] = { name, city, rooms:{} };
     if (!cinemas[key].rooms[room]) cinemas[key].rooms[room] = [];
-    cinemas[key].rooms[room].push({ label:dev, ip });
+    if (/ e icmp\b/i.test(dev)) {
+      cinemas[key].rooms[room].push({ label: dev.replace(/\s+e\s+icmp\b.*/i, '').trim(), ip });
+      cinemas[key].rooms[room].push({ label: 'ICMP', ip });
+    } else {
+      cinemas[key].rooms[room].push({ label:dev, ip });
+    }
   });
   const result = Object.values(cinemas).sort((a,b) => a.city.localeCompare(b.city));
   result.forEach(c => Object.keys(c.rooms).forEach(r => {
@@ -771,7 +776,7 @@ function devType(label) {
   if (/mikrotik|router/i.test(label))                         return ['rtr','ROUTER'];
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
-  if (/server|ims|doremi|srv|showvault/i.test(label))         return ['srv','SERVER'];
+  if (/server|ims|doremi|srv|showvault|\bicmp\b/i.test(label)) return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|cp[0-9]|cpi[0-9]/i.test(label))       return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
@@ -1167,7 +1172,6 @@ function buildByType() {
       devices.forEach(d => {
         const [tc] = devType(d.label);
         const buckets = (tc in modelMap) ? [tc] : ['proj'];
-        if (tc === 'proj' && / e (icmp|server)\b/i.test(d.label)) buckets.push('srv');
         const key = d.label
           .replace(/\s+e\s+(icmp|server)\b.*/i, '')
           .replace(/^(proiettore|barco|christie|nec|cinemeccanica|server|doremi)\s+/gi, '')
