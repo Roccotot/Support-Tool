@@ -772,7 +772,11 @@ function parseRaw(raw) {
   result.forEach(c => Object.keys(c.rooms).forEach(r => {
     c.rooms[r].sort((a,b) => {
       const ta = devType(a.label)[0], tb = devType(b.label)[0];
-      return ta === tb ? 0 : ta === 'srv' ? -1 : 1;
+      const TYPE_ORDER = {proj:0,srv:1,aud:2,pc:3,tms:4,rtr:5};
+      const oa = TYPE_ORDER[ta]??9, ob = TYPE_ORDER[tb]??9;
+      if (oa !== ob) return oa - ob;
+      if (ta === 'proj') return projModelAge(a.label) - projModelAge(b.label);
+      return 0;
     });
   }));
   return result;
@@ -788,9 +792,24 @@ function devType(label) {
   return ['proj','UNITÀ'];
 }
 
+const PROJ_AGE = {
+  'cmc4':1, 'dp-2000':2, 'dp2000':2,
+  'dpc-80':3, 'dpc80':3,
+  'dp2k-20c':4, 'dp2k-19b':5,
+  'dp2k-10s':6, 'dp2k-8s':7, 'dp2k-15c':8,
+  'dp4k-19b':9, 'dp2k-6e':10,
+  'sp2k-9':11, 'sp2k-11':12,
+};
+function projModelAge(label) {
+  const l = label.toLowerCase();
+  for (const [k,v] of Object.entries(PROJ_AGE)) if (l.includes(k)) return v;
+  return 99;
+}
+
 const MODEL_IMG = {
   tms:      'https://scontent.fflr2-1.fna.fbcdn.net/v/t39.30808-6/424618581_916060460519155_7035170290504294318_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=sSSxH6IFbkkQ7kNvwFmV_BF&_nc_oc=Adq0zgeq8XnEWnDCEjFikW9njC9JQs4WjhR8NGc7zWSQFJKL9ou3QRHxhUyzFbBKSho&_nc_zt=23&_nc_ht=scontent.fflr2-1.fna&_nc_gid=C9lBCa8xVlUQ3MG1RA6VPg&_nc_ss=7b2a8&oh=00_Af64T1JoIWjqJbbgCU1M6jTMgHOO-un0HvP74CtHX_8uzw&oe=6A07B596',
   dp4k:     'https://assets.barco.com/transform/738c0903-4c8c-4cff-873e-dbaba2f625ab/DP4K-32B-right-low-angle',
+  icmp:     'https://assets.barco.com/transform/2e29e139-a17e-4b1b-8f04-acfeec3b4f96/ICMP-board-front-2',
   sp2k:     'https://shop.cinemanext.com/web/image/product.template/10756/image_1024?unique=651fdb0',
   dp2k_c:   'https://assets.barco.com/transform/4bcd93f0-0ad7-412a-beb2-53aae3c21227/DP2K-20c-right-std-angle-with-outlet-jpg',
   dp2k_s:   'https://assets.barco.com/transform/7e65034e-1598-4601-99dc-3060720b3ff2/DP2K-10S-right-low-angle-jpg',
@@ -817,6 +836,7 @@ function getModelImage(label) {
   if (/dp2k-\d+b\b/.test(l))       return MODEL_IMG.dp4k;
   if (/dp2k-\d+s\b/.test(l))       return MODEL_IMG.dp2k_s;
   if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
+  if (/\bicmp\b/.test(l))           return MODEL_IMG.icmp;
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
   if (/christie/.test(l))           return MODEL_IMG.christie;
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
@@ -1194,7 +1214,11 @@ function buildByType() {
   Object.entries(modelMap).forEach(([bucket, models]) => {
     const grid = grids[bucket];
     if (!grid) return;
-    const sortedLabels = Object.keys(models).sort((a,b) => a.localeCompare(b));
+    const sortedLabels = Object.keys(models).sort((a,b) =>
+      bucket === 'proj'
+        ? (projModelAge(a) - projModelAge(b)) || a.localeCompare(b)
+        : a.localeCompare(b)
+    );
     sortedLabels.forEach(label => {
       const entries = models[label];
       counts[bucket] += entries.length;
