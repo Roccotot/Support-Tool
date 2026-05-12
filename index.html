@@ -203,6 +203,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .model-group-header{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:0}
 .model-group-header .mgh-line{flex:1;height:1px;background:rgba(255,255,255,0.08)}
 .model-group-header .mgh-img{width:240px;height:152px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.04);flex-shrink:0;padding:4px}
+.model-group-header .mgh-img.white-bg{background:#fff}
 .model-group-header .mgh-label{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#c0d8f0;white-space:nowrap;text-transform:uppercase}
 .model-group-header .mgh-count{font-size:9px;color:var(--text2);background:rgba(255,255,255,0.06);border-radius:10px;padding:1px 8px;letter-spacing:.5px}
 
@@ -728,10 +729,10 @@ Roma AB - Figline e Incisa Valdarno - Sala 1 - CP750	10.56.89.14:161	ICMP
 // ─────────────────────────────────────────────────────────
 
 Goldoni - Viareggio - Rete - MikroTik	10.58.83.1:161	SNMP
-Goldoni - Viareggio - Sala 1 - Barco SP2K-11	10.58.83.12:161	SNMP
+Goldoni - Viareggio - Sala 1 - Barco SP2K-11S	10.58.83.12:161	SNMP
 Goldoni - Viareggio - Sala 1 - ICMP	10.58.83.12:161	SNMP
 Goldoni - Viareggio - Sala 1 - CPI2000	10.58.83.14:161	ICMP
-Goldoni - Viareggio - Sala 2 - Barco SP2K-9	10.58.83.22:161	SNMP
+Goldoni - Viareggio - Sala 2 - Barco SP2K-9S	10.58.83.22:161	SNMP
 Goldoni - Viareggio - Sala 2 - ICMP	10.58.83.22:161	SNMP
 Goldoni - Viareggio - Sala 2 - CPI2000	10.58.83.24:161	ICMP`;
 
@@ -828,7 +829,7 @@ const PROJ_AGE = {
   // Serie E (Entry): DP2K-6E
   'dp2k-6e':   7000,
   // SP2K Series 4
-  'sp2k-11':   8000, 'sp2k-9':   8100,
+  'sp2k-11s':  8000, 'sp2k-9s':  8100, 'sp2k-7s': 8200,
   // SP4K-B / SP2K-B (serie B laser bright)
   'sp4k-': 9000, 'sp2k-\d+b': 9100,
   // SP4K-C / SP2K-C (serie C laser compact)
@@ -1275,7 +1276,8 @@ function buildByType() {
       const imgUrl = getModelImage(label);
       const hdr = document.createElement('div');
       hdr.className = 'model-group-header';
-      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
+      const imgWhite = imgUrl === MODEL_IMG.sp_b;
+      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img${imgWhite?' white-bg':''}" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
       grid.appendChild(hdr);
 
       // One card per cinema/sala
