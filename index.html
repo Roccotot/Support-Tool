@@ -519,10 +519,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 <!-- SENZA VPN -->
 <div class="view" id="view-novpn">
   <div class="main">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 14px;background:rgba(255,100,100,0.08);border:1px solid rgba(255,100,100,0.2);border-radius:10px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#ff6464" stroke-width="2" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-      <span style="font-size:11px;color:#ff9090">Questi cinema sono raggiungibili in rete locale (192.168.1.x) senza VPN — usare solo quando connessi in loco.</span>
-    </div>
     <div id="grid-novpn" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px"></div>
   </div>
 </div>
@@ -739,12 +735,17 @@ Goldoni - Viareggio - Sala 2 - Barco SP2K-9	10.58.83.22:161	SNMP
 Goldoni - Viareggio - Sala 2 - ICMP	10.58.83.22:161	SNMP
 Goldoni - Viareggio - Sala 2 - CPI2000	10.58.83.24:161	ICMP`;
 
-const RAW_NOVPN = `Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Proiettore\t192.168.1.134:161\tICMP
+const RAW_NOVPN = `
+Teatro Bucci - San Giovanni in Valdarno - Rete - MikroTik\t192.168.1.1:161\tSNMP
+Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Proiettore\t192.168.1.134:161\tICMP
 Teatro Bucci - San Giovanni in Valdarno - Sala 1 - ICMP\t192.168.1.134:161\tICMP
 Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Dolby CP950\t192.168.1.136:161\tICMP
+
+CRC Antella - Antella - Rete - MikroTik\t192.168.1.1:161\tSNMP
 CRC Antella - Antella - Sala 1 - Proiettore\t192.168.1.134:161\tICMP
 CRC Antella - Antella - Sala 1 - ICMP\t192.168.1.134:161\tICMP
-CRC Antella - Antella - Sala 1 - CP650\t192.168.1.136:161\tICMP`;
+CRC Antella - Antella - Sala 1 - CP650\t192.168.1.136:161\tICMP
+`;
 
 // ── PALETTE ───────────────────────────────────────────────────
 // 15 colori distinti e vividi — un colore unico per ogni cinema fino a 15
@@ -809,7 +810,7 @@ function devType(label) {
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
   if (/server|ims|doremi|srv|showvault|\bicmp\b/i.test(label)) return ['srv','SERVER'];
-  if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
+  if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|sp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|cp[0-9]|cpi[0-9]/i.test(label))       return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
 }
@@ -828,6 +829,10 @@ const PROJ_AGE = {
   'dp2k-6e':   7000,
   // SP2K Series 4
   'sp2k-11':   8000, 'sp2k-9':   8100,
+  // SP4K-B / SP2K-B (serie B laser bright)
+  'sp4k-': 9000, 'sp2k-\d+b': 9100,
+  // SP4K-C / SP2K-C (serie C laser compact)
+  'sp2k-\d+c': 9200,
 };
 function projModelAge(label) {
   const l = label.toLowerCase();
@@ -842,6 +847,8 @@ const MODEL_IMG = {
   dp4k:     'https://assets.barco.com/transform/738c0903-4c8c-4cff-873e-dbaba2f625ab/DP4K-32B-right-low-angle',
   icmp:     'https://assets.barco.com/transform/2e29e139-a17e-4b1b-8f04-acfeec3b4f96/ICMP-board-front-2',
   sp2k:     'https://shop.cinemanext.com/web/image/product.template/10756/image_1024?unique=651fdb0',
+  sp_b:     'https://assets.barco.com/transform/13d8dd8c-89f6-488d-8ca2-0df5047bf1e9/Barco-SP4K-B-left-high-persp-main',
+  sp_c:     'https://assets.barco.com/transform/3117a421-ee3c-457e-a3da-378869d41e1f/Barco-SP4K-C-003',
   dp2k_c:   'https://assets.barco.com/transform/4bcd93f0-0ad7-412a-beb2-53aae3c21227/DP2K-20c-right-std-angle-with-outlet-jpg',
   dp2k_s:   'https://assets.barco.com/transform/7e65034e-1598-4601-99dc-3060720b3ff2/DP2K-10S-right-low-angle-jpg',
   dp2k_e:   'https://assets.barco.com/transform/29bc20c4-9703-4388-9b72-8901d557c383/DP2K-6E-3-4-Right-Low-onwhite-jpg',
@@ -863,6 +870,8 @@ function getModelImage(label) {
   if (/cmc4/.test(l))               return MODEL_IMG.cmc4;
   if (/\btms\b/.test(l))            return MODEL_IMG.tms;
   if (/dp4k/.test(l))               return MODEL_IMG.dp4k;
+  if (/sp4k-\d+b\b|sp2k-\d+b\b/.test(l)) return MODEL_IMG.sp_b;
+  if (/sp4k-\d+c\b|sp2k-\d+c\b/.test(l)) return MODEL_IMG.sp_c;
   if (/sp2k/.test(l))               return MODEL_IMG.sp2k;
   if (/dp2k-\d+c\b/.test(l))       return MODEL_IMG.dp2k_c;
   if (/dp2k-\d+e\b/.test(l))       return MODEL_IMG.dp2k_e;
@@ -1224,24 +1233,28 @@ function buildByType() {
   };
   Object.values(grids).forEach(g => { if(g) g.innerHTML = ''; });
 
-  // Collect: modelMap[bucket][normalizedLabel] = [{cinema, city, room, ip, label}]
+  // Collect: modelMap[bucket][normalizedLabel] = [{cinema, city, room, ip, label, novpn?}]
   const modelMap = {rtr:{}, tms:{}, srv:{}, proj:{}, aud:{}};
-  cinemas.forEach(c => {
-    Object.entries(c.rooms).forEach(([room, devices]) => {
-      devices.forEach(d => {
-        const [tc] = devType(d.label);
-        const buckets = (tc in modelMap) ? [tc] : ['proj'];
-        const key = d.label
-          .replace(/\s+e\s+(icmp|server)\b.*/i, '')
-          .replace(/^(proiettore|barco|christie|nec|cinemeccanica|server|doremi)\s+/gi, '')
-          .trim() || d.label;
-        buckets.forEach(b => {
-          if (!modelMap[b][key]) modelMap[b][key] = [];
-          modelMap[b][key].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label});
+  const addToMap = (cinemaList, novpn=false) => {
+    cinemaList.forEach(c => {
+      Object.entries(c.rooms).forEach(([room, devices]) => {
+        devices.forEach(d => {
+          const [tc] = devType(d.label);
+          const buckets = (tc in modelMap) ? [tc] : ['proj'];
+          const key = d.label
+            .replace(/\s+e\s+(icmp|server)\b.*/i, '')
+            .replace(/^(proiettore|barco|christie|nec|cinemeccanica|server|doremi)\s+/gi, '')
+            .trim() || d.label;
+          buckets.forEach(b => {
+            if (!modelMap[b][key]) modelMap[b][key] = [];
+            modelMap[b][key].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label, novpn});
+          });
         });
       });
     });
-  });
+  };
+  addToMap(cinemas);
+  addToMap(parseRaw(RAW_NOVPN), true);
 
   const counts = {rtr:0, tms:0, srv:0, proj:0, aud:0};
   Object.entries(modelMap).forEach(([bucket, models]) => {
@@ -1271,12 +1284,12 @@ function buildByType() {
         card.className = 'type-card';
         card.style.cssText = `background:${color}0d;border-color:${color}44`;
         card.innerHTML = `
-          <div class="tc-cinema">${e.cinema}</div>
+          <div class="tc-cinema">${e.cinema}${e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
           <div class="tc-name" title="${e.room}">${e.room}</div>
           <div class="tc-btns">
             <div class="tc-ping" data-ip="${e.ip}" title="Clicca per verificare"
               onclick="pingDevice('${e.ip}',this${pingPort})"></div>
-            ${devBtnsHTML(e.ip, e.label)}
+            ${e.novpn ? '' : devBtnsHTML(e.ip, e.label)}
           </div>`;
         card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip].join(' ').toLowerCase();
         grid.appendChild(card);
