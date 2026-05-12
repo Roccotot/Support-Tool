@@ -884,7 +884,7 @@ function getModelImage(label) {
   if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
   if (/\bicmp\b/.test(l))           return MODEL_IMG.icmp;
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
-  if (/christie/.test(l))           return MODEL_IMG.christie;
+  if (/christie|cp2210/i.test(l))   return MODEL_IMG.christie;
   if (/nec|nc2000/i.test(l))        return MODEL_IMG.nec_nc2000c;
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
