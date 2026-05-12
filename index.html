@@ -69,9 +69,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 /* ── VIEWS ── */
 .view{display:none;flex:1;overflow:hidden;position:relative}
 .view.active{display:flex;flex-direction:column}
-#view-dashboard,#view-bytype{overflow-y:auto}
-#view-dashboard::-webkit-scrollbar,#view-bytype::-webkit-scrollbar{width:5px}
-#view-dashboard::-webkit-scrollbar-thumb,#view-bytype::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#view-dashboard,#view-bytype,#view-novpn{overflow-y:auto}
+#view-dashboard::-webkit-scrollbar,#view-bytype::-webkit-scrollbar,#view-novpn::-webkit-scrollbar{width:5px}
+#view-dashboard::-webkit-scrollbar-thumb,#view-bytype::-webkit-scrollbar-thumb,#view-novpn::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* ── STATS ── */
 .stats-strip{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);
@@ -422,6 +422,12 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
           <rect x="16" y="3" width="6" height="8"/>
         </svg>Per tipo
       </button>
+      <button class="view-btn" id="tab-novpn" onclick="switchView('novpn')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+          <line x1="2" y1="2" x2="22" y2="22"/>
+        </svg>Senza VPN
+      </button>
     </div>
   </div>
 </header>
@@ -510,7 +516,16 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   </div>
 </div>
 
-<!-- CRONOLOGIA -->
+<!-- SENZA VPN -->
+<div class="view" id="view-novpn">
+  <div class="main">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 14px;background:rgba(255,100,100,0.08);border:1px solid rgba(255,100,100,0.2);border-radius:10px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ff6464" stroke-width="2" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+      <span style="font-size:11px;color:#ff9090">Questi cinema sono raggiungibili in rete locale (192.168.1.x) senza VPN — usare solo quando connessi in loco.</span>
+    </div>
+    <div id="grid-novpn" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px"></div>
+  </div>
+</div>
 <div class="history-bar">
   <div class="history-label">Recenti</div>
   <div class="history-items" id="historyItems">
@@ -723,6 +738,10 @@ Goldoni - Viareggio - Sala 1 - CPI2000	10.58.83.14:161	ICMP
 Goldoni - Viareggio - Sala 2 - Barco SP2K-9	10.58.83.22:161	SNMP
 Goldoni - Viareggio - Sala 2 - ICMP	10.58.83.22:161	SNMP
 Goldoni - Viareggio - Sala 2 - CPI2000	10.58.83.24:161	ICMP`;
+
+const RAW_NOVPN = `Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Proiettore\t192.168.1.134:161\tICMP
+Teatro Bucci - San Giovanni in Valdarno - Sala 1 - ICMP\t192.168.1.134:161\tICMP
+Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Dolby CP950\t192.168.1.136:161\tICMP`;
 
 // ── PALETTE ───────────────────────────────────────────────────
 // 15 colori distinti e vividi — un colore unico per ogni cinema fino a 15
@@ -1269,6 +1288,18 @@ function buildByType() {
   document.getElementById('count-aud').textContent  = counts.aud  + ' dispositivi';
 }
 
+// ── SENZA VPN ─────────────────────────────────────────────────
+function buildNoVPN() {
+  const cinemas = parseRaw(RAW_NOVPN);
+  initColors(cinemas);
+  const grid = document.getElementById('grid-novpn');
+  grid.innerHTML = '';
+  cinemas.forEach(c => {
+    const card = buildCinemaCard(c);
+    grid.appendChild(card);
+  });
+}
+
 // ── MAP ───────────────────────────────────────────────────────
 function buildPopupHTML(c) {
   const color    = cinemaColor(c.name);
@@ -1402,8 +1433,8 @@ async function buildMap() {
 
 // ── VIEW SWITCHER ─────────────────────────────────────────────
 let mapBuilt=false;
-const _VIEWS=['map','dashboard','bytype'];
-const _VIEW_LABELS={map:'Mappa',dashboard:'Cinema',bytype:'Per tipo'};
+const _VIEWS=['map','dashboard','bytype','novpn'];
+const _VIEW_LABELS={map:'Mappa',dashboard:'Cinema',bytype:'Per tipo',novpn:'Senza VPN'};
 
 function cycleView(){
   const cur=(document.querySelector('.view.active')||{id:'view-map'}).id.replace('view-','');
@@ -1455,6 +1486,7 @@ function toggleTheme() {
 // ── INIT ──────────────────────────────────────────────────────
 buildDashboard();
 buildByType();
+buildNoVPN();
 renderHistory();
 switchView('dashboard');
 updateGlobalStatus();
