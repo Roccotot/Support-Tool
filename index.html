@@ -829,8 +829,10 @@ const PROJ_AGE = {
   'dp2k-6e':   7000,
   // SP2K Series 4
   'sp2k-11':   8000, 'sp2k-9':   8100,
-  // SP4K-B / SP2K-B (serie B laser)
-  'sp4k':      9000, 'sp2k-':    9100,
+  // SP4K-B / SP2K-B (serie B laser bright)
+  'sp4k-': 9000, 'sp2k-\d+b': 9100,
+  // SP4K-C / SP2K-C (serie C laser compact)
+  'sp2k-\d+c': 9200,
 };
 function projModelAge(label) {
   const l = label.toLowerCase();
@@ -846,6 +848,7 @@ const MODEL_IMG = {
   icmp:     'https://assets.barco.com/transform/2e29e139-a17e-4b1b-8f04-acfeec3b4f96/ICMP-board-front-2',
   sp2k:     'https://shop.cinemanext.com/web/image/product.template/10756/image_1024?unique=651fdb0',
   sp_b:     'https://assets.barco.com/transform/13d8dd8c-89f6-488d-8ca2-0df5047bf1e9/Barco-SP4K-B-left-high-persp-main',
+  sp_c:     'https://assets.barco.com/transform/3117a421-ee3c-457e-a3da-378869d41e1f/Barco-SP4K-C-003',
   dp2k_c:   'https://assets.barco.com/transform/4bcd93f0-0ad7-412a-beb2-53aae3c21227/DP2K-20c-right-std-angle-with-outlet-jpg',
   dp2k_s:   'https://assets.barco.com/transform/7e65034e-1598-4601-99dc-3060720b3ff2/DP2K-10S-right-low-angle-jpg',
   dp2k_e:   'https://assets.barco.com/transform/29bc20c4-9703-4388-9b72-8901d557c383/DP2K-6E-3-4-Right-Low-onwhite-jpg',
@@ -867,7 +870,8 @@ function getModelImage(label) {
   if (/cmc4/.test(l))               return MODEL_IMG.cmc4;
   if (/\btms\b/.test(l))            return MODEL_IMG.tms;
   if (/dp4k/.test(l))               return MODEL_IMG.dp4k;
-  if (/sp4k|sp2k-\d+b\b/.test(l))  return MODEL_IMG.sp_b;
+  if (/sp4k-\d+b\b|sp2k-\d+b\b/.test(l)) return MODEL_IMG.sp_b;
+  if (/sp4k-\d+c\b|sp2k-\d+c\b/.test(l)) return MODEL_IMG.sp_c;
   if (/sp2k/.test(l))               return MODEL_IMG.sp2k;
   if (/dp2k-\d+c\b/.test(l))       return MODEL_IMG.dp2k_c;
   if (/dp2k-\d+e\b/.test(l))       return MODEL_IMG.dp2k_e;
