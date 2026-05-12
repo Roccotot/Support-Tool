@@ -737,7 +737,7 @@ Goldoni - Viareggio - Sala 2 - CPI2000	10.58.83.24:161	ICMP`;
 
 const RAW_NOVPN = `
 Teatro Bucci - San Giovanni in Valdarno - Rete - MikroTik\t192.168.1.1:161\tSNMP
-Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Proiettore\t192.168.1.134:161\tICMP
+Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Barco SP4K-15B\t192.168.1.134:161\tICMP
 Teatro Bucci - San Giovanni in Valdarno - Sala 1 - ICMP\t192.168.1.134:161\tICMP
 Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Dolby CP950\t192.168.1.136:161\tICMP
 
@@ -861,6 +861,7 @@ const MODEL_IMG = {
   cp650:    'https://www.lubianitecnologie.it/wp-content/uploads/2012/02/remoto-dolby-650x433.png',
   cp750:    'https://i.ebayimg.com/images/g/BWsAAOSwO~VnNijg/s-l1200.jpg',
   cp850:    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr0vSWudXvBEQ66XA7_cvB1o2Y25UMndD_fQ&s',
+  cp950:    'https://professional.dolby.com/siteassets/products/dolby-audio-products/dolby-cinema-processor-cp950/cp950_noatmos_left.jpg',
   cpi2000:  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGHUP25MpMXKjFLQGa4FeK_xTuk2Xck8rpVg&s',
 };
 
@@ -884,6 +885,7 @@ function getModelImage(label) {
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
   if (/showvault/.test(l))          return MODEL_IMG.showvault;
+  if (/cp950/.test(l))              return MODEL_IMG.cp950;
   if (/cp850/.test(l))              return MODEL_IMG.cp850;
   if (/cp750/.test(l))              return MODEL_IMG.cp750;
   if (/cp650/.test(l))              return MODEL_IMG.cp650;
@@ -1311,7 +1313,46 @@ function buildNoVPN() {
   const grid = document.getElementById('grid-novpn');
   grid.innerHTML = '';
   cinemas.forEach(c => {
-    const card = buildCinemaCard(c);
+    const color = cinemaColor(c.name);
+    const rooms = Object.entries(c.rooms);
+    const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
+    let roomsHTML = '';
+    rooms.forEach(([roomName, devices]) => {
+      roomsHTML += `<div class="room-sep">
+        <div class="room-sep-dot" style="background:${color}"></div>
+        <div class="room-sep-label">${roomName}</div>
+        <div class="room-sep-line"></div>
+      </div>`;
+      devices.forEach(d => {
+        const isRtr = devType(d.label)[0] === 'rtr';
+        roomsHTML += `<div class="dev-row">
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isRtr?'data-rtr="1"':''} title="Clicca per verificare raggiungibilità"
+            onclick="pingDevice('${d.ip}',this)"></div>
+          <div class="dev-name" title="${d.label}">${d.label}</div>
+          <div class="dev-btns"></div>
+        </div>`;
+      });
+    });
+    const card = document.createElement('div');
+    card.className = 'cinema-card';
+    card.style.cssText = `background:${color}0d;border-color:${color}55`;
+    card.innerHTML = `
+      <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="openCard(this)">
+        <div class="card-title-block">
+          <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
+          <div>
+            <div class="card-name">${c.name}</div>
+            <div class="card-city" style="color:${color}">📍 ${c.city}</div>
+          </div>
+        </div>
+        <div class="card-actions">
+          <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body">${roomsHTML}</div>`;
     grid.appendChild(card);
   });
 }
