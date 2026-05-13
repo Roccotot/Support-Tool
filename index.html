@@ -1369,11 +1369,13 @@ function buildNoVPN() {
       </div>`;
       devices.forEach(d => {
         const isRtr = devType(d.label)[0] === 'rtr';
+        const isTms = devType(d.label)[0] === 'tms';
+        const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isRtr?'data-rtr="1"':''} title="Clicca per verificare raggiungibilità"
-            onclick="pingDevice('${d.ip}',this)"></div>
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isRtr?'data-rtr="1"':''} ${isTms?'data-port="9000"':''} title="Clicca per verificare raggiungibilità"
+            onclick="pingDevice('${d.ip}',this${dPort})"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
-          <div class="dev-btns"></div>
+          <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
         </div>`;
       });
     });
