@@ -1056,10 +1056,11 @@ function openCard(hdr) {
 }
 
 async function autoPing() {
-  if (_cFilter !== 'vpn') return;
+  if (_cFilter === 'offline') return;
   const seen = new Set();
   const grid = document.getElementById('cinemasGrid');
   const dots = [...(grid ? grid.querySelectorAll('[data-ip]') : [])].filter(d => {
+    if (_cFilter === 'tutti' && !d.dataset.ip.startsWith('10.')) return false;
     if (seen.has(d.dataset.ip)) return false;
     const card = d.closest('.cinema-card');
     const isRouter = d.dataset.router === '1';
