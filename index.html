@@ -206,10 +206,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 
 /* ── MAP ── */
 #view-mappa{position:relative}
-.map-container{position:absolute;inset:0;display:none}
+.map-container{position:absolute;inset:0;display:none;z-index:1}
 .map-container.active{display:block}
 .leaflet-container{background:#07090e !important}
-.map-stats-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:100;
+.map-stats-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:200;
   display:flex;gap:12px;align-items:center;background:rgba(7,9,14,0.93);
   border:1px solid var(--border);border-radius:30px;padding:9px 22px;
   backdrop-filter:blur(14px);pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
@@ -376,8 +376,11 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 @media(min-width:901px){.tms-ping-dot{width:11px;height:11px}}
 
 /* ── CINEMA FILTER BAR ── */
-.cinema-filter-bar{position:relative;z-index:1;display:flex;align-items:center;gap:8px;
-  padding:10px 28px 0;max-width:1600px;margin:0 auto;width:100%}
+.cinema-filter-bar{position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 28px;
+  background:rgba(7,9,14,0.97);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border2);width:100%}
 .cf-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;
   padding:5px 16px;border-radius:6px;border:1px solid var(--border);background:var(--panel);
   color:var(--text2);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
@@ -385,7 +388,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .cf-btn.active{color:#fff;border-color:var(--accent);background:rgba(41,121,255,0.15)}
 
 /* ── MAP FILTER BAR ── */
-.map-filter-bar{position:absolute;top:16px;right:16px;z-index:100;display:flex;gap:6px}
+.map-filter-bar{position:absolute;top:16px;right:16px;z-index:200;display:flex;gap:6px}
 .mf-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;
   padding:5px 14px;border-radius:6px;border:1px solid var(--border);
   background:rgba(7,9,14,0.93);backdrop-filter:blur(14px);
@@ -1474,7 +1477,7 @@ const _mapBuilt = {};
 function getCinemasForFilter(f) {
   if (f === 'vpn')     return parseRaw(RAW);
   if (f === 'offline') return parseRaw(RAW_NOVPN);
-  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN)];
+  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN)].sort((a,b) => a.city.localeCompare(b.city));
 }
 
 function setCinemaFilter(f) {
