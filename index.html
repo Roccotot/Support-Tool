@@ -1411,38 +1411,38 @@ async function geocodeCinema(name, city) {
   return null;
 }
 
-async function buildMap() {
-  const map = L.map('map',{center:[43.5,11.2],zoom:8,zoomControl:false,attributionControl:false});
-  window._map = map;
+// ── LEAFLET MAP (condiviso da Mappa VPN e Mappa offline) ──────
+async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost, coords, geocode=false, showStatus=false}) {
+  const map = L.map(mapId,{center:[43.5,11.2],zoom:geocode?8:9,zoomControl:false,attributionControl:false});
+  window[windowKey] = map;
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
-  const s = document.createElement('style');
-  s.textContent='.leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important;padding:0 !important}';
-  document.head.appendChild(s);
+  if (!window._leafletStyleDone) {
+    window._leafletStyleDone = true;
+    const s = document.createElement('style');
+    s.textContent='.leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important;padding:0 !important}';
+    document.head.appendChild(s);
+  }
 
-  const cinemas = parseRaw(RAW);
   initColors(cinemas);
-  document.getElementById('msb-cinema').textContent = cinemas.length;
-  document.getElementById('msb-host').textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
-
-  const FALLBACK = {
-    'Grosseto':[42.7629,11.1121],'Chiusi':[43.0146,11.9454],
-    'Montecatini Terme':[43.8847,10.7728],'Pisa':[43.7228,10.4017],
-    'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],'Empoli':[43.7193,10.9497],'Firenze':[43.7696,11.2558],
-    'Prato':[43.8799,11.0970],'Figline e Incisa Valdarno':[43.6248,11.4672],'Montaione':[43.5586,10.9137],'Borgo San Lorenzo':[43.9552,11.3876],'Livorno':[43.5479,10.3146],'Viareggio':[43.8677,10.2519],
-  };
+  document.getElementById(statCinema).textContent = cinemas.length;
+  document.getElementById(statHost).textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
 
   for (let i=0; i<cinemas.length; i++) {
     const c=cinemas[i], color=cinemaColor(c.name);
-    if (i>0) await new Promise(r=>setTimeout(r,1150));
-    const geo=await geocodeCinema(c.name,c.city);
-    let lat,lng;
-    if (geo){lat=geo.lat;lng=geo.lng;c._address=geo.address;}
-    else if(FALLBACK[c.city]){[lat,lng]=FALLBACK[c.city];c._address=null;}
-    else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
-
+    let lat, lng;
+    if (geocode) {
+      if (i>0) await new Promise(r=>setTimeout(r,1150));
+      const geo=await geocodeCinema(c.name,c.city);
+      if (geo){lat=geo.lat;lng=geo.lng;c._address=geo.address;}
+      else if(coords[c.city]){[lat,lng]=coords[c.city];c._address=null;}
+      else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
+    } else {
+      [lat,lng]=coords[c.city]||[43.5,11.2];
+    }
+    const statusHtml = showStatus ? `<div class="cmarker-status" id="${cinemaId(c.name)}"></div>` : '';
     const icon=L.divIcon({
-      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div><div class="cmarker-status" id="${cinemaId(c.name)}"></div></div>`,
+      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div>${statusHtml}</div>`,
       className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
     });
     const marker=L.marker([lat,lng],{icon}).addTo(map);
@@ -1453,12 +1453,14 @@ async function buildMap() {
     marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     marker.on('popupopen',()=>{
       const el=marker.getPopup().getElement(); if(!el) return;
-      el.querySelectorAll('.ping-dot[data-ip]').forEach(dot=>{
-        const src=document.querySelector(`.ping-dot[data-cinema][data-ip="${dot.dataset.ip}"]`);
-        if(!src) return;
-        ['ok','err','checking'].forEach(cls=>dot.classList.toggle(cls,src.classList.contains(cls)));
-        dot.title=src.title;
-      });
+      if (showStatus) {
+        el.querySelectorAll('.ping-dot[data-ip]').forEach(dot=>{
+          const src=document.querySelector(`.ping-dot[data-cinema][data-ip="${dot.dataset.ip}"]`);
+          if(!src) return;
+          ['ok','err','checking'].forEach(cls=>dot.classList.toggle(cls,src.classList.contains(cls)));
+          dot.title=src.title;
+        });
+      }
       el.addEventListener('mouseenter',()=>clearTimeout(ct));
       el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     });
@@ -1466,50 +1468,23 @@ async function buildMap() {
       `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
       {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
     );
-    updateMapStatus(c.name);
+    if (showStatus) updateMapStatus(c.name);
   }
 }
 
-// ── MAPPA LOCALE ─────────────────────────────────────────────
+async function buildMap() {
+  await buildLeafletMap(parseRaw(RAW), {
+    mapId:'map', windowKey:'_map', statCinema:'msb-cinema', statHost:'msb-host',
+    coords:{'Grosseto':[42.7629,11.1121],'Chiusi':[43.0146,11.9454],'Montecatini Terme':[43.8847,10.7728],'Pisa':[43.7228,10.4017],'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],'Empoli':[43.7193,10.9497],'Firenze':[43.7696,11.2558],'Prato':[43.8799,11.0970],'Figline e Incisa Valdarno':[43.6248,11.4672],'Montaione':[43.5586,10.9137],'Borgo San Lorenzo':[43.9552,11.3876],'Livorno':[43.5479,10.3146],'Viareggio':[43.8677,10.2519]},
+    geocode:true, showStatus:true
+  });
+}
+
 function buildMapLocale() {
-  const map = L.map('map-locale',{center:[43.5,11.2],zoom:9,zoomControl:false,attributionControl:false});
-  window._mapLocale = map;
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
-  L.control.zoom({position:'bottomright'}).addTo(map);
-
-  const cinemas = parseRaw(RAW_NOVPN);
-  initColors(cinemas);
-  document.getElementById('msb-locale-cinema').textContent = cinemas.length;
-  document.getElementById('msb-locale-host').textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
-
-  const COORDS = {
-    'San Giovanni in Valdarno':[43.5632,11.5218],
-    'Antella':[43.7398,11.3047],
-    'Monte San Savino':[43.3294,11.7268],
-  };
-
-  cinemas.forEach(c => {
-    const color = cinemaColor(c.name);
-    const [lat,lng] = COORDS[c.city] || [43.5,11.2];
-    const icon = L.divIcon({
-      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div></div>`,
-      className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
-    });
-    const marker = L.marker([lat,lng],{icon}).addTo(map);
-    const popup  = L.popup({closeButton:false,autoClose:false,closeOnClick:false}).setContent(buildPopupHTML(c));
-    marker.bindPopup(popup);
-    let ct;
-    marker.on('mouseover',()=>{clearTimeout(ct);marker.openPopup()});
-    marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
-    marker.on('popupopen',()=>{
-      const el=marker.getPopup().getElement(); if(!el) return;
-      el.addEventListener('mouseenter',()=>clearTimeout(ct));
-      el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
-    });
-    marker.bindTooltip(
-      `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
-      {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
-    );
+  buildLeafletMap(parseRaw(RAW_NOVPN), {
+    mapId:'map-locale', windowKey:'_mapLocale', statCinema:'msb-locale-cinema', statHost:'msb-locale-host',
+    coords:{'San Giovanni in Valdarno':[43.5632,11.5218],'Antella':[43.7398,11.3047],'Monte San Savino':[43.3294,11.7268]},
+    geocode:false, showStatus:false
   });
 }
 
