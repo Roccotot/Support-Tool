@@ -22,9 +22,6 @@
   
 
 /* ── TEMA NEGATIVO ── */
-html.light { filter:invert(1) hue-rotate(180deg) }
-html.light img { filter:invert(1) hue-rotate(180deg) }
-html.light .cmarker-inner { filter:invert(1) hue-rotate(180deg) }
 html.light .leaflet-tile { filter:invert(1) hue-rotate(180deg) }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
@@ -391,9 +388,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <input type="text" class="search-input" id="searchInput"
     placeholder="Cerca cinema, IP, dispositivo..." oninput="filterDevices(this.value)">
   <div class="header-right">
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia tema">
-      <span id="themeIcon">☀️</span>
-    </button>
     <button class="view-cycle-btn" id="viewCycleBtn" onclick="cycleView()" title="Cambia vista">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
         <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
@@ -533,10 +527,19 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   </div>
 </div>
 
-<!-- SENZA VPN -->
+<!-- CINEMA OFFLINE -->
 <div class="view" id="view-novpn">
+  <div class="stats-strip">
+    <div class="stat-tile"><div class="st-label">Cinema</div><div class="st-value" id="statCinemaNovpn">—</div></div>
+    <div class="stat-tile"><div class="st-label">Host Totali</div><div class="st-value" id="statDevicesNovpn">—</div></div>
+    <div class="stat-tile"><div class="st-label">Gruppi Sala</div><div class="st-value" id="statRoomsNovpn">—</div></div>
+  </div>
   <div class="main">
-    <div id="grid-novpn" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px"></div>
+    <div class="section-hdr">
+      <div class="section-title">Cinema Offline — Rete Locale</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="cinemas-grid" id="grid-novpn"></div>
   </div>
 </div>
 <div class="history-bar">
@@ -1342,10 +1345,21 @@ function buildNoVPN() {
   initColors(cinemas);
   const grid = document.getElementById('grid-novpn');
   grid.innerHTML = '';
+  let totalDevs = 0, totalRooms = 0;
+
+  const cityMap = new Map();
   cinemas.forEach(c => {
-    const color = cinemaColor(c.name);
-    const rooms = Object.entries(c.rooms);
+    if (!cityMap.has(c.city)) cityMap.set(c.city, []);
+    cityMap.get(c.city).push(c);
+  });
+
+  const buildCard = (c) => {
+    const color    = cinemaColor(c.name);
+    const rooms    = Object.entries(c.rooms);
     const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
+    totalDevs  += devCount;
+    totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
+    const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
       roomsHTML += `<div class="room-sep">
@@ -1373,6 +1387,12 @@ function buildNoVPN() {
           <div>
             <div class="card-name">${c.name}</div>
             <div class="card-city" style="color:${color}">📍 ${c.city}</div>
+            ${routerDev ? `<div class="card-rtr">
+              <div class="ping-dot" data-ip="${routerDev.ip}" data-cinema="${c.name}"
+                title="MikroTik — clicca per verificare"
+                onclick="event.stopPropagation();pingDevice('${routerDev.ip}',this)"></div>
+              <span>MikroTik&ensp;${routerDev.ip}</span>
+            </div>` : ''}
           </div>
         </div>
         <div class="card-actions">
@@ -1383,8 +1403,44 @@ function buildNoVPN() {
         </div>
       </div>
       <div class="card-body">${roomsHTML}</div>`;
-    grid.appendChild(card);
+    card.dataset.city = c.city;
+    return card;
+  };
+
+  let colPos = 0;
+  cityMap.forEach((cityCinemas, city) => {
+    const span = Math.min(cityCinemas.length, 3);
+    if (colPos > 0 && colPos + span > 3) {
+      for (let i = colPos; i < 3; i++) {
+        const f = document.createElement('div');
+        f.className = 'city-col grid-filler';
+        grid.appendChild(f);
+      }
+      colPos = 0;
+    }
+    const col = document.createElement('div');
+    col.className = 'city-col' + (span > 1 ? ` span-${span}` : '');
+    col.dataset.city = city;
+    const hdr = document.createElement('div');
+    hdr.className = 'city-col-hdr';
+    hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${city}</span><div class="city-col-hdr-line"></div>`;
+    col.appendChild(hdr);
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'cinema-cards';
+    cityCinemas.forEach(c => cardsWrap.appendChild(buildCard(c)));
+    col.appendChild(cardsWrap);
+    grid.appendChild(col);
+    colPos = (colPos + span) % 3;
   });
+  for (let i = colPos; colPos > 0 && i < 3; i++) {
+    const f = document.createElement('div');
+    f.className = 'city-col grid-filler';
+    grid.appendChild(f);
+  }
+
+  document.getElementById('statCinemaNovpn').textContent  = cinemas.length;
+  document.getElementById('statDevicesNovpn').textContent = totalDevs;
+  document.getElementById('statRoomsNovpn').textContent   = totalRooms;
 }
 
 // ── MAP ───────────────────────────────────────────────────────
@@ -1599,23 +1655,6 @@ function showToast(title,msg,type){
 }
 
 // ── THEME ────────────────────────────────────────────────────
-function toggleTheme() {
-  const isLight = document.documentElement.classList.toggle('light');
-  document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
-  try { localStorage.setItem('noc_theme', isLight ? 'light' : 'dark'); } catch(e){}
-}
-// Ripristina tema salvato
-(function(){
-  try {
-    if (localStorage.getItem('noc_theme') === 'light') {
-      document.documentElement.classList.add('light');
-      document.addEventListener('DOMContentLoaded', () => {
-        const el = document.getElementById('themeIcon');
-        if (el) el.textContent = '🌙';
-      });
-    }
-  } catch(e){}
-})();
 
 // ── INIT ──────────────────────────────────────────────────────
 buildDashboard();
