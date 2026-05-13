@@ -66,9 +66,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 /* ── VIEWS ── */
 .view{display:none;flex:1;overflow:hidden;position:relative}
 .view.active{display:flex;flex-direction:column}
-#view-dashboard,#view-bytype,#view-novpn{overflow-y:auto}
-#view-dashboard::-webkit-scrollbar,#view-bytype::-webkit-scrollbar,#view-novpn::-webkit-scrollbar{width:5px}
-#view-dashboard::-webkit-scrollbar-thumb,#view-bytype::-webkit-scrollbar-thumb,#view-novpn::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#view-cinema,#view-bytype{overflow-y:auto}
+#view-cinema::-webkit-scrollbar,#view-bytype::-webkit-scrollbar{width:5px}
+#view-cinema::-webkit-scrollbar-thumb,#view-bytype::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* ── STATS ── */
 .stats-strip{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);
@@ -205,8 +205,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .model-group-header .mgh-count{font-size:9px;color:var(--text2);background:rgba(255,255,255,0.06);border-radius:10px;padding:1px 8px;letter-spacing:.5px}
 
 /* ── MAP ── */
-#view-map{position:relative}
-#map{width:100%;height:100%;z-index:1}
+#view-mappa{position:relative}
+.map-container{position:absolute;inset:0;display:none}
+.map-container.active{display:block}
 .leaflet-container{background:#07090e !important}
 .map-stats-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:100;
   display:flex;gap:12px;align-items:center;background:rgba(7,9,14,0.93);
@@ -373,6 +374,24 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .proto-btn.winscp{color:#80cbc4;border-color:rgba(128,203,196,0.3);background:rgba(128,203,196,0.07)}
 .proto-btn.winscp:hover{background:rgba(128,203,196,0.2);border-color:#80cbc4;color:#fff}
 @media(min-width:901px){.tms-ping-dot{width:11px;height:11px}}
+
+/* ── CINEMA FILTER BAR ── */
+.cinema-filter-bar{position:relative;z-index:1;display:flex;align-items:center;gap:8px;
+  padding:10px 28px 0;max-width:1600px;margin:0 auto;width:100%}
+.cf-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  padding:5px 16px;border-radius:6px;border:1px solid var(--border);background:var(--panel);
+  color:var(--text2);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+.cf-btn:hover{color:var(--text);border-color:rgba(41,121,255,0.4)}
+.cf-btn.active{color:#fff;border-color:var(--accent);background:rgba(41,121,255,0.15)}
+
+/* ── MAP FILTER BAR ── */
+.map-filter-bar{position:absolute;top:16px;right:16px;z-index:100;display:flex;gap:6px}
+.mf-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  padding:5px 14px;border-radius:6px;border:1px solid var(--border);
+  background:rgba(7,9,14,0.93);backdrop-filter:blur(14px);
+  color:var(--text2);cursor:pointer;transition:all 0.2s}
+.mf-btn:hover{color:var(--text);border-color:rgba(41,121,255,0.4)}
+.mf-btn.active{color:#fff;border-color:var(--accent);background:rgba(41,121,255,0.2)}
 </style>
 </head>
 <body>
@@ -399,29 +418,17 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       </svg>
     </button>
     <div class="view-toggle">
-      <button class="view-btn" id="tab-dashboard" onclick="switchView('dashboard')">
+      <button class="view-btn" id="tab-cinema" onclick="switchView('cinema')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
           <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-        </svg>Cinema VPN
+        </svg>Cinema
       </button>
-      <button class="view-btn" id="tab-map" onclick="switchView('map')">
+      <button class="view-btn" id="tab-mappa" onclick="switchView('mappa')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
           <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
-        </svg>Mappa VPN
-      </button>
-      <button class="view-btn" id="tab-novpn" onclick="switchView('novpn')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
-          <line x1="2" y1="2" x2="22" y2="22"/>
-        </svg>Cinema offline
-      </button>
-      <button class="view-btn" id="tab-maplocale" onclick="switchView('maplocale')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
-          <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
-        </svg>Mappa offline
+        </svg>Mappa
       </button>
       <button class="view-btn" id="tab-bytype" onclick="switchView('bytype')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -433,22 +440,26 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   </div>
 </header>
 
-<!-- MAP -->
-<div class="view active" id="view-map">
-  <div id="map"></div>
-  <div class="map-stats-bar">
-    <div class="msb-item">CINEMA <span id="msb-cinema">—</span></div>
-    <div class="msb-sep">|</div>
-    <div class="msb-item">HOST <span id="msb-host">—</span></div>
-  </div>
-</div>
-
-<!-- DASHBOARD per cinema -->
-<div class="view" id="view-dashboard">
+<!-- CINEMA (VPN + OFFLINE) -->
+<div class="view active" id="view-cinema">
   <div class="stats-strip">
     <div class="stat-tile"><div class="st-label">Cinema</div><div class="st-value" id="statCinema">—</div></div>
     <div class="stat-tile"><div class="st-label">Host Totali</div><div class="st-value" id="statDevices">—</div></div>
     <div class="stat-tile"><div class="st-label">Gruppi Sala</div><div class="st-value" id="statRooms">—</div></div>
+  </div>
+  <div class="cinema-filter-bar">
+    <button id="cf-vpn" class="cf-btn active" onclick="setCinemaFilter('vpn')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      VPN
+    </button>
+    <button id="cf-offline" class="cf-btn" onclick="setCinemaFilter('offline')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+      OFFLINE
+    </button>
+    <button id="cf-tutti" class="cf-btn" onclick="setCinemaFilter('tutti')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      TUTTI
+    </button>
   </div>
   <div class="global-status-bar">
     <span class="gs-item"><span class="gs-dot ok"></span><span id="gs-online-count">—</span> online</span>
@@ -462,7 +473,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   </div>
   <div class="main">
     <div class="section-hdr">
-      <div class="section-title">Cinema — Dispositivi Monitorati</div>
+      <div class="section-title" id="cinemaTitle">Cinema VPN — Dispositivi Monitorati</div>
       <div class="section-line"></div>
       <div class="section-title" id="lastUpdate" style="white-space:nowrap">—</div>
     </div>
@@ -517,29 +528,20 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   </div>
 </div>
 
-<!-- MAPPA LOCALE -->
-<div class="view" id="view-maplocale">
-  <div id="map-locale" style="width:100%;height:100%"></div>
+<!-- MAPPA (VPN + OFFLINE) -->
+<div class="view" id="view-mappa">
+  <div class="map-container" id="map-vpn"></div>
+  <div class="map-container" id="map-offline"></div>
+  <div class="map-container" id="map-tutti"></div>
+  <div class="map-filter-bar">
+    <button id="mf-vpn" class="mf-btn active" onclick="setMapFilter('vpn')">VPN</button>
+    <button id="mf-offline" class="mf-btn" onclick="setMapFilter('offline')">OFFLINE</button>
+    <button id="mf-tutti" class="mf-btn" onclick="setMapFilter('tutti')">TUTTI</button>
+  </div>
   <div class="map-stats-bar">
-    <div class="msb-item">CINEMA LOCALI <span id="msb-locale-cinema">—</span></div>
+    <div class="msb-item">CINEMA <span id="msb-cinema">—</span></div>
     <div class="msb-sep">|</div>
-    <div class="msb-item">HOST <span id="msb-locale-host">—</span></div>
-  </div>
-</div>
-
-<!-- CINEMA OFFLINE -->
-<div class="view" id="view-novpn">
-  <div class="stats-strip">
-    <div class="stat-tile"><div class="st-label">Cinema</div><div class="st-value" id="statCinemaNovpn">—</div></div>
-    <div class="stat-tile"><div class="st-label">Host Totali</div><div class="st-value" id="statDevicesNovpn">—</div></div>
-    <div class="stat-tile"><div class="st-label">Gruppi Sala</div><div class="st-value" id="statRoomsNovpn">—</div></div>
-  </div>
-  <div class="main">
-    <div class="section-hdr">
-      <div class="section-title">Cinema Offline — Rete Locale</div>
-      <div class="section-line"></div>
-    </div>
-    <div class="cinemas-grid" id="grid-novpn"></div>
+    <div class="msb-item">HOST <span id="msb-host">—</span></div>
   </div>
 </div>
 <div class="history-bar">
@@ -1051,9 +1053,10 @@ function openCard(hdr) {
 }
 
 async function autoPing() {
-  // Deduplica: un solo ping per IP, salta carte chiuse
+  if (_cFilter !== 'vpn') return;
   const seen = new Set();
-  const dots = [...document.querySelectorAll('[data-ip]')].filter(d => {
+  const grid = document.getElementById('cinemasGrid');
+  const dots = [...(grid ? grid.querySelectorAll('[data-ip]') : [])].filter(d => {
     if (seen.has(d.dataset.ip)) return false;
     const card = d.closest('.cinema-card');
     const isRouter = d.dataset.router === '1';
@@ -1243,12 +1246,6 @@ function buildCinemaGrid(cinemas, gridId, ids) {
   }
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────
-function buildDashboard() {
-  buildCinemaGrid(parseRaw(RAW), 'cinemasGrid', {
-    cinema:'statCinema', devices:'statDevices', rooms:'statRooms', lastUpdate:'lastUpdate'
-  });
-}
 
 // ── PER TIPO ──────────────────────────────────────────────────
 function buildByType() {
@@ -1335,12 +1332,6 @@ function buildByType() {
   document.getElementById('count-aud').textContent  = counts.aud  + ' dispositivi';
 }
 
-// ── CINEMA OFFLINE ────────────────────────────────────────────
-function buildNoVPN() {
-  buildCinemaGrid(parseRaw(RAW_NOVPN), 'grid-novpn', {
-    cinema:'statCinemaNovpn', devices:'statDevicesNovpn', rooms:'statRoomsNovpn'
-  });
-}
 
 // ── MAP ───────────────────────────────────────────────────────
 function buildPopupHTML(c) {
@@ -1411,6 +1402,10 @@ async function geocodeCinema(name, city) {
   return null;
 }
 
+// ── COORDS ───────────────────────────────────────────────────
+const COORDS_VPN = {'Grosseto':[42.7629,11.1121],'Chiusi':[43.0146,11.9454],'Montecatini Terme':[43.8847,10.7728],'Pisa':[43.7228,10.4017],'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],'Empoli':[43.7193,10.9497],'Firenze':[43.7696,11.2558],'Prato':[43.8799,11.0970],'Figline e Incisa Valdarno':[43.6248,11.4672],'Montaione':[43.5586,10.9137],'Borgo San Lorenzo':[43.9552,11.3876],'Livorno':[43.5479,10.3146],'Viareggio':[43.8677,10.2519]};
+const COORDS_OFFLINE = {'San Giovanni in Valdarno':[43.5632,11.5218],'Antella':[43.7398,11.3047],'Monte San Savino':[43.3294,11.7268]};
+
 // ── LEAFLET MAP (condiviso da Mappa VPN e Mappa offline) ──────
 async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost, coords, geocode=false, showStatus=false}) {
   const map = L.map(mapId,{center:[43.5,11.2],zoom:geocode?8:9,zoomControl:false,attributionControl:false});
@@ -1472,32 +1467,68 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
   }
 }
 
-async function buildMap() {
-  await buildLeafletMap(parseRaw(RAW), {
-    mapId:'map', windowKey:'_map', statCinema:'msb-cinema', statHost:'msb-host',
-    coords:{'Grosseto':[42.7629,11.1121],'Chiusi':[43.0146,11.9454],'Montecatini Terme':[43.8847,10.7728],'Pisa':[43.7228,10.4017],'Sansepolcro':[43.5693,12.1396],'Massa':[44.0355,10.1398],'Empoli':[43.7193,10.9497],'Firenze':[43.7696,11.2558],'Prato':[43.8799,11.0970],'Figline e Incisa Valdarno':[43.6248,11.4672],'Montaione':[43.5586,10.9137],'Borgo San Lorenzo':[43.9552,11.3876],'Livorno':[43.5479,10.3146],'Viareggio':[43.8677,10.2519]},
-    geocode:true, showStatus:true
+// ── FILTER HELPERS ────────────────────────────────────────────
+let _cFilter = 'vpn', _mFilter = 'vpn';
+const _mapBuilt = {};
+
+function getCinemasForFilter(f) {
+  if (f === 'vpn')     return parseRaw(RAW);
+  if (f === 'offline') return parseRaw(RAW_NOVPN);
+  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN)];
+}
+
+function setCinemaFilter(f) {
+  _cFilter = f;
+  ['vpn','offline','tutti'].forEach(x => document.getElementById('cf-'+x).classList.toggle('active', x===f));
+  const titles = {vpn:'Cinema VPN — Dispositivi Monitorati', offline:'Cinema Offline — Rete Locale', tutti:'Tutti i Cinema'};
+  const t = document.getElementById('cinemaTitle'); if(t) t.textContent = titles[f];
+  const sb = document.querySelector('.global-status-bar'); if(sb) sb.style.display = f==='vpn' ? '' : 'none';
+  buildCinema();
+}
+
+function buildCinema() {
+  buildCinemaGrid(getCinemasForFilter(_cFilter), 'cinemasGrid', {
+    cinema:'statCinema', devices:'statDevices', rooms:'statRooms', lastUpdate:'lastUpdate'
   });
 }
 
-function buildMapLocale() {
-  buildLeafletMap(parseRaw(RAW_NOVPN), {
-    mapId:'map-locale', windowKey:'_mapLocale', statCinema:'msb-locale-cinema', statHost:'msb-locale-host',
-    coords:{'San Giovanni in Valdarno':[43.5632,11.5218],'Antella':[43.7398,11.3047],'Monte San Savino':[43.3294,11.7268]},
-    geocode:false, showStatus:false
-  });
+async function setMapFilter(f) {
+  _mFilter = f;
+  ['vpn','offline','tutti'].forEach(x => document.getElementById('mf-'+x).classList.toggle('active', x===f));
+  await showMap();
+}
+
+async function showMap() {
+  const f = _mFilter;
+  document.querySelectorAll('.map-container').forEach(el => el.classList.remove('active'));
+  document.getElementById('map-'+f).classList.add('active');
+  if (!_mapBuilt[f]) {
+    _mapBuilt[f] = true;
+    const cinemas = getCinemasForFilter(f);
+    const coords = f === 'offline' ? COORDS_OFFLINE : {...COORDS_VPN, ...COORDS_OFFLINE};
+    await buildLeafletMap(cinemas, {
+      mapId:'map-'+f, windowKey:'_map_'+f,
+      statCinema:'msb-cinema', statHost:'msb-host',
+      coords, geocode: f==='vpn', showStatus: f==='vpn'
+    });
+  } else {
+    const inst = window['_map_'+f];
+    if (inst) setTimeout(()=>inst.invalidateSize(),50);
+    const cinemas = getCinemasForFilter(f);
+    document.getElementById('msb-cinema').textContent = cinemas.length;
+    document.getElementById('msb-host').textContent = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
+  }
 }
 
 // ── TMS ───────────────────────────────────────────────────────
 
 
 // ── VIEW SWITCHER ─────────────────────────────────────────────
-let mapBuilt=false, mapLocaleBuilt=false;
-const _VIEWS=['dashboard','map','novpn','maplocale','bytype'];
-const _VIEW_LABELS={dashboard:'Cinema VPN',map:'Mappa VPN',novpn:'Cinema offline',maplocale:'Mappa offline',bytype:'Per tipo'};
+const _VIEWS=['cinema','mappa','bytype'];
+const _VIEW_LABELS={cinema:'Cinema',mappa:'Mappa',bytype:'Per tipo'};
 
 function cycleView(){
-  const cur=(document.querySelector('.view.active')||{id:'view-map'}).id.replace('view-','');
+  const cur=(document.querySelector('.view.active')||{id:'view-cinema'}).id.replace('view-','');
   const next=_VIEWS[(_VIEWS.indexOf(cur)+1)%_VIEWS.length];
   switchView(next);
 }
@@ -1509,14 +1540,7 @@ function switchView(v) {
   document.getElementById('tab-'+v).classList.add('active');
   const lbl=document.getElementById('viewCycleLabel');
   if(lbl) lbl.textContent=_VIEW_LABELS[v]||v;
-  if(v==='map'){
-    if(!mapBuilt){mapBuilt=true;buildMap();}
-    else if(window._map) setTimeout(()=>window._map.invalidateSize(),50);
-  }
-  if(v==='maplocale'){
-    if(!mapLocaleBuilt){mapLocaleBuilt=true;buildMapLocale();}
-    else if(window._mapLocale) setTimeout(()=>window._mapLocale.invalidateSize(),50);
-  }
+  if(v==='mappa') showMap();
 }
 
 // ── TOAST ─────────────────────────────────────────────────────
@@ -1531,11 +1555,10 @@ function showToast(title,msg,type){
 // ── THEME ────────────────────────────────────────────────────
 
 // ── INIT ──────────────────────────────────────────────────────
-buildDashboard();
+buildCinema();
 buildByType();
-buildNoVPN();
 renderHistory();
-switchView('dashboard');
+switchView('cinema');
 updateGlobalStatus();
 autoPing();
 setInterval(autoPing, 5 * 60 * 1000);
