@@ -405,29 +405,35 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       </svg>
     </button>
     <div class="view-toggle">
-      <button class="view-btn" id="tab-map" onclick="switchView('map')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
-          <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
-        </svg>Mappa
-      </button>
       <button class="view-btn" id="tab-dashboard" onclick="switchView('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
           <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-        </svg>Cinema
+        </svg>Cinema VPN
+      </button>
+      <button class="view-btn" id="tab-map" onclick="switchView('map')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+          <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+        </svg>Mappa VPN
+      </button>
+      <button class="view-btn" id="tab-novpn" onclick="switchView('novpn')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+          <line x1="2" y1="2" x2="22" y2="22"/>
+        </svg>Cinema offline
+      </button>
+      <button class="view-btn" id="tab-maplocale" onclick="switchView('maplocale')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+          <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+        </svg>Mappa offline
       </button>
       <button class="view-btn" id="tab-bytype" onclick="switchView('bytype')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="3" width="6" height="18"/><rect x="9" y="3" width="6" height="12"/>
           <rect x="16" y="3" width="6" height="8"/>
         </svg>Per tipo
-      </button>
-      <button class="view-btn" id="tab-novpn" onclick="switchView('novpn')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
-          <line x1="2" y1="2" x2="22" y2="22"/>
-        </svg>Senza VPN
       </button>
     </div>
   </div>
@@ -514,6 +520,16 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       </div>
       <div class="type-grid" id="grid-aud"></div>
     </div>
+  </div>
+</div>
+
+<!-- MAPPA LOCALE -->
+<div class="view" id="view-maplocale">
+  <div id="map-locale" style="width:100%;height:100%"></div>
+  <div class="map-stats-bar">
+    <div class="msb-item">CINEMA LOCALI <span id="msb-locale-cinema">—</span></div>
+    <div class="msb-sep">|</div>
+    <div class="msb-item">HOST <span id="msb-locale-host">—</span></div>
   </div>
 </div>
 
@@ -1499,13 +1515,56 @@ async function buildMap() {
   }
 }
 
+// ── MAPPA LOCALE ─────────────────────────────────────────────
+function buildMapLocale() {
+  const map = L.map('map-locale',{center:[43.5,11.2],zoom:9,zoomControl:false,attributionControl:false});
+  window._mapLocale = map;
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+  L.control.zoom({position:'bottomright'}).addTo(map);
+
+  const cinemas = parseRaw(RAW_NOVPN);
+  initColors(cinemas);
+  document.getElementById('msb-locale-cinema').textContent = cinemas.length;
+  document.getElementById('msb-locale-host').textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
+
+  const COORDS = {
+    'San Giovanni in Valdarno':[43.5632,11.5218],
+    'Antella':[43.7398,11.3047],
+    'Monte San Savino':[43.3294,11.7268],
+  };
+
+  cinemas.forEach(c => {
+    const color = cinemaColor(c.name);
+    const [lat,lng] = COORDS[c.city] || [43.5,11.2];
+    const icon = L.divIcon({
+      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div></div>`,
+      className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
+    });
+    const marker = L.marker([lat,lng],{icon}).addTo(map);
+    const popup  = L.popup({closeButton:false,autoClose:false,closeOnClick:false}).setContent(buildPopupHTML(c));
+    marker.bindPopup(popup);
+    let ct;
+    marker.on('mouseover',()=>{clearTimeout(ct);marker.openPopup()});
+    marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
+    marker.on('popupopen',()=>{
+      const el=marker.getPopup().getElement(); if(!el) return;
+      el.addEventListener('mouseenter',()=>clearTimeout(ct));
+      el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
+    });
+    marker.bindTooltip(
+      `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
+      {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
+    );
+  });
+}
+
 // ── TMS ───────────────────────────────────────────────────────
 
 
 // ── VIEW SWITCHER ─────────────────────────────────────────────
-let mapBuilt=false;
-const _VIEWS=['map','dashboard','bytype','novpn'];
-const _VIEW_LABELS={map:'Mappa',dashboard:'Cinema',bytype:'Per tipo',novpn:'Senza VPN'};
+let mapBuilt=false, mapLocaleBuilt=false;
+const _VIEWS=['dashboard','map','novpn','maplocale','bytype'];
+const _VIEW_LABELS={dashboard:'Cinema VPN',map:'Mappa VPN',novpn:'Cinema offline',maplocale:'Mappa offline',bytype:'Per tipo'};
 
 function cycleView(){
   const cur=(document.querySelector('.view.active')||{id:'view-map'}).id.replace('view-','');
@@ -1523,6 +1582,10 @@ function switchView(v) {
   if(v==='map'){
     if(!mapBuilt){mapBuilt=true;buildMap();}
     else if(window._map) setTimeout(()=>window._map.invalidateSize(),50);
+  }
+  if(v==='maplocale'){
+    if(!mapLocaleBuilt){mapLocaleBuilt=true;buildMapLocale();}
+    else if(window._mapLocale) setTimeout(()=>window._mapLocale.invalidateSize(),50);
   }
 }
 
