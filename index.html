@@ -862,6 +862,7 @@ const MODEL_IMG = {
   dp2000:   'https://assets.barco.com/transform/078fbcc0-7dbc-440a-96dc-335bb6b6683d/DP-2000',
   ims3000:  'https://professional.dolby.com/siteassets/products/ims3000/ims3000-m1.jpg',
   cinecloud: 'https://www.danieletrevisan.it/wp-content/uploads/cine1.jpg',
+  cp45:      'https://www.projectionniste.net/images/dolby-CP45-1.jpg',
   christie: 'https://location.hifivintage.eu/62105-large_default/cristie-cp-2210.jpg',
   nec_nc2000c: 'https://shop.cinemanext.com/web/image/product.product/3920/image_1024/%5BP004640%5D%20NEC%20NC2000C%20PROJECTOR?unique=7ad76ba',
   dpc80:    'https://www.danieletrevisan.it/wp-content/uploads/DPC-80.jpg',
@@ -896,6 +897,7 @@ function getModelImage(label) {
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
   if (/showvault/.test(l))          return MODEL_IMG.showvault;
+  if (/cp45\b/.test(l))             return MODEL_IMG.cp45;
   if (/cp950/.test(l))              return MODEL_IMG.cp950;
   if (/cp850/.test(l))              return MODEL_IMG.cp850;
   if (/cp750/.test(l))              return MODEL_IMG.cp750;
