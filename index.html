@@ -445,11 +445,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 
 <!-- CINEMA (VPN + OFFLINE) -->
 <div class="view active" id="view-cinema">
-  <div class="stats-strip">
-    <div class="stat-tile"><div class="st-label">Cinema</div><div class="st-value" id="statCinema">—</div></div>
-    <div class="stat-tile"><div class="st-label">Host Totali</div><div class="st-value" id="statDevices">—</div></div>
-    <div class="stat-tile"><div class="st-label">Gruppi Sala</div><div class="st-value" id="statRooms">—</div></div>
-  </div>
   <div class="cinema-filter-bar">
     <button id="cf-vpn" class="cf-btn active" onclick="setCinemaFilter('vpn')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -463,6 +458,11 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       TUTTI
     </button>
+  </div>
+  <div class="stats-strip">
+    <div class="stat-tile"><div class="st-label">Cinema</div><div class="st-value" id="statCinema">—</div></div>
+    <div class="stat-tile"><div class="st-label">Host Totali</div><div class="st-value" id="statDevices">—</div></div>
+    <div class="stat-tile"><div class="st-label">Gruppi Sala</div><div class="st-value" id="statRooms">—</div></div>
   </div>
   <div class="global-status-bar">
     <span class="gs-item"><span class="gs-dot ok"></span><span id="gs-online-count">—</span> online</span>
@@ -1056,10 +1056,11 @@ function openCard(hdr) {
 }
 
 async function autoPing() {
-  if (_cFilter !== 'vpn') return;
+  if (_cFilter === 'offline') return;
   const seen = new Set();
   const grid = document.getElementById('cinemasGrid');
   const dots = [...(grid ? grid.querySelectorAll('[data-ip]') : [])].filter(d => {
+    if (_cFilter === 'tutti' && !d.dataset.ip.startsWith('10.')) return false;
     if (seen.has(d.dataset.ip)) return false;
     const card = d.closest('.cinema-card');
     const isRouter = d.dataset.router === '1';
