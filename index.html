@@ -750,7 +750,7 @@ CRC Antella - Antella - Sala 1 - CP650\t192.168.1.136:161\tICMP
 
 Teatro Verdi - Monte San Savino - Rete - MikroTik\t192.168.1.1:161\tSNMP
 Teatro Verdi - Monte San Savino - Sala 1 - Barco DP2K-8S\t192.168.1.134:161\tICMP
-Teatro Verdi - Monte San Savino - Sala 1 - Server Cinecloud\t192.168.1.170:161\tICMP
+Teatro Verdi - Monte San Savino - Sala 1 - Server Cinecloud\t192.168.1.10:161\tICMP
 Teatro Verdi - Monte San Savino - Sala 1 - Dolby CP45\t192.168.1.136:161\tICMP
 `;
 
@@ -888,7 +888,7 @@ function getModelImage(label) {
   if (/dp2k-\d+s\b/.test(l))       return MODEL_IMG.dp2k_s;
   if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
   if (/\bicmp\b/.test(l))           return MODEL_IMG.icmp;
-  if (/ims3000|cinecloud/.test(l))  return MODEL_IMG.ims3000;
+  if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
   if (/christie|cp2210/i.test(l))   return MODEL_IMG.christie;
   if (/nec|nc2000/i.test(l))        return MODEL_IMG.nec_nc2000c;
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
