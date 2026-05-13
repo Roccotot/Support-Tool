@@ -1133,15 +1133,13 @@ function devBtnsHTML(ip, label) {
   return vncBtn + sshBtn + webBtn + copyBtn;
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────
-function buildDashboard() {
-  const cinemas = parseRaw(RAW);
+// ── CINEMA GRID (condiviso da Dashboard e Offline) ────────────
+function buildCinemaGrid(cinemas, gridId, ids) {
   initColors(cinemas);
-  const grid = document.getElementById('cinemasGrid');
+  const grid = document.getElementById(gridId);
   grid.innerHTML = '';
   let totalDevs = 0, totalRooms = 0;
 
-  // Raggruppa cinema per città (preserva ordine del RAW)
   const cityMap = new Map();
   cinemas.forEach(c => {
     if (!cityMap.has(c.city)) cityMap.set(c.city, []);
@@ -1154,7 +1152,6 @@ function buildDashboard() {
     const devCount  = rooms.reduce((s,[,r]) => s+r.length, 0);
     totalDevs  += devCount;
     totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
-    const allIPs    = rooms.flatMap(([,devs]) => devs.map(d => d.ip));
     const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
     const tmsDev    = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'tms');
     let roomsHTML = '';
@@ -1169,7 +1166,7 @@ function buildDashboard() {
         const isRtr = devType(d.label)[0] === 'rtr';
         const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms ? 'data-port="9000"' : ''} ${(isRtr || isTms) ? 'data-router="1"' : ''} ${isRtr ? 'data-rtr="1"' : ''} title="Clicca per verificare raggiungibilità"
+          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms?'data-port="9000"':''} ${(isRtr||isTms)?'data-router="1"':''} ${isRtr?'data-rtr="1"':''} title="Clicca per verificare raggiungibilità"
             onclick="pingDevice('${d.ip}',this${dPort})"></div>
           <div class="dev-name" title="${d.label}">${d.label}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
@@ -1213,13 +1210,8 @@ function buildDashboard() {
   let colPos = 0;
   cityMap.forEach((cityCinemas, city) => {
     const span = Math.min(cityCinemas.length, 3);
-    // Se la città non entra nelle colonne rimanenti → vai a capo
     if (colPos > 0 && colPos + span > 3) {
-      for (let i = colPos; i < 3; i++) {
-        const f = document.createElement('div');
-        f.className = 'city-col grid-filler';
-        grid.appendChild(f);
-      }
+      for (let i = colPos; i < 3; i++) { const f = document.createElement('div'); f.className='city-col grid-filler'; grid.appendChild(f); }
       colPos = 0;
     }
     const col = document.createElement('div');
@@ -1229,29 +1221,33 @@ function buildDashboard() {
     hdr.className = 'city-col-hdr';
     hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${city}</span><div class="city-col-hdr-line"></div>`;
     col.appendChild(hdr);
-    const cardsWrap = document.createElement('div');
-    cardsWrap.className = 'cinema-cards';
-    cityCinemas.forEach(c => cardsWrap.appendChild(buildCard(c)));
-    col.appendChild(cardsWrap);
+    const wrap = document.createElement('div');
+    wrap.className = 'cinema-cards';
+    cityCinemas.forEach(c => wrap.appendChild(buildCard(c)));
+    col.appendChild(wrap);
     col.dataset.search = cityCinemas.flatMap(c =>
       [c.name, c.city, ...Object.entries(c.rooms).flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])]
     ).join(' ').toLowerCase();
     grid.appendChild(col);
     colPos = (colPos + span) % 3;
   });
-  // Fillers per completare l'ultima riga
-  for (let i = colPos; colPos > 0 && i < 3; i++) {
-    const f = document.createElement('div');
-    f.className = 'city-col grid-filler';
-    grid.appendChild(f);
-  }
+  for (let i = colPos; colPos > 0 && i < 3; i++) { const f = document.createElement('div'); f.className='city-col grid-filler'; grid.appendChild(f); }
 
-  document.getElementById('statCinema').textContent  = cinemas.length;
-  document.getElementById('statDevices').textContent = totalDevs;
-  document.getElementById('statRooms').textContent   = totalRooms;
-  const now = new Date();
-  document.getElementById('lastUpdate').textContent  =
-    now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById(ids.cinema).textContent  = cinemas.length;
+  document.getElementById(ids.devices).textContent = totalDevs;
+  document.getElementById(ids.rooms).textContent   = totalRooms;
+  if (ids.lastUpdate) {
+    const now = new Date();
+    document.getElementById(ids.lastUpdate).textContent =
+      now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  }
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function buildDashboard() {
+  buildCinemaGrid(parseRaw(RAW), 'cinemasGrid', {
+    cinema:'statCinema', devices:'statDevices', rooms:'statRooms', lastUpdate:'lastUpdate'
+  });
 }
 
 // ── PER TIPO ──────────────────────────────────────────────────
@@ -1339,110 +1335,11 @@ function buildByType() {
   document.getElementById('count-aud').textContent  = counts.aud  + ' dispositivi';
 }
 
-// ── SENZA VPN ─────────────────────────────────────────────────
+// ── CINEMA OFFLINE ────────────────────────────────────────────
 function buildNoVPN() {
-  const cinemas = parseRaw(RAW_NOVPN);
-  initColors(cinemas);
-  const grid = document.getElementById('grid-novpn');
-  grid.innerHTML = '';
-  let totalDevs = 0, totalRooms = 0;
-
-  const cityMap = new Map();
-  cinemas.forEach(c => {
-    if (!cityMap.has(c.city)) cityMap.set(c.city, []);
-    cityMap.get(c.city).push(c);
+  buildCinemaGrid(parseRaw(RAW_NOVPN), 'grid-novpn', {
+    cinema:'statCinemaNovpn', devices:'statDevicesNovpn', rooms:'statRoomsNovpn'
   });
-
-  const buildCard = (c) => {
-    const color    = cinemaColor(c.name);
-    const rooms    = Object.entries(c.rooms);
-    const devCount = rooms.reduce((s,[,r]) => s+r.length, 0);
-    totalDevs  += devCount;
-    totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
-    const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
-    let roomsHTML = '';
-    rooms.forEach(([roomName, devices]) => {
-      roomsHTML += `<div class="room-sep">
-        <div class="room-sep-dot" style="background:${color}"></div>
-        <div class="room-sep-label">${roomName}</div>
-        <div class="room-sep-line"></div>
-      </div>`;
-      devices.forEach(d => {
-        const isRtr = devType(d.label)[0] === 'rtr';
-        const isTms = devType(d.label)[0] === 'tms';
-        const dPort = isTms ? ',9000' : '';
-        roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isRtr?'data-rtr="1"':''} ${isTms?'data-port="9000"':''} title="Clicca per verificare raggiungibilità"
-            onclick="pingDevice('${d.ip}',this${dPort})"></div>
-          <div class="dev-name" title="${d.label}">${d.label}</div>
-          <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
-        </div>`;
-      });
-    });
-    const card = document.createElement('div');
-    card.className = 'cinema-card';
-    card.style.cssText = `background:${color}0d;border-color:${color}55`;
-    card.innerHTML = `
-      <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="openCard(this)">
-        <div class="card-title-block">
-          <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
-          <div>
-            <div class="card-name">${c.name}</div>
-            <div class="card-city" style="color:${color}">📍 ${c.city}</div>
-            ${routerDev ? `<div class="card-rtr">
-              <div class="ping-dot" data-ip="${routerDev.ip}" data-cinema="${c.name}"
-                title="MikroTik — clicca per verificare"
-                onclick="event.stopPropagation();pingDevice('${routerDev.ip}',this)"></div>
-              <span>MikroTik&ensp;${routerDev.ip}</span>
-            </div>` : ''}
-          </div>
-        </div>
-        <div class="card-actions">
-          <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
-          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
-      </div>
-      <div class="card-body">${roomsHTML}</div>`;
-    card.dataset.city = c.city;
-    return card;
-  };
-
-  let colPos = 0;
-  cityMap.forEach((cityCinemas, city) => {
-    const span = Math.min(cityCinemas.length, 3);
-    if (colPos > 0 && colPos + span > 3) {
-      for (let i = colPos; i < 3; i++) {
-        const f = document.createElement('div');
-        f.className = 'city-col grid-filler';
-        grid.appendChild(f);
-      }
-      colPos = 0;
-    }
-    const col = document.createElement('div');
-    col.className = 'city-col' + (span > 1 ? ` span-${span}` : '');
-    col.dataset.city = city;
-    const hdr = document.createElement('div');
-    hdr.className = 'city-col-hdr';
-    hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${city}</span><div class="city-col-hdr-line"></div>`;
-    col.appendChild(hdr);
-    const cardsWrap = document.createElement('div');
-    cardsWrap.className = 'cinema-cards';
-    cityCinemas.forEach(c => cardsWrap.appendChild(buildCard(c)));
-    col.appendChild(cardsWrap);
-    grid.appendChild(col);
-    colPos = (colPos + span) % 3;
-  });
-  for (let i = colPos; colPos > 0 && i < 3; i++) {
-    const f = document.createElement('div');
-    f.className = 'city-col grid-filler';
-    grid.appendChild(f);
-  }
-
-  document.getElementById('statCinemaNovpn').textContent  = cinemas.length;
-  document.getElementById('statDevicesNovpn').textContent = totalDevs;
-  document.getElementById('statRoomsNovpn').textContent   = totalRooms;
 }
 
 // ── MAP ───────────────────────────────────────────────────────
