@@ -747,6 +747,11 @@ CRC Antella - Antella - Rete - MikroTik\t192.168.1.1:161\tSNMP
 CRC Antella - Antella - Sala 1 - Proiettore\t192.168.1.134:161\tICMP
 CRC Antella - Antella - Sala 1 - ICMP\t192.168.1.134:161\tICMP
 CRC Antella - Antella - Sala 1 - CP650\t192.168.1.136:161\tICMP
+
+Teatro Verdi - Monte San Savino - Rete - MikroTik\t192.168.1.1:161\tSNMP
+Teatro Verdi - Monte San Savino - Sala 1 - Barco DP2K-8S\t192.168.1.134:161\tICMP
+Teatro Verdi - Monte San Savino - Sala 1 - Server Cinecloud\t192.168.1.10:161\tICMP
+Teatro Verdi - Monte San Savino - Sala 1 - Dolby CP45\t192.168.1.136:161\tICMP
 `;
 
 // ── PALETTE ───────────────────────────────────────────────────
@@ -856,6 +861,8 @@ const MODEL_IMG = {
   dp2k_e:   'https://assets.barco.com/transform/29bc20c4-9703-4388-9b72-8901d557c383/DP2K-6E-3-4-Right-Low-onwhite-jpg',
   dp2000:   'https://assets.barco.com/transform/078fbcc0-7dbc-440a-96dc-335bb6b6683d/DP-2000',
   ims3000:  'https://professional.dolby.com/siteassets/products/ims3000/ims3000-m1.jpg',
+  cinecloud: 'https://www.danieletrevisan.it/wp-content/uploads/cine1.jpg',
+  cp45:      'https://www.projectionniste.net/images/dolby-CP45-1.jpg',
   christie: 'https://location.hifivintage.eu/62105-large_default/cristie-cp-2210.jpg',
   nec_nc2000c: 'https://shop.cinemanext.com/web/image/product.product/3920/image_1024/%5BP004640%5D%20NEC%20NC2000C%20PROJECTOR?unique=7ad76ba',
   dpc80:    'https://www.danieletrevisan.it/wp-content/uploads/DPC-80.jpg',
@@ -884,11 +891,13 @@ function getModelImage(label) {
   if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
   if (/\bicmp\b/.test(l))           return MODEL_IMG.icmp;
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
+  if (/cinecloud/.test(l))          return MODEL_IMG.cinecloud;
   if (/christie|cp2210/i.test(l))   return MODEL_IMG.christie;
   if (/nec|nc2000/i.test(l))        return MODEL_IMG.nec_nc2000c;
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
   if (/showvault/.test(l))          return MODEL_IMG.showvault;
+  if (/cp45\b/.test(l))             return MODEL_IMG.cp45;
   if (/cp950/.test(l))              return MODEL_IMG.cp950;
   if (/cp850/.test(l))              return MODEL_IMG.cp850;
   if (/cp750/.test(l))              return MODEL_IMG.cp750;
