@@ -250,26 +250,11 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .pdev-btns{display:flex;gap:4px;flex-shrink:0}
 .cinema-tooltip .leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important}
 
-/* ── CRONOLOGIA ── */
-.history-bar{position:fixed;bottom:0;left:0;right:0;z-index:500;
-  background:rgba(7,9,14,0.96);border-top:1px solid var(--border);
-  backdrop-filter:blur(14px);padding:7px 20px;
-  display:flex;align-items:center;gap:10px;min-height:40px}
-.history-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:#c0d8f0;
-  letter-spacing:2px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
-.history-items{display:flex;gap:6px;overflow-x:auto;flex:1}
-.history-items::-webkit-scrollbar{display:none}
 .hist-item{font-family:'Share Tech Mono',monospace;font-size:10px;color:#fff;
   padding:3px 10px;border-radius:4px;border:1px solid rgba(41,121,255,0.25);
   background:rgba(41,121,255,0.07);white-space:nowrap;cursor:pointer;
   text-decoration:none;transition:all 0.15s;flex-shrink:0;display:inline-flex;align-items:center;gap:5px}
 .hist-item:hover{background:rgba(41,121,255,0.2);border-color:var(--accent);color:#fff}
-.hist-item-label{font-size:8px;color:rgba(255,255,255,0.6);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hist-empty{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2);font-style:italic}
-.history-clear{font-family:'Share Tech Mono',monospace;font-size:9px;color:#c0d8f0;
-  padding:3px 8px;border-radius:4px;border:1px solid var(--border2);
-  background:none;cursor:pointer;transition:all 0.15s;flex-shrink:0}
-.history-clear:hover{color:var(--crimson);border-color:rgba(255,23,68,0.3)}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:50px;right:20px;z-index:9999;background:var(--panel2);
@@ -300,12 +285,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   .chevron{width:20px;height:20px}
   .action-btn{font-size:14px;padding:8px 20px}
   .section-title{font-size:15px;letter-spacing:2px}
-  .history-bar{padding:10px 20px}
-  .history-label{font-size:13px}
   .hist-item{font-size:13px;padding:5px 12px}
-  .hist-item-label{font-size:11px}
-  .history-clear{font-size:12px;padding:5px 10px}
-  .hist-empty{font-size:12px}
 }
 @media(max-width:900px){
   .stats-strip{grid-template-columns:repeat(3,1fr);padding:12px}
@@ -546,13 +526,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <div class="msb-sep">|</div>
     <div class="msb-item">HOST <span id="msb-host">—</span></div>
   </div>
-</div>
-<div class="history-bar">
-  <div class="history-label">Recenti</div>
-  <div class="history-items" id="historyItems">
-    <span class="hist-empty">Nessun dispositivo visitato</span>
-  </div>
-  <button class="history-clear" onclick="clearHistory()">✕</button>
 </div>
 
 <div class="toast" id="toast">
@@ -994,9 +967,9 @@ Pendola - Siena - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
 
 Puccini - Altopascio - Coord	43.8138,10.6763	GEO
 Puccini - Altopascio - Rete - MikroTik	192.168.1.1:161	SNMP
-Puccini - Altopascio - Sala 1 - Server	192.168.1.10:161	ICMP
-Puccini - Altopascio - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Puccini - Altopascio - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
+Puccini - Altopascio - Sala 1 - ICMP	192.168.1.10:161	ICMP
+Puccini - Altopascio - Sala 1 - Barco SP2K-11S	192.168.1.12:161	ICMP
+Puccini - Altopascio - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
 Borsalino - Camaiore - Coord	43.9369,10.3010	GEO
 Borsalino - Camaiore - Rete - MikroTik	192.168.1.1:161	SNMP
@@ -1511,47 +1484,21 @@ function copyIP(ip, el) {
 let histList = [];
 try { histList = JSON.parse(localStorage.getItem('noc_hist') || '[]'); } catch(e){}
 
-function addHistory(ip, label) {
-  histList = histList.filter(h => h.ip !== ip);
-  histList.unshift({ ip, label: label.substring(0,30) });
-  if (histList.length > 8) histList = histList.slice(0,8);
-  try { localStorage.setItem('noc_hist', JSON.stringify(histList)); } catch(e){}
-  renderHistory();
-}
-function clearHistory() {
-  histList = [];
-  try { localStorage.removeItem('noc_hist'); } catch(e){}
-  renderHistory();
-}
-function renderHistory() {
-  const el = document.getElementById('historyItems');
-  if (!histList.length) {
-    el.innerHTML = '<span class="hist-empty">Nessun dispositivo visitato</span>';
-    return;
-  }
-  el.innerHTML = histList.map(h =>
-    `<a class="hist-item" href="http://${h.ip}" target="_blank"
-       onclick="addHistory('${h.ip}','${h.label.replace(/'/g,'')}')">
-       <span>${h.ip}</span>
-       <span class="hist-item-label">${h.label}</span>
-     </a>`
-  ).join('');
-}
 
 // ── COSTRUISCE PULSANTI DISPOSITIVO ──────────────────────────
 function devBtnsHTML(ip, label) {
   const [tc] = devType(label);
   const safe = label.replace(/'/g,'').replace(/"/g,'').substring(0,40);
   const copyBtn = `<button class="ip-btn" onclick="copyIP('${ip}',this)">${ip}</button>`;
-  const webBtn  = `<a class="proto-btn web" href="http://${ip}" target="_blank" onclick="addHistory('${ip}','${safe}')" title="Apri interfaccia web">WEB</a>`;
+  const webBtn  = `<a class="proto-btn web" href="http://${ip}" target="_blank" title="Apri interfaccia web">WEB</a>`;
   const sshBtn  = (tc === 'srv' || tc === 'rtr')
     ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
     : '';
   const vncBtn  = tc === 'srv'
-    ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>`
+    ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC">VNC</a>`
     : '';
   if (tc === 'aud') return copyBtn;
-  if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC" onclick="addHistory('${ip}','${safe}')">VNC</a>` + copyBtn;
+  if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC">VNC</a>` + copyBtn;
   if (tc === 'tms') {
     const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
     const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/?redirect=/tms/" target="_blank" title="Apri TMS porta 9000">WEB</a>`;
@@ -1776,9 +1723,9 @@ function buildPopupHTML(c) {
         <div class="pdev-name" title="${d.label}">${d.label}</div>
         <div class="pdev-btns">
           <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
-          <a class="proto-btn web" href="http://${d.ip}" target="_blank" onclick="addHistory('${d.ip}','${safe}')" style="font-size:8px">WEB</a>
+          <a class="proto-btn web" href="http://${d.ip}" target="_blank" style="font-size:8px">WEB</a>
           ${tc==='srv' ? `<a class="proto-btn ssh" href="ssh://${d.ip}" style="font-size:8px">SSH</a>
-          <a class="proto-btn vnc" href="vnc://${d.ip}" onclick="addHistory('${d.ip}','${safe}')" style="font-size:8px">VNC</a>` : ''}
+          <a class="proto-btn vnc" href="vnc://${d.ip}" style="font-size:8px">VNC</a>` : ''}
         </div>
       </div>`;
     });
@@ -2004,7 +1951,6 @@ function showToast(title,msg,type){
 // ── INIT ──────────────────────────────────────────────────────
 buildCinema();
 buildByType();
-renderHistory();
 switchView('cinema');
 updateGlobalStatus();
 autoPing();
