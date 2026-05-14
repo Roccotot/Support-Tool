@@ -1541,6 +1541,7 @@ function setCinemaFilter(f) {
   const t = document.getElementById('cinemaTitle'); if(t) t.textContent = titles[f];
   const sb = document.querySelector('.global-status-bar'); if(sb) sb.style.display = f==='vpn' ? '' : 'none';
   buildCinema();
+  autoPing();
 }
 
 function buildCinema() {
@@ -1553,6 +1554,7 @@ async function setMapFilter(f) {
   _mFilter = f;
   ['vpn','offline','tutti'].forEach(x => document.getElementById('mf-'+x).classList.toggle('active', x===f));
   await showMap();
+  if (f !== 'offline') autoPing();
 }
 
 async function showMap() {
@@ -1566,7 +1568,7 @@ async function showMap() {
     await buildLeafletMap(cinemas, {
       mapId:'map-'+f, windowKey:'_map_'+f,
       statCinema:'msb-cinema', statHost:'msb-host',
-      coords, geocode: false, showStatus: f==='vpn'
+      coords, geocode: false, showStatus: f !== 'offline'
     });
   } else {
     const inst = window['_map_'+f];
