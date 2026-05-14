@@ -1595,10 +1595,12 @@ function buildCinemaGrid(cinemas, gridId, ids) {
     hdr.className = 'city-col-hdr';
     hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${city}</span><div class="city-col-hdr-line"></div>`;
     col.appendChild(hdr);
-    const wrap = document.createElement('div');
-    wrap.className = 'cinema-cards';
-    cityCinemas.forEach(c => wrap.appendChild(buildCard(c)));
-    col.appendChild(wrap);
+    for (let i = 0; i < cityCinemas.length; i += 3) {
+      const wrap = document.createElement('div');
+      wrap.className = 'cinema-cards';
+      cityCinemas.slice(i, i + 3).forEach(c => wrap.appendChild(buildCard(c)));
+      col.appendChild(wrap);
+    }
     col.dataset.search = cityCinemas.flatMap(c =>
       [c.name, c.city, ...Object.entries(c.rooms).flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])]
     ).join(' ').toLowerCase();
