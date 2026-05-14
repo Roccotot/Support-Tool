@@ -1541,6 +1541,7 @@ function setCinemaFilter(f) {
   const t = document.getElementById('cinemaTitle'); if(t) t.textContent = titles[f];
   const sb = document.querySelector('.global-status-bar'); if(sb) sb.style.display = f==='vpn' ? '' : 'none';
   buildCinema();
+  autoPing();
 }
 
 function buildCinema() {
