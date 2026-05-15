@@ -450,7 +450,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 <!-- PER TIPO -->
 <div class="view" id="view-bytype">
   <div class="cinema-filter-bar">
-    <button id="tf-vpn" class="cf-btn active" onclick="setTypeFilter('vpn')">
+    <button id="tf-vpn" class="cf-btn" onclick="setTypeFilter('vpn')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       VPN
     </button>
@@ -458,7 +458,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
       OFFLINE
     </button>
-    <button id="tf-tutti" class="cf-btn" onclick="setTypeFilter('tutti')">
+    <button id="tf-tutti" class="cf-btn active" onclick="setTypeFilter('tutti')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       TUTTI
     </button>
@@ -832,13 +832,13 @@ Cinema Castello - Firenze - Sala 2 - Dolby CP65	192.168.1.24:161	ICMP
 Cinema Marconi - Firenze - Coord	43.7581,11.2850	GEO
 Cinema Marconi - Firenze - Rete - MikroTik	192.168.1.1:161	SNMP
 Cinema Marconi - Firenze - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Cinema Marconi - Firenze - Sala 1 - Christie	192.168.1.12:161	ICMP
+Cinema Marconi - Firenze - Sala 1 - Proiettore	192.168.1.12:161	ICMP
 Cinema Marconi - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 Cinema Marconi - Firenze - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Cinema Marconi - Firenze - Sala 2 - Christie	192.168.1.22:161	ICMP
+Cinema Marconi - Firenze - Sala 2 - Proiettore	192.168.1.22:161	ICMP
 Cinema Marconi - Firenze - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
 Cinema Marconi - Firenze - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Cinema Marconi - Firenze - Sala 3 - Christie	192.168.1.32:161	ICMP
+Cinema Marconi - Firenze - Sala 3 - Proiettore	192.168.1.32:161	ICMP
 Cinema Marconi - Firenze - Sala 3 - Dolby CP750	192.168.1.34:161	ICMP
 
 Cinema Odeon - Firenze - Coord	43.7710,11.2525	GEO
@@ -856,10 +856,10 @@ Everest - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 Fiamma - Firenze - Coord	43.7831,11.2715	GEO
 Fiamma - Firenze - Rete - MikroTik	192.168.1.1:161	SNMP
 Fiamma - Firenze - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Fiamma - Firenze - Sala 1 - Christie	192.168.1.12:161	ICMP
+Fiamma - Firenze - Sala 1 - Proiettore	192.168.1.12:161	ICMP
 Fiamma - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 Fiamma - Firenze - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Fiamma - Firenze - Sala 2 - Christie	192.168.1.22:161	ICMP
+Fiamma - Firenze - Sala 2 - Proiettore	192.168.1.22:161	ICMP
 Fiamma - Firenze - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
 
 Flora - Firenze - Coord	43.7963,11.2410	GEO
@@ -889,10 +889,10 @@ Il Portico - Firenze - Sala 2 - Dolby CP65	192.168.1.24:161	ICMP
 Principe - Firenze - Coord	43.7825,11.2628	GEO
 Principe - Firenze - Rete - MikroTik	192.168.1.1:161	SNMP
 Principe - Firenze - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Principe - Firenze - Sala 1 - Christie	192.168.1.12:161	ICMP
+Principe - Firenze - Sala 1 - Proiettore	192.168.1.12:161	ICMP
 Principe - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 Principe - Firenze - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Principe - Firenze - Sala 2 - Christie	192.168.1.22:161	ICMP
+Principe - Firenze - Sala 2 - Proiettore	192.168.1.22:161	ICMP
 Principe - Firenze - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
 
 Sala Esse - Firenze - Coord	43.7688,11.2763	GEO
@@ -967,28 +967,28 @@ Cinema Excelsior - Montecatini Terme - Sala 2 - Dolby CP650	192.168.1.24:161	ICM
 Cine8 - Montevarchi - Coord	43.5363,11.5628	GEO
 Cine8 - Montevarchi - Rete - MikroTik	192.168.1.1:161	SNMP
 Cine8 - Montevarchi - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Cine8 - Montevarchi - Sala 1 - Christie	192.168.1.12:161	ICMP
+Cine8 - Montevarchi - Sala 1 - Proiettore	192.168.1.12:161	ICMP
 Cine8 - Montevarchi - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
 Cine8 - Montevarchi - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Cine8 - Montevarchi - Sala 2 - Christie	192.168.1.22:161	ICMP
+Cine8 - Montevarchi - Sala 2 - Proiettore	192.168.1.22:161	ICMP
 Cine8 - Montevarchi - Sala 2 - Processore Audio	192.168.1.24:161	ICMP
 Cine8 - Montevarchi - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Cine8 - Montevarchi - Sala 3 - Christie	192.168.1.32:161	ICMP
+Cine8 - Montevarchi - Sala 3 - Proiettore	192.168.1.32:161	ICMP
 Cine8 - Montevarchi - Sala 3 - Processore Audio	192.168.1.34:161	ICMP
 Cine8 - Montevarchi - Sala 4 - Qube XP-D	192.168.1.40:161	ICMP
-Cine8 - Montevarchi - Sala 4 - Christie	192.168.1.42:161	ICMP
+Cine8 - Montevarchi - Sala 4 - Proiettore	192.168.1.42:161	ICMP
 Cine8 - Montevarchi - Sala 4 - Processore Audio	192.168.1.44:161	ICMP
 Cine8 - Montevarchi - Sala 5 - Qube XP-D	192.168.1.50:161	ICMP
-Cine8 - Montevarchi - Sala 5 - Christie	192.168.1.52:161	ICMP
+Cine8 - Montevarchi - Sala 5 - Proiettore	192.168.1.52:161	ICMP
 Cine8 - Montevarchi - Sala 5 - Processore Audio	192.168.1.54:161	ICMP
 Cine8 - Montevarchi - Sala 6 - Qube XP-D	192.168.1.60:161	ICMP
-Cine8 - Montevarchi - Sala 6 - Christie	192.168.1.62:161	ICMP
+Cine8 - Montevarchi - Sala 6 - Proiettore	192.168.1.62:161	ICMP
 Cine8 - Montevarchi - Sala 6 - Processore Audio	192.168.1.64:161	ICMP
 Cine8 - Montevarchi - Sala 7 - Qube XP-D	192.168.1.70:161	ICMP
-Cine8 - Montevarchi - Sala 7 - Christie	192.168.1.72:161	ICMP
+Cine8 - Montevarchi - Sala 7 - Proiettore	192.168.1.72:161	ICMP
 Cine8 - Montevarchi - Sala 7 - Processore Audio	192.168.1.74:161	ICMP
 Cine8 - Montevarchi - Sala 8 - Qube XP-D	192.168.1.80:161	ICMP
-Cine8 - Montevarchi - Sala 8 - Christie	192.168.1.82:161	ICMP
+Cine8 - Montevarchi - Sala 8 - Proiettore	192.168.1.82:161	ICMP
 Cine8 - Montevarchi - Sala 8 - Processore Audio	192.168.1.84:161	ICMP
 
 Comunale - Pietrasanta - Coord	43.9575,10.2305	GEO
@@ -1012,7 +1012,7 @@ Arno - Pisa - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
 Arsenale - Pisa - Coord	43.7138,10.4035	GEO
 Arsenale - Pisa - Rete - MikroTik	192.168.1.1:161	SNMP
 Arsenale - Pisa - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Arsenale - Pisa - Sala 1 - Christie	192.168.1.12:161	ICMP
+Arsenale - Pisa - Sala 1 - Proiettore	192.168.1.12:161	ICMP
 Arsenale - Pisa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Caffè Lanteri - Pisa - Coord	43.7140,10.4200	GEO
@@ -1024,16 +1024,16 @@ Caffè Lanteri - Pisa - Sala 1 - JBL CPI2000	192.168.1.14:161	ICMP
 Lux - Pistoia - Coord	43.9313,10.9138	GEO
 Lux - Pistoia - Rete - MikroTik	192.168.1.1:161	SNMP
 Lux - Pistoia - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Lux - Pistoia - Sala 1 - Christie	192.168.1.12:161	ICMP
+Lux - Pistoia - Sala 1 - Proiettore	192.168.1.12:161	ICMP
 Lux - Pistoia - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 Lux - Pistoia - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Lux - Pistoia - Sala 2 - Christie	192.168.1.22:161	ICMP
+Lux - Pistoia - Sala 2 - Proiettore	192.168.1.22:161	ICMP
 Lux - Pistoia - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
 Lux - Pistoia - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Lux - Pistoia - Sala 3 - Christie	192.168.1.32:161	ICMP
+Lux - Pistoia - Sala 3 - Proiettore	192.168.1.32:161	ICMP
 Lux - Pistoia - Sala 3 - Dolby CP750	192.168.1.34:161	ICMP
 Lux - Pistoia - Sala 4 - Qube XP-D	192.168.1.40:161	ICMP
-Lux - Pistoia - Sala 4 - Christie	192.168.1.42:161	ICMP
+Lux - Pistoia - Sala 4 - Proiettore	192.168.1.42:161	ICMP
 Lux - Pistoia - Sala 4 - Dolby CP650	192.168.1.44:161	ICMP
 
 Accademia - Pontassieve - Coord	43.7744,11.4400	GEO
@@ -1092,19 +1092,19 @@ Cinema Verdi - San Vincenzo - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 Lami - Santa Croce sull'Arno - Coord	43.7088,10.7788	GEO
 Lami - Santa Croce sull'Arno - Rete - MikroTik	192.168.1.1:161	SNMP
 Lami - Santa Croce sull'Arno - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 1 - Christie	192.168.1.12:161	ICMP
+Lami - Santa Croce sull'Arno - Sala 1 - Proiettore	192.168.1.12:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 2 - Christie	192.168.1.22:161	ICMP
+Lami - Santa Croce sull'Arno - Sala 2 - Proiettore	192.168.1.22:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 2 - Processore Audio	192.168.1.24:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 3 - Christie	192.168.1.32:161	ICMP
+Lami - Santa Croce sull'Arno - Sala 3 - Proiettore	192.168.1.32:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 3 - Processore Audio	192.168.1.34:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 4 - Qube XP-D	192.168.1.40:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 4 - Christie	192.168.1.42:161	ICMP
+Lami - Santa Croce sull'Arno - Sala 4 - Proiettore	192.168.1.42:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 4 - Processore Audio	192.168.1.44:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 5 - Qube XP-D	192.168.1.50:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 5 - Christie	192.168.1.52:161	ICMP
+Lami - Santa Croce sull'Arno - Sala 5 - Proiettore	192.168.1.52:161	ICMP
 Lami - Santa Croce sull'Arno - Sala 5 - Processore Audio	192.168.1.54:161	ICMP
 
 Cabiria - Scandicci - Coord	43.7540,11.1820	GEO
@@ -1645,7 +1645,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
 }
 
 // ── PER TIPO ──────────────────────────────────────────────────
-let _tFilter = 'vpn';
+let _tFilter = 'tutti';
 
 function setTypeFilter(f) {
   _tFilter = f;
