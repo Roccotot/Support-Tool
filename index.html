@@ -467,6 +467,20 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 
 <!-- PER TIPO -->
 <div class="view" id="view-bytype">
+  <div class="cinema-filter-bar">
+    <button id="tf-vpn" class="cf-btn active" onclick="setTypeFilter('vpn')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      VPN
+    </button>
+    <button id="tf-offline" class="cf-btn" onclick="setTypeFilter('offline')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+      OFFLINE
+    </button>
+    <button id="tf-tutti" class="cf-btn" onclick="setTypeFilter('tutti')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      TUTTI
+    </button>
+  </div>
   <div class="main">
     <div class="type-section">
       <div class="type-hdr">
@@ -1654,9 +1668,21 @@ function buildCinemaGrid(cinemas, gridId, ids) {
 }
 
 // ── PER TIPO ──────────────────────────────────────────────────
+let _tFilter = 'vpn';
+
+function setTypeFilter(f) {
+  _tFilter = f;
+  ['vpn','offline','tutti'].forEach(x => document.getElementById('tf-'+x).classList.toggle('active', x===f));
+  buildByType();
+}
+
 function buildByType() {
-  const cinemas = parseRaw(RAW);
-  initColors(cinemas);
+  const vpnList    = parseRaw(RAW);
+  const novpnList  = parseRaw(RAW_NOVPN);
+  const allCinemas = _tFilter === 'vpn'    ? vpnList
+                   : _tFilter === 'offline' ? novpnList
+                   : [...vpnList, ...novpnList];
+  initColors(allCinemas);
   const grids = {
     rtr:  document.getElementById('grid-rtr'),
     tms:  document.getElementById('grid-tms'),
@@ -1686,8 +1712,8 @@ function buildByType() {
       });
     });
   };
-  addToMap(cinemas);
-  addToMap(parseRaw(RAW_NOVPN), true);
+  if (_tFilter === 'vpn' || _tFilter === 'tutti')    addToMap(vpnList,   false);
+  if (_tFilter === 'offline' || _tFilter === 'tutti') addToMap(novpnList, true);
 
   const counts = {rtr:0, tms:0, srv:0, proj:0, aud:0};
   Object.entries(modelMap).forEach(([bucket, models]) => {
