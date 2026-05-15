@@ -1294,6 +1294,9 @@ const MODEL_IMG = {
   dpc80:    'https://www.danieletrevisan.it/wp-content/uploads/DPC-80.jpg',
   dcp2000:  'https://www.danieletrevisan.it/wp-content/uploads/dcp2000.jpg',
   showvault:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0n1MkIShbTsc2SIExYi5U6MSZKKCxcbsUg&s',
+  cp55:     'https://www.springair.de/thumbnail/7e/c0/2c/1720576529/h56091-0-56091_1280x1280.jpg',
+  cp65:     'https://www.retrosonicproaudio.com/retrosonic-future/images/products/dolby-labs-model-cp65-cinema-sound-processor-1.webp',
+  cp500:    'https://i.pinimg.com/1200x/00/56/0f/00560fef1d7c8b7b60682e6684f2b865.jpg',
   cp650:    'https://www.lubianitecnologie.it/wp-content/uploads/2012/02/remoto-dolby-650x433.png',
   cp750:    'https://i.ebayimg.com/images/g/BWsAAOSwO~VnNijg/s-l1200.jpg',
   cp850:    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr0vSWudXvBEQ66XA7_cvB1o2Y25UMndD_fQ&s',
@@ -1328,6 +1331,9 @@ function getModelImage(label) {
   if (/cp850/.test(l))              return MODEL_IMG.cp850;
   if (/cp750/.test(l))              return MODEL_IMG.cp750;
   if (/cp650/.test(l))              return MODEL_IMG.cp650;
+  if (/cp500\b/.test(l))            return MODEL_IMG.cp500;
+  if (/cp65\b/.test(l))             return MODEL_IMG.cp65;
+  if (/cp55\b/.test(l))             return MODEL_IMG.cp55;
   if (/cpi2000/.test(l))            return MODEL_IMG.cpi2000;
   return null;
 }
@@ -1648,7 +1654,7 @@ function buildByType() {
           const buckets = (tc in modelMap) ? [tc] : ['proj'];
           const key = d.label
             .replace(/\s+e\s+(icmp|server)\b.*/i, '')
-            .replace(/^(proiettore|barco|christie|nec|cinemeccanica|server|doremi)\s+/gi, '')
+            .replace(/^(proiettore|server)\s+/gi, '')
             .trim() || d.label;
           buckets.forEach(b => {
             if (!modelMap[b][key]) modelMap[b][key] = [];
