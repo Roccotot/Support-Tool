@@ -1231,7 +1231,7 @@ function parseRaw(raw) {
       const TYPE_ORDER = {proj:0,srv:1,aud:2,pc:3,tms:4,rtr:5};
       const oa = TYPE_ORDER[ta]??9, ob = TYPE_ORDER[tb]??9;
       if (oa !== ob) return oa - ob;
-      if (ta === 'proj') return projModelAge(a.label) - projModelAge(b.label);
+      if (ta === 'proj') return modelYear(a.label) - modelYear(b.label);
       return 0;
     });
   }));
@@ -1248,29 +1248,46 @@ function devType(label) {
   return ['proj','UNITÀ'];
 }
 
-const PROJ_AGE = {
-  'cmc4':      1000,
-  'dp-2000':   2000, 'dp2000':   2000,
-  'dpc-80':    3000, 'dpc80':    3000,
-  // Serie B (Bright): DP2K-19B, DP4K-19B
-  'dp2k-19b':  4000, 'dp4k-19b': 4100,
-  // Serie C (Compact): DP2K-20C, DP2K-15C, DP2K-12C
-  'dp2k-20c':  5000, 'dp2k-15c': 5100, 'dp2k-12c': 5200,
-  // Serie S (Small): DP2K-10S, DP2K-8S
-  'dp2k-10s':  6000, 'dp2k-8s':  6100,
-  // Serie E (Entry): DP2K-6E
-  'dp2k-6e':   7000,
-  // SP2K Series 4
-  'sp2k-11s':  8000, 'sp2k-9s':  8100, 'sp2k-7s': 8200,
-  // SP4K-B / SP2K-B (serie B laser bright)
-  'sp4k-': 9000, 'sp2k-\d+b': 9100,
-  // SP4K-C / SP2K-C (serie C laser compact)
-  'sp2k-\d+c': 9200,
+// Anno di lancio commerciale per ogni modello — usato per ordinare "per tipo" e nelle sale
+// Fonte: press release CinemaCon / NAB / IBC / produttori
+const MODEL_YEAR = {
+  // ── AUDIO PROCESSORS ─────────────────────────────────────────
+  // Nota: 'cp650' prima di 'cp65' (substring match — 'cp650'.includes('cp65') = true)
+  'cp55':      1986,
+  'cp650':     2002,
+  'cp65':      1991,
+  'cp45':      1996,
+  'cp500':     1998,
+  'cp750':     2009,
+  'cp850':     2012,
+  'cpi2000':   2018,
+  'cp950':     2019,
+  // ── SERVER / MEDIA BLOCK ─────────────────────────────────────
+  'dcp-2000':  2005,  'dcp2000':  2005,   // Doremi
+  'qube':      2005,
+  'showvault': 2011,
+  'cinecloud': 2013,
+  'icmp':      2014,  // Barco ICMP / Alchemy
+  'ims3000':   2017,  // Dolby IMS3000
+  // ── PROJECTORS ───────────────────────────────────────────────
+  'cmc4':      2006,  // Cinemeccanica CMC4D2
+  'nc2000':    2008,  // NEC NC2000C (DCI cert. 2008)
+  'dp-2000':   2008,  'dp2000':   2008,  // Barco DP-2000
+  'dpc-80':    2010,  'dpc80':    2010,  // Cinemeccanica DPC-80
+  'dp2k-19b':  2012,  'dp4k-19b': 2012,
+  'dp2k-20c':  2013,  'dp2k-15c': 2013, 'dp2k-12c': 2013,
+  'dp2k-10s':  2013,  'dp2k-8s':  2013,
+  'dp2k-6e':   2015,
+  'sp4k-':     2019,  // Barco Series 4 (laser) — SP4K-B
+  'sp2k-':     2020,  // Cinionic SP2K Series 4 — SP2K-11S/9S/7S
+  'cp2406':    2024,  // Christie CineLife+ RBe
+  'cp2411':    2024,
 };
-function projModelAge(label) {
+function modelYear(label) {
   const l = label.toLowerCase();
-  for (const [k,v] of Object.entries(PROJ_AGE)) if (l.includes(k)) return v;
-  return 99;
+  // cp650 deve essere testato prima di cp65 (substring)
+  for (const [k,v] of Object.entries(MODEL_YEAR)) if (l.includes(k)) return v;
+  return 9999;
 }
 
 const MODEL_IMG = {
@@ -1676,9 +1693,7 @@ function buildByType() {
     const grid = grids[bucket];
     if (!grid) return;
     const sortedLabels = Object.keys(models).sort((a,b) =>
-      bucket === 'proj'
-        ? (projModelAge(a) - projModelAge(b)) || a.localeCompare(b)
-        : a.localeCompare(b)
+      (modelYear(a) - modelYear(b)) || a.localeCompare(b)
     );
     sortedLabels.forEach(label => {
       const entries = models[label];
