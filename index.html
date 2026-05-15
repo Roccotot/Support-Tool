@@ -801,10 +801,10 @@ Flamingo - Capoliveri - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Nuovo Cinema Caporali - Castiglione del Lago - Coord	43.1210,12.0510	GEO
 Nuovo Cinema Caporali - Castiglione del Lago - Rete - MikroTik	192.168.1.1:161	SNMP
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 1 - Christie CP2411-RBe	192.168.1.10:161	ICMP
+Nuovo Cinema Caporali - Castiglione del Lago - Sala 1 - Christie CineLife+ IMB-S4	192.168.1.10:161	ICMP
 Nuovo Cinema Caporali - Castiglione del Lago - Sala 1 - Christie CP2411-RBe	192.168.1.12:161	ICMP
 Nuovo Cinema Caporali - Castiglione del Lago - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 2 - Christie CP2406-RBe	192.168.1.20:161	ICMP
+Nuovo Cinema Caporali - Castiglione del Lago - Sala 2 - Christie CineLife+ IMB-S4	192.168.1.20:161	ICMP
 Nuovo Cinema Caporali - Castiglione del Lago - Sala 2 - Christie CP2406-RBe	192.168.1.22:161	ICMP
 Nuovo Cinema Caporali - Castiglione del Lago - Sala 2 - Processore Audio	192.168.1.24:161	ICMP
 
@@ -1017,7 +1017,7 @@ Arsenale - Pisa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Caffè Lanteri - Pisa - Coord	43.7140,10.4200	GEO
 Caffè Lanteri - Pisa - Rete - MikroTik	192.168.1.1:161	SNMP
-Caffè Lanteri - Pisa - Sala 1 - Christie CP2411-RBe	192.168.1.10:161	ICMP
+Caffè Lanteri - Pisa - Sala 1 - Christie CineLife+ IMB-S4	192.168.1.10:161	ICMP
 Caffè Lanteri - Pisa - Sala 1 - Christie CP2411-RBe	192.168.1.12:161	ICMP
 Caffè Lanteri - Pisa - Sala 1 - JBL CPI2000	192.168.1.14:161	ICMP
 
@@ -1238,7 +1238,7 @@ function devType(label) {
   if (/mikrotik|router/i.test(label))                          return ['rtr','ROUTER'];
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
-  if (/server|ims3000|dcp2000|cinecloud|doremi|qube|srv|showvault|\bicmp\b/i.test(label)) return ['srv','SERVER'];
+  if (/server|ims3000|dcp2000|cinecloud|doremi|qube|srv|showvault|\bicmp\b|\bimb\b/i.test(label)) return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|sp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|dolby|jbl|cp[0-9]|cpi[0-9]/i.test(label)) return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
@@ -1265,6 +1265,7 @@ const MODEL_YEAR = {
   'cinecloud': 2013,
   'icmp':      2014,  // Barco ICMP / Alchemy
   'ims3000':   2017,  // Dolby IMS3000
+  'imb-s4':    2024,  // Christie CineLife+ IMB-S4
   // ── PROJECTORS ───────────────────────────────────────────────
   'cmc4':      2006,  // Cinemeccanica CMC4D2
   'nc2000':    2008,  // NEC NC2000C (DCI cert. 2008)
@@ -1306,6 +1307,7 @@ const MODEL_IMG = {
   christie:    'https://location.hifivintage.eu/62105-large_default/cristie-cp-2210.jpg',
   cp2406rbe:   'https://www.christiedigital.com/globalassets/.catalog/products/cinema/cinelife-plus/2406-rbe/cp2406-rbe-hero.png',
   cp2411rbe:   'https://www.christiedigital.com/globalassets/.catalog/products/cinema/cinelife-plus/2411-rbe/cp2411-rbe-hero.png',
+  imbs4:       'https://www.christiedigital.com/globalassets/.catalog/products/imb/imb-s4-hero1.png',
   nec_nc2000c: 'https://www.sharpdisplays.eu/p/download/v/8d9c500d2a35c3a2b3d981dd7e3df153/cp/Products/DigitalCinemaProjectors/Products/SupportedProducts/NC2000C/Media/NC2000C-Page1-DatasheetPic.jpg?h=480&w=640',
   dpc80:    'https://www.danieletrevisan.it/wp-content/uploads/DPC-80.jpg',
   dcp2000:  'https://smart-story.ru/images/cms/thumbs/5221bd6603440a682b65528c59965bf3c1bdd3e7/dcp2000-3t-hdsdi-nts_620_auto_png.png',
@@ -1339,6 +1341,7 @@ function getModelImage(label) {
   if (/cinecloud/.test(l))          return MODEL_IMG.cinecloud;
   if (/cp2411-?rbe/i.test(l))        return MODEL_IMG.cp2411rbe;
   if (/cp2406-?rbe/i.test(l))        return MODEL_IMG.cp2406rbe;
+  if (/imb-?s4/i.test(l))            return MODEL_IMG.imbs4;
   if (/christie|cp2210/i.test(l))    return MODEL_IMG.christie;
   if (/nec|nc2000/i.test(l))        return MODEL_IMG.nec_nc2000c;
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
