@@ -667,8 +667,8 @@ Excelsior - Empoli - Sala 3 - Dolby CP650\t10.58.75.34:161\tICMP
 
 Nuova Aurora - Sansepolcro - Coord	43.5726,12.1386	GEO
 Nuova Aurora - Sansepolcro - Rete - MikroTik\t10.58.78.1:161\tSNMP
-Nuova Aurora - Sansepolcro - Sala 1 - Server\t10.58.78.10:161\tSNMP
-Nuova Aurora - Sansepolcro - Sala 1 - Proiettore\t10.58.78.12:161\tSNMP
+Nuova Aurora - Sansepolcro - Sala 1 - Doremi ShowVault\t10.58.78.10:161\tSNMP
+Nuova Aurora - Sansepolcro - Sala 1 - Barco DP2K-10SLP\t10.58.78.12:161\tSNMP
 Nuova Aurora - Sansepolcro - Sala 1 - Dolby CP750\t10.58.78.14:161\tICMP
 Nuova Aurora - Sansepolcro - Sala 2 - Proiettore\t10.58.78.22:161	SNMP
 Nuova Aurora - Sansepolcro - Sala 2 - Barco ICMP\t10.58.78.22:161	SNMP
@@ -1334,7 +1334,7 @@ function getModelImage(label) {
   if (/dp2k-\d+c\b/.test(l))       return MODEL_IMG.dp2k_c;
   if (/dp2k-\d+e\b/.test(l))       return MODEL_IMG.dp2k_e;
   if (/dp2k-\d+b\b/.test(l))       return MODEL_IMG.dp4k;
-  if (/dp2k-\d+s\b/.test(l))       return MODEL_IMG.dp2k_s;
+  if (/dp2k-\d+s[a-z]*/i.test(l))  return MODEL_IMG.dp2k_s;
   if (/dp[-\s]?2000/.test(l))      return MODEL_IMG.dp2000;
   if (/\bicmp\b/.test(l))           return MODEL_IMG.icmp;
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
