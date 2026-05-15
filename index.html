@@ -1239,12 +1239,12 @@ function parseRaw(raw) {
 }
 
 function devType(label) {
-  if (/mikrotik|router/i.test(label))                         return ['rtr','ROUTER'];
+  if (/mikrotik|router/i.test(label))                          return ['rtr','ROUTER'];
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
-  if (/server|ims|doremi|srv|showvault|\bicmp\b/i.test(label)) return ['srv','SERVER'];
+  if (/server|ims3000|dcp2000|cinecloud|doremi|qube|srv|showvault|\bicmp\b/i.test(label)) return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|sp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
-  if (/processore audio|cp[0-9]|cpi[0-9]/i.test(label))       return ['aud','AUDIO'];
+  if (/processore audio|dolby|jbl|cp[0-9]|cpi[0-9]/i.test(label)) return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
 }
 
