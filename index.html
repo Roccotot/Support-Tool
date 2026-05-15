@@ -1676,7 +1676,8 @@ function buildByType() {
       Object.entries(c.rooms).forEach(([room, devices]) => {
         devices.forEach(d => {
           const [tc] = devType(d.label);
-          const buckets = (tc in modelMap) ? [tc] : tc === 'pc' ? ['srv'] : ['proj'];
+          if (tc === 'pc') return;
+          const buckets = (tc in modelMap) ? [tc] : ['proj'];
           const key = d.label
             .replace(/\s+e\s+(icmp|server)\b.*/i, '')
             .replace(/^(proiettore|server)\s+/gi, '')
