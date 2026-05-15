@@ -1680,6 +1680,7 @@ function buildByType() {
         devices.forEach(d => {
           const [tc] = devType(d.label);
           if (tc === 'pc') return;
+          if (tc === 'rtr' && novpn) return;
           const buckets = (tc in modelMap) ? [tc] : ['proj'];
           const key = d.label
             .replace(/\s+e\s+(icmp|server)\b.*/i, '')
