@@ -197,12 +197,18 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .tc-ping.ok{background:var(--lime);box-shadow:0 0 5px var(--lime);border-color:var(--lime);animation:blinkdot 1.5s infinite}
 .tc-ping.err{background:var(--crimson);box-shadow:0 0 5px var(--crimson);animation:blinkdot 1.5s infinite}
 .tc-ping.checking{background:var(--amber);box-shadow:0 0 5px var(--amber);animation:blinkdot 0.5s infinite}
-.model-group-header{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:0}
+.model-group-header{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:0;cursor:pointer;user-select:none}
+.model-group-header:hover .mgh-label{color:#fff}
 .model-group-header .mgh-line{flex:1;height:1px;background:rgba(255,255,255,0.08)}
 .model-group-header .mgh-img{width:240px;height:152px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.04);flex-shrink:0;padding:4px}
 .model-group-header .mgh-img.white-bg{background:#fff}
-.model-group-header .mgh-label{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#c0d8f0;white-space:nowrap;text-transform:uppercase}
+.model-group-header .mgh-label{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#c0d8f0;white-space:nowrap;text-transform:uppercase;transition:color .15s}
 .model-group-header .mgh-count{font-size:9px;color:var(--text2);background:rgba(255,255,255,0.06);border-radius:10px;padding:1px 8px;letter-spacing:.5px}
+.model-group-header .mgh-chevron{font-size:10px;color:var(--text2);transition:transform .2s;flex-shrink:0}
+.model-group-header.collapsed .mgh-chevron{transform:rotate(-90deg)}
+.model-group-header.collapsed .mgh-img{display:none}
+.model-group-cards{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;overflow:hidden;transition:opacity .2s}
+.model-group-cards.hidden{display:none}
 
 /* ── MAP ── */
 #view-mappa{position:relative}
@@ -1713,8 +1719,16 @@ function buildByType() {
       const hdr = document.createElement('div');
       hdr.className = 'model-group-header';
       const imgWhite = imgUrl === MODEL_IMG.sp_b || imgUrl === MODEL_IMG.nec_nc2000c;
-      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img${imgWhite?' white-bg':''}" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div>`;
+      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img${imgWhite?' white-bg':''}" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div><span class="mgh-chevron">▼</span>`;
       grid.appendChild(hdr);
+
+      // Cards container (collapsible)
+      const cardsWrap = document.createElement('div');
+      cardsWrap.className = 'model-group-cards';
+      hdr.addEventListener('click', () => {
+        const collapsed = hdr.classList.toggle('collapsed');
+        cardsWrap.classList.toggle('hidden', collapsed);
+      });
 
       // One card per cinema/sala
       entries.forEach(e => {
@@ -1732,8 +1746,9 @@ function buildByType() {
             ${e.novpn ? '' : devBtnsHTML(e.ip, e.label)}
           </div>`;
         card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip].join(' ').toLowerCase();
-        grid.appendChild(card);
+        cardsWrap.appendChild(card);
       });
+      grid.appendChild(cardsWrap);
     });
   });
 
