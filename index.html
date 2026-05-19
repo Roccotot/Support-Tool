@@ -1277,7 +1277,8 @@ const MODEL_YEAR = {
   'cpi2000':   2018,
   'cp950':     2019,
   // ── SERVER / MEDIA BLOCK ─────────────────────────────────────
-  'dcp-2000':  2005,  'dcp2000':  2005,   // Doremi
+  'dcp-2000':  2005,  'dcp2000':  2005,   // Doremi DCP-2000
+  'dcp-2k4':   2008,  'dcp2k4':   2008,   // Doremi DCP-2K4
   'qube':      2005,
   'showvault': 2011,
   'cinecloud': 2013,
@@ -1329,6 +1330,7 @@ const MODEL_IMG = {
   nec_nc2000c: 'https://www.sharpdisplays.eu/p/download/v/8d9c500d2a35c3a2b3d981dd7e3df153/cp/Products/DigitalCinemaProjectors/Products/SupportedProducts/NC2000C/Media/NC2000C-Page1-DatasheetPic.jpg?h=480&w=640',
   dpc80:    'https://www.danieletrevisan.it/wp-content/uploads/DPC-80.jpg',
   dcp2000:  'https://smart-story.ru/images/cms/thumbs/5221bd6603440a682b65528c59965bf3c1bdd3e7/dcp2000-3t-hdsdi-nts_620_auto_png.png',
+  dcp2k4:   'https://magna-tech.org/wp-content/uploads/2018/03/82.png',
   showvault:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0n1MkIShbTsc2SIExYi5U6MSZKKCxcbsUg&s',
   cp55:     'https://www.springair.de/thumbnail/7e/c0/2c/1720576529/h56091-0-56091_1280x1280.jpg',
   cp65:     'https://www.retrosonicproaudio.com/retrosonic-future/images/products/dolby-labs-model-cp65-cinema-sound-processor-1.webp',
@@ -1363,6 +1365,7 @@ function getModelImage(label) {
   if (/christie|cp2210/i.test(l))    return MODEL_IMG.christie;
   if (/nec|nc2000/i.test(l))        return MODEL_IMG.nec_nc2000c;
   if (/dpc-?80/.test(l))            return MODEL_IMG.dpc80;
+  if (/dcp-?2k4/i.test(l))          return MODEL_IMG.dcp2k4;
   if (/dcp2000/.test(l))            return MODEL_IMG.dcp2000;
   if (/showvault/.test(l))          return MODEL_IMG.showvault;
   if (/cp45\b/.test(l))             return MODEL_IMG.cp45;
