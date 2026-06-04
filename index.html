@@ -423,6 +423,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
       OFFLINE
     </button>
+    <button id="cf-estivi" class="cf-btn" onclick="setCinemaFilter('estivi')">
+      ☀️ ESTIVI
+    </button>
+    <button id="cf-chiuso" class="cf-btn" onclick="setCinemaFilter('chiuso')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      AL CHIUSO
+    </button>
     <button id="cf-tutti" class="cf-btn" onclick="setCinemaFilter('tutti')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       TUTTI
@@ -464,6 +471,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <button id="tf-offline" class="cf-btn" onclick="setTypeFilter('offline')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
       OFFLINE
+    </button>
+    <button id="tf-estivi" class="cf-btn" onclick="setTypeFilter('estivi')">
+      ☀️ ESTIVI
+    </button>
+    <button id="tf-chiuso" class="cf-btn" onclick="setTypeFilter('chiuso')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      AL CHIUSO
     </button>
     <button id="tf-tutti" class="cf-btn active" onclick="setTypeFilter('tutti')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -520,9 +534,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <div class="map-container" id="map-vpn"></div>
   <div class="map-container" id="map-offline"></div>
   <div class="map-container" id="map-tutti"></div>
+  <div class="map-container" id="map-estivi"></div>
+  <div class="map-container" id="map-chiuso"></div>
   <div class="map-filter-bar">
     <button id="mf-vpn" class="mf-btn active" onclick="setMapFilter('vpn')">VPN</button>
     <button id="mf-offline" class="mf-btn" onclick="setMapFilter('offline')">OFFLINE</button>
+    <button id="mf-estivi" class="mf-btn" onclick="setMapFilter('estivi')">☀️ ESTIVI</button>
+    <button id="mf-chiuso" class="mf-btn" onclick="setMapFilter('chiuso')">AL CHIUSO</button>
     <button id="mf-tutti" class="mf-btn" onclick="setMapFilter('tutti')">TUTTI</button>
   </div>
   <div class="map-stats-bar">
@@ -1204,6 +1222,34 @@ Teatro delle Arti - Lastra a Signa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 `;
 
+const RAW_ESTIVI = `
+Flog - Firenze - Coord	43.7930,11.2460	GEO
+Flog - Firenze - Rete - MikroTik	192.168.1.1:161	SNMP
+
+Rocca del Leone - Castiglione del Lago - Coord	43.1276,12.0556	GEO
+Rocca del Leone - Castiglione del Lago - Rete - MikroTik	192.168.1.1:161	SNMP
+Rocca del Leone - Castiglione del Lago - Sala 1 - Doremi DCP2000	192.168.1.10:161	ICMP
+Rocca del Leone - Castiglione del Lago - Sala 1 - Barco DP2K-12C	192.168.1.12:161	ICMP
+
+Cinema Estivo - Scarperia e San Piero - Coord	43.9937,11.3533	GEO
+Cinema Estivo - Scarperia e San Piero - Rete - MikroTik	192.168.1.1:161	SNMP
+Cinema Estivo - Scarperia e San Piero - Sala 1 - Proiettore Acer	192.168.1.10:161	ICMP
+Cinema Estivo - Scarperia e San Piero - Sala 1 - Blu-ray Denon	192.168.1.12:161	ICMP
+
+Chiaro di Luna - Firenze - Coord	43.7697,11.2345	GEO
+Chiaro di Luna - Firenze - Rete - MikroTik	192.168.1.1:161	SNMP
+Chiaro di Luna - Firenze - Sala 1 - Doremi DCP-2K4	192.168.1.10:161	ICMP
+Chiaro di Luna - Firenze - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
+Chiaro di Luna - Firenze - Sala 1 - JBL CPI2000	192.168.1.14:161	ICMP
+Chiaro di Luna - Firenze - Sala 2 - Doremi DCP-2K4	192.168.1.20:161	ICMP
+Chiaro di Luna - Firenze - Sala 2 - Barco DP2K-15C	192.168.1.22:161	ICMP
+
+Cinema Estivo Roma - Pisa - Coord	43.7260,10.3976	GEO
+Cinema Estivo Roma - Pisa - Rete - MikroTik	192.168.1.1:161	SNMP
+Cinema Estivo Roma - Pisa - Sala 1 - GDC CMC4	192.168.1.10:161	ICMP
+Cinema Estivo Roma - Pisa - Sala 2 - Barco DP2K-12C	192.168.1.20:161	ICMP
+`;
+
 // ── PALETTE ───────────────────────────────────────────────────
 // 15 colori distinti e vividi — un colore unico per ogni cinema fino a 15
 const PALETTE = [
@@ -1279,7 +1325,7 @@ function devType(label) {
   if (/mikrotik|router/i.test(label))                          return ['rtr','ROUTER'];
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
-  if (/server|ims3000|dcp2000|cinecloud|doremi|qube|srv|showvault|\bicmp\b|\bimb\b/i.test(label)) return ['srv','SERVER'];
+  if (/server|ims3000|dcp2000|cinecloud|doremi|qube|srv|showvault|\bicmp\b|\bimb\b|cmc4/i.test(label)) return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|sp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|dolby|jbl|cp[0-9]|cpi[0-9]/i.test(label)) return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
@@ -1519,6 +1565,7 @@ async function downloadExcel() {
 
   addRows(parseRaw(RAW),        'VPN');
   addRows(parseRaw(RAW_NOVPN),  'Offline');
+  addRows(parseRaw(RAW_ESTIVI), 'Estivo');
 
   const buf  = await wb.xlsx.writeBuffer();
   const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -1586,11 +1633,11 @@ function openCard(hdr) {
 }
 
 async function autoPing() {
-  if (_cFilter === 'offline') return;
+  if (_cFilter === 'offline' || _cFilter === 'estivi') return;
   const seen = new Set();
   const grid = document.getElementById('cinemasGrid');
   const dots = [...(grid ? grid.querySelectorAll('[data-ip]') : [])].filter(d => {
-    if (_cFilter === 'tutti' && !d.dataset.ip.startsWith('10.')) return false;
+    if ((_cFilter === 'tutti' || _cFilter === 'chiuso') && !d.dataset.ip.startsWith('10.')) return false;
     if (seen.has(d.dataset.ip)) return false;
     const card = d.closest('.cinema-card');
     const isRouter = d.dataset.router === '1';
@@ -1754,16 +1801,19 @@ let _tFilter = 'tutti';
 
 function setTypeFilter(f) {
   _tFilter = f;
-  ['vpn','offline','tutti'].forEach(x => document.getElementById('tf-'+x).classList.toggle('active', x===f));
+  ['vpn','offline','estivi','chiuso','tutti'].forEach(x => document.getElementById('tf-'+x).classList.toggle('active', x===f));
   buildByType();
 }
 
 function buildByType() {
   const vpnList    = parseRaw(RAW);
   const novpnList  = parseRaw(RAW_NOVPN);
-  const allCinemas = _tFilter === 'vpn'    ? vpnList
-                   : _tFilter === 'offline' ? novpnList
-                   : [...vpnList, ...novpnList];
+  const estiviList = parseRaw(RAW_ESTIVI);
+  const allCinemas = _tFilter === 'vpn'     ? vpnList
+                   : _tFilter === 'offline'  ? novpnList
+                   : _tFilter === 'estivi'   ? estiviList
+                   : _tFilter === 'chiuso'   ? [...vpnList, ...novpnList]
+                   : [...vpnList, ...novpnList, ...estiviList];
   initColors(allCinemas);
   const grids = {
     rtr:  document.getElementById('grid-rtr'),
@@ -1776,7 +1826,7 @@ function buildByType() {
 
   // Collect: modelMap[bucket][normalizedLabel] = [{cinema, city, room, ip, label, novpn?}]
   const modelMap = {rtr:{}, tms:{}, srv:{}, proj:{}, aud:{}};
-  const addToMap = (cinemaList, novpn=false) => {
+  const addToMap = (cinemaList, novpn=false, estate=false) => {
     cinemaList.forEach(c => {
       Object.entries(c.rooms).forEach(([room, devices]) => {
         devices.forEach(d => {
@@ -1790,14 +1840,15 @@ function buildByType() {
             .trim() || d.label;
           buckets.forEach(b => {
             if (!modelMap[b][key]) modelMap[b][key] = [];
-            modelMap[b][key].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label, novpn});
+            modelMap[b][key].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label, novpn, estate});
           });
         });
       });
     });
   };
-  if (_tFilter === 'vpn' || _tFilter === 'tutti')    addToMap(vpnList,   false);
-  if (_tFilter === 'offline' || _tFilter === 'tutti') addToMap(novpnList, true);
+  if (_tFilter === 'vpn' || _tFilter === 'tutti' || _tFilter === 'chiuso')    addToMap(vpnList,    false, false);
+  if (_tFilter === 'offline' || _tFilter === 'tutti' || _tFilter === 'chiuso') addToMap(novpnList,  true,  false);
+  if (_tFilter === 'estivi' || _tFilter === 'tutti')                           addToMap(estiviList, true,  true);
 
   const counts = {rtr:0, tms:0, srv:0, proj:0, aud:0};
   Object.entries(modelMap).forEach(([bucket, models]) => {
@@ -1834,7 +1885,7 @@ function buildByType() {
         card.className = 'type-card';
         card.style.cssText = `background:${color}0d;border-color:${color}44`;
         card.innerHTML = `
-          <div class="tc-cinema">${e.cinema}${e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
+          <div class="tc-cinema">${e.cinema}${e.estate ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· estate</span>' : e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
           <div class="tc-name" title="${e.room}">${e.room}</div>
           <div class="tc-btns">
             <div class="tc-ping" data-ip="${e.ip}" title="Clicca per verificare"
@@ -1946,6 +1997,12 @@ const COORDS_OFFLINE = {
   'Antella':                     [43.7398, 11.3047],
   'Monte San Savino':            [43.3294, 11.7268],
 };
+const COORDS_ESTIVI = {
+  'Firenze':                     [43.7696, 11.2558],
+  'Castiglione del Lago':        [43.1210, 12.0510],
+  'Scarperia e San Piero':       [43.9950, 11.3557],
+  'Pisa':                        [43.7228, 10.4017],
+};
 
 // ── LEAFLET MAP (condiviso da Mappa VPN e Mappa offline) ──────
 async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost, coords, geocode=false, showStatus=false}) {
@@ -2015,13 +2072,21 @@ const _mapBuilt = {};
 function getCinemasForFilter(f) {
   if (f === 'vpn')     return parseRaw(RAW);
   if (f === 'offline') return parseRaw(RAW_NOVPN);
-  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN)].sort((a,b) => a.city.localeCompare(b.city));
+  if (f === 'estivi')  return parseRaw(RAW_ESTIVI);
+  if (f === 'chiuso')  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN)].sort((a,b) => a.city.localeCompare(b.city));
+  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN), ...parseRaw(RAW_ESTIVI)].sort((a,b) => a.city.localeCompare(b.city));
 }
 
 function setCinemaFilter(f) {
   _cFilter = f;
-  ['vpn','offline','tutti'].forEach(x => document.getElementById('cf-'+x).classList.toggle('active', x===f));
-  const titles = {vpn:'Cinema VPN — Dispositivi Monitorati', offline:'Cinema Offline — Rete Locale', tutti:'Tutti i Cinema'};
+  ['vpn','offline','estivi','chiuso','tutti'].forEach(x => document.getElementById('cf-'+x).classList.toggle('active', x===f));
+  const titles = {
+    vpn:    'Cinema VPN — Dispositivi Monitorati',
+    offline:'Cinema Offline — Rete Locale',
+    estivi: 'Cinema Estivi ☀️',
+    chiuso: 'Tutti i Cinema al Chiuso',
+    tutti:  'Tutti i Cinema'
+  };
   const t = document.getElementById('cinemaTitle'); if(t) t.textContent = titles[f];
   const sb = document.querySelector('.global-status-bar'); if(sb) sb.style.display = f==='vpn' ? '' : 'none';
   buildCinema();
@@ -2036,9 +2101,9 @@ function buildCinema() {
 
 async function setMapFilter(f) {
   _mFilter = f;
-  ['vpn','offline','tutti'].forEach(x => document.getElementById('mf-'+x).classList.toggle('active', x===f));
+  ['vpn','offline','estivi','chiuso','tutti'].forEach(x => document.getElementById('mf-'+x).classList.toggle('active', x===f));
   await showMap();
-  if (f !== 'offline') autoPing();
+  if (f !== 'offline' && f !== 'estivi') autoPing();
 }
 
 async function showMap() {
@@ -2048,11 +2113,11 @@ async function showMap() {
   if (!_mapBuilt[f]) {
     _mapBuilt[f] = true;
     const cinemas = getCinemasForFilter(f);
-    const coords = {...COORDS_VPN, ...COORDS_OFFLINE};
+    const coords = {...COORDS_VPN, ...COORDS_OFFLINE, ...COORDS_ESTIVI};
     await buildLeafletMap(cinemas, {
       mapId:'map-'+f, windowKey:'_map_'+f,
       statCinema:'msb-cinema', statHost:'msb-host',
-      coords, geocode: false, showStatus: f !== 'offline'
+      coords, geocode: false, showStatus: f !== 'offline' && f !== 'estivi'
     });
   } else {
     const inst = window['_map_'+f];
