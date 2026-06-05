@@ -1171,7 +1171,7 @@ Cabiria - Scandicci - Sala 2 - Dolby CP45	192.168.1.24:161	ICMP
 
 Cinema Garibaldi - Scarperia e San Piero - Coord	43.9950,11.3557	GEO
 Cinema Garibaldi - Scarperia e San Piero - Rete - MikroTik	192.168.1.1:161	SNMP
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - GDC CMC4	192.168.1.10:161	ICMP
+Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Cinemeccanica CMC4	192.168.1.10:161	ICMP
 Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Barco DP2000	192.168.1.12:161	ICMP
 Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Dolby CP45	192.168.1.14:161	ICMP
 
@@ -1246,7 +1246,7 @@ Chiaro di Luna - Firenze - Sala 2 - Barco DP2K-15C	192.168.1.22:161	ICMP
 
 Cinema Estivo Roma - Pisa - Coord	43.7260,10.3976	GEO
 Cinema Estivo Roma - Pisa - Rete - MikroTik	192.168.1.1:161	SNMP
-Cinema Estivo Roma - Pisa - Sala 1 - GDC CMC4	192.168.1.10:161	ICMP
+Cinema Estivo Roma - Pisa - Sala 1 - Cinemeccanica CMC4	192.168.1.10:161	ICMP
 Cinema Estivo Roma - Pisa - Sala 2 - Barco DP2K-12C	192.168.1.20:161	ICMP
 `;
 
@@ -1325,7 +1325,7 @@ function devType(label) {
   if (/mikrotik|router/i.test(label))                          return ['rtr','ROUTER'];
   if (/\btms\b/i.test(label))                                  return ['tms','TMS'];
   if (/\bpc\b/i.test(label))                                   return ['pc','PC'];
-  if (/server|ims3000|dcp2000|cinecloud|doremi|qube|srv|showvault|\bicmp\b|\bimb\b|cmc4/i.test(label)) return ['srv','SERVER'];
+  if (/server|ims3000|dcp2000|cinecloud|doremi|qube|srv|showvault|\bicmp\b|\bimb\b/i.test(label)) return ['srv','SERVER'];
   if (/proiettore|barco|christie|nec|projector|dp2k|sp2k|dp4k|sp4k|cinemeccanica|dpc-/i.test(label)) return ['proj','PROIETT.'];
   if (/processore audio|dolby|jbl|cp[0-9]|cpi[0-9]/i.test(label)) return ['aud','AUDIO'];
   return ['proj','UNITÀ'];
