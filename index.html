@@ -1773,13 +1773,30 @@ async function autoPing() {
     seen.add(d.dataset.ip);
     return true;
   });
+  const pending = [];
   for (let i = 0; i < dots.length; i++) {
     if (i > 0) await new Promise(r => setTimeout(r, 80));
     const dot = dots[i];
-    pingDevice(dot.dataset.ip, dot.dataset.port || '').then(() => {
+    pending.push(pingDevice(dot.dataset.ip, dot.dataset.port || '').then(() => {
       if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
-    });
+    }));
   }
+  await Promise.all(pending);
+  maybeWarnMixedContent(seen);
+}
+
+// In HTTPS (es. GitHub Pages) il browser blocca le richieste http:// verso
+// gli IP privati (mixed content) e tutti i ping falliscono. Avvisa una sola
+// volta, e solo se nessun dispositivo ha risposto al giro automatico.
+let _mixedWarned = false;
+function maybeWarnMixedContent(checkedIPs) {
+  if (_mixedWarned || location.protocol !== 'https:' || !checkedIPs.size) return;
+  for (const ip of checkedIPs) if (pingStatusMap[ip] === 'ok') return;
+  _mixedWarned = true;
+  showToast('PING BLOCCATI?',
+    'Nessun dispositivo risponde: verifica di essere nella VPN e che il browser ' +
+    'consenta i contenuti http:// per questo sito (lucchetto → Impostazioni sito → ' +
+    'Contenuti non sicuri → Consenti)', 'err', 12000);
 }
 
 // ── COPIA IP ─────────────────────────────────────────────────
@@ -2242,11 +2259,11 @@ function switchView(v) {
 
 // ── TOAST ─────────────────────────────────────────────────────
 let _tt;
-function showToast(title,msg,type){
+function showToast(title,msg,type,duration){
   const t=document.getElementById('toast'),tl=document.getElementById('toastTitle');
   tl.textContent=title;tl.className='toast-title '+(type||'info');
   document.getElementById('toastMsg').textContent=msg;
-  t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),4000);
+  t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),duration||4000);
 }
 
 // ── INIT ──────────────────────────────────────────────────────
@@ -2265,12 +2282,6 @@ switchView('cinema');
 updateGlobalStatus();
 autoPing();
 setInterval(autoPing, 5 * 60 * 1000);
-
-// In HTTPS il browser blocca le richieste http:// verso gli IP della VPN
-// (mixed content): i ping funzionano solo aprendo la pagina in locale o in HTTP
-if (location.protocol === 'https:') {
-  showToast('ATTENZIONE', 'Pagina servita in HTTPS: i ping verso i dispositivi (http://) verranno bloccati dal browser', 'err');
-}
 </script>
 </body>
 </html>

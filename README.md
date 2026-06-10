@@ -3,9 +3,12 @@
 Dashboard NOC per il monitoraggio dei dispositivi di proiezione (server, proiettori,
 processori audio, router MikroTik, TMS) dei cinema del circuito.
 
-È una **single-page app senza build e senza backend**: basta aprire `index.html`
-nel browser. Le uniche dipendenze (Leaflet per la mappa, ExcelJS per l'export)
-sono caricate da CDN.
+**Sito live:** <https://roccotot.github.io/Support-Tool/>
+
+È una **single-page app senza build e senza backend**: viene pubblicata con
+GitHub Pages, ma funziona anche aprendo `index.html` direttamente nel browser.
+Le uniche dipendenze (Leaflet per la mappa, ExcelJS per l'export) sono caricate
+da CDN.
 
 ## Funzionalità
 
@@ -27,9 +30,16 @@ Limiti noti:
 
 - un dispositivo **senza web server** (es. alcuni processori audio) può risultare
   "non risponde" anche se è acceso;
-- se la pagina è servita in **HTTPS**, il browser blocca le richieste `http://`
-  verso IP privati (mixed content): i ping funzionano solo aprendo il file in
-  locale o servendolo in HTTP dentro la VPN;
+- il sito su GitHub Pages è in **HTTPS**, quindi il browser blocca di default le
+  richieste `http://` verso gli IP privati (mixed content) e tutti i dispositivi
+  risultano offline. Per usare i ping da
+  <https://roccotot.github.io/Support-Tool/> bisogna consentire i contenuti non
+  sicuri per il sito: in Chrome/Edge, lucchetto nella barra dell'indirizzo →
+  **Impostazioni sito** → **Contenuti non sicuri** → **Consenti** (e ricaricare).
+  Se dopo il primo giro di ping automatico nessun dispositivo risponde, l'app
+  mostra un avviso con questa indicazione. In alternativa i ping funzionano
+  sempre aprendo `index.html` in locale;
+- serve comunque essere **connessi alla VPN** per raggiungere gli IP `10.x.x.x`;
 - i cinema "Offline" usano reti locali `192.168.x.x` non raggiungibili dalla
   VPN, quindi non vengono pingati automaticamente.
 
