@@ -74,11 +74,18 @@ console del browser.
   python3 genera_dispositivi.py
   ```
 
+- `scarica_immagini.py` — scarica in `img/` le foto dei modelli (oggi
+  hotlinkate da siti esterni in `MODEL_IMG`) e aggiorna `index.html` con i
+  percorsi locali, così le immagini non spariscono se i siti le rimuovono.
+  Solo libreria standard, da eseguire una volta da un PC con internet:
+
+  ```bash
+  python3 scarica_immagini.py
+  # poi committare img/ e index.html
+  ```
+
+  È idempotente: si può rilanciare per riprovare solo i download falliti.
+  Finché un'immagine resta remota e il link muore, viene semplicemente
+  nascosta (`onerror`).
+
 I file `.xlsx` generati non vanno committati (sono in `.gitignore`).
-
-## Nota sulle immagini dei modelli
-
-Le foto dei dispositivi nella vista "Per tipo" (`MODEL_IMG` in `index.html`)
-sono hotlinkate da siti esterni: se un link muore l'immagine viene semplicemente
-nascosta (`onerror`). Per renderle stabili, scaricarle in una cartella `img/`
-del repo e aggiornare gli URL in `MODEL_IMG` con i percorsi relativi.
