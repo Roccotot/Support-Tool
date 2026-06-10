@@ -1,0 +1,11 @@
+# Artefatti generati (riproducibili con genera_dispositivi.py o dall'app)
+*.xlsx
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+
+# Sistema
+.DS_Store
+Thumbs.db

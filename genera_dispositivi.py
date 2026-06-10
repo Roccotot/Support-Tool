@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 """
-Genera dispositivi_mancanti.xlsx leggendo i template RAW e RAW_NOVPN da index.html.
+Genera dispositivi_mancanti.xlsx leggendo i template RAW, RAW_NOVPN e
+RAW_ESTIVI da index.html (nella stessa cartella di questo script).
 """
 
 import re
+from pathlib import Path
+
 import openpyxl
 from openpyxl.styles import PatternFill, Font, Alignment
 from openpyxl.utils import get_column_letter
 
+BASE_DIR    = Path(__file__).resolve().parent
+HTML_PATH   = BASE_DIR / 'index.html'
+OUTPUT_PATH = BASE_DIR / 'dispositivi_mancanti.xlsx'
+
 # ── Leggi index.html ──────────────────────────────────────────────────────────
-with open('/home/user/NOC-DASHBOARD-ROCCO/index.html', 'r', encoding='utf-8') as f:
+with open(HTML_PATH, 'r', encoding='utf-8') as f:
     html = f.read()
 
 # ── Estrai i blocchi RAW e RAW_NOVPN ─────────────────────────────────────────
@@ -23,6 +30,7 @@ def extract_block(text, varname):
 
 raw_vpn    = extract_block(html, 'RAW')
 raw_novpn  = extract_block(html, 'RAW_NOVPN')
+raw_estivi = extract_block(html, 'RAW_ESTIVI')
 
 # ── Parser righe ─────────────────────────────────────────────────────────────
 # Formato atteso (separatore: TAB reale o \t letterale):
@@ -86,12 +94,14 @@ def parse_block(block, tipo):
         })
     return rows
 
-rows_vpn   = parse_block(raw_vpn,   'VPN')
-rows_novpn = parse_block(raw_novpn, 'Offline')
-all_rows   = rows_vpn + rows_novpn
+rows_vpn    = parse_block(raw_vpn,    'VPN')
+rows_novpn  = parse_block(raw_novpn,  'Offline')
+rows_estivi = parse_block(raw_estivi, 'Estivo')
+all_rows    = rows_vpn + rows_novpn + rows_estivi
 
 print(f"Righe VPN:    {len(rows_vpn)}")
 print(f"Righe Offline:{len(rows_novpn)}")
+print(f"Righe Estivi: {len(rows_estivi)}")
 print(f"Totale dati:  {len(all_rows)}")
 
 # ── Crea Excel ────────────────────────────────────────────────────────────────
@@ -153,7 +163,6 @@ for row_idx, row in enumerate(all_rows, start=2):
             cell.fill = fill
 
 # ── Salva ─────────────────────────────────────────────────────────────────────
-output_path = '/home/user/NOC-DASHBOARD-ROCCO/dispositivi_mancanti.xlsx'
-wb.save(output_path)
-print(f"\nSalvato: {output_path}")
+wb.save(OUTPUT_PATH)
+print(f"\nSalvato: {OUTPUT_PATH}")
 print(f"Righe scritte (dati): {len(all_rows)}  (+ 1 intestazione = {len(all_rows)+1} totali)")

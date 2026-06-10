@@ -20,10 +20,6 @@
   --rb:linear-gradient(90deg,#e8192c,#1db954,#1565c0);
 }
 
-  
-
-/* ── TEMA NEGATIVO ── */
-html.light .leaflet-tile { filter:invert(1) hue-rotate(180deg) }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;display:flex;flex-direction:column}
@@ -48,10 +44,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
 
 /* ── VIEW TOGGLE ── */
-.theme-toggle{background:var(--panel);border:1px solid var(--border);
-  border-radius:8px;padding:8px 11px;cursor:pointer;font-size:16px;
-  transition:all 0.2s;line-height:1;display:flex;align-items:center}
-.theme-toggle:hover{border-color:rgba(41,121,255,0.5);box-shadow:var(--glow)}
 .view-toggle{display:flex;background:var(--panel);border:1px solid var(--border);border-radius:9px;overflow:hidden}
 .view-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;
   font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.5px;
@@ -244,7 +236,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .popup-ico{width:36px;height:36px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid rgba(255,255,255,0.1)}
 .popup-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:1.5px;color:#fff;text-transform:uppercase;line-height:1.2}
 .popup-city{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;margin-top:3px}
-.popup-addr{font-family:'Share Tech Mono',monospace;font-size:9px;color:#fff;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
 .popup-badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
 .pbadge{font-family:'Share Tech Mono',monospace;font-size:9px;border-radius:3px;padding:2px 7px;border:1px solid;white-space:nowrap;text-decoration:none;display:inline-block}
 .popup-room-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:#ffe066;letter-spacing:2px;text-transform:uppercase;padding:6px 15px 3px;border-top:1px solid rgba(41,121,255,0.06);margin-top:2px}
@@ -336,7 +327,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   header{padding:0 8px;gap:8px}
   .logo-wrap img{height:30px}
   .search-input{width:80px;padding:6px 8px;font-size:10px}
-  .theme-toggle{padding:6px 8px;font-size:14px}
   .view-cycle-btn{padding:6px 9px;font-size:11px;gap:4px}
   .view-cycle-btn svg:last-child{display:none}
 }
@@ -376,7 +366,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <div class="logo-div"></div>
     <div class="logo-text">SUPPORT TOOL<br><b>di Rocco Totaro</b> — V3.1</div>
   </div>
-  <input type="text" class="search-input" id="searchInput"
+  <input type="text" class="search-input" id="searchInput" aria-label="Cerca cinema, IP o dispositivo"
     placeholder="Cerca cinema, IP, dispositivo..." oninput="filterDevices(this.value)">
   <div class="header-right">
     <button class="view-cycle-btn" id="viewCycleBtn" onclick="cycleView()" title="Cambia vista">
@@ -1376,22 +1366,31 @@ function initColors(cinemas) {
   // Reset completo ad ogni init
   Object.keys(_colorMap).forEach(k => delete _colorMap[k]);
   // Assegna in ordine di indice: i primi 15 prendono colori tutti diversi,
-  // oltre 15 si ricicla (per forza maggiore)
+  // oltre 15 si ricicla (per forza maggiore).
+  // Chiave nome+città: esistono cinema omonimi in città diverse.
   cinemas.forEach((c, i) => {
-    _colorMap[c.name] = PALETTE[i % PALETTE.length];
+    _colorMap[c.name + '|' + c.city] = PALETTE[i % PALETTE.length];
   });
 }
 
-function cinemaColor(name) {
-  return _colorMap[name] || PALETTE[0];
+function cinemaColor(name, city) {
+  return _colorMap[name + '|' + city] || PALETTE[0];
 }
 
 // ── PARSE ─────────────────────────────────────────────────────
+// Escape per interpolazioni in innerHTML / attributi
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const IP_RE = /^\d{1,3}(\.\d{1,3}){3}(:\d+)?$/;
+
 function parseRaw(raw) {
   const cinemas = {};
   raw.split('\n').forEach(line => {
     line = line.trim();
-    if (!line) return;
+    if (!line || line.startsWith('//')) return;
     const cols = line.split('\t');
     // Riga coordinate: "Nome - Città - Coord\tlat,lng\tGEO"
     if (cols[2] === 'GEO') {
@@ -1405,9 +1404,12 @@ function parseRaw(raw) {
       if (!isNaN(lat) && !isNaN(lng)) cinemas[key].coords = [lat, lng];
       return;
     }
-    if (!line.includes(':161')) return;
+    if (!IP_RE.test((cols[1]||'').trim())) {
+      console.warn('parseRaw: riga ignorata (manca IP):', line);
+      return;
+    }
     const full  = cols[0];
-    const ip    = (cols[1]||'').replace(':161','');
+    const ip    = cols[1].trim().replace(/:\d+$/,'');
     const parts = full.split(' - ');
     if (parts.length < 2) return;
     const name = parts[0].trim();
@@ -1447,7 +1449,6 @@ function devType(label) {
 // Fonte: press release CinemaCon / NAB / IBC / produttori
 const MODEL_YEAR = {
   // ── AUDIO PROCESSORS ─────────────────────────────────────────
-  // Nota: 'cp650' prima di 'cp65' (substring match — 'cp650'.includes('cp65') = true)
   'cp55':      1986,
   'cp650':     2002,
   'cp65':      1991,
@@ -1482,17 +1483,18 @@ const MODEL_YEAR = {
   'cp2406':    2024,  // Christie CineLife+ RBe
   'cp2411':    2024,
 };
+// Chiavi ordinate per lunghezza decrescente: la chiave più specifica vince
+// (es. 'cp650' deve essere testata prima di 'cp65', che ne è substring)
+const MODEL_YEAR_KEYS = Object.keys(MODEL_YEAR).sort((a,b) => b.length - a.length);
 function modelYear(label) {
   const l = label.toLowerCase();
-  // cp650 deve essere testato prima di cp65 (substring)
-  for (const [k,v] of Object.entries(MODEL_YEAR)) if (l.includes(k)) return v;
+  for (const k of MODEL_YEAR_KEYS) if (l.includes(k)) return MODEL_YEAR[k];
   return 9999;
 }
 
 const MODEL_IMG = {
   mikrotik: 'https://www.aikomtech.com/wp-content/uploads/2021/06/logo-rect.png',
   cmc4:     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoWWr0FZOzt6eMvb4WvHQs6nWuf1qJvDDX3Q&s',
-  tms:      'https://scontent.fflr2-1.fna.fbcdn.net/v/t39.30808-6/424618581_916060460519155_7035170290504294318_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=sSSxH6IFbkkQ7kNvwFmV_BF&_nc_oc=Adq0zgeq8XnEWnDCEjFikW9njC9JQs4WjhR8NGc7zWSQFJKL9ou3QRHxhUyzFbBKSho&_nc_zt=23&_nc_ht=scontent.fflr2-1.fna&_nc_gid=C9lBCa8xVlUQ3MG1RA6VPg&_nc_ss=7b2a8&oh=00_Af64T1JoIWjqJbbgCU1M6jTMgHOO-un0HvP74CtHX_8uzw&oe=6A07B596',
   dp4k:     'https://assets.barco.com/transform/738c0903-4c8c-4cff-873e-dbaba2f625ab/DP4K-32B-right-low-angle',
   icmp:     'https://assets.barco.com/transform/2e29e139-a17e-4b1b-8f04-acfeec3b4f96/ICMP-board-front-2',
   sp2k:     'https://shop.cinemanext.com/web/image/product.template/10756/image_1024?unique=651fdb0',
@@ -1528,7 +1530,6 @@ function getModelImage(label) {
   const l = label.toLowerCase();
   if (/mikrotik|router/i.test(l))   return MODEL_IMG.mikrotik;
   if (/cmc4/.test(l))               return MODEL_IMG.cmc4;
-  if (/\btms\b/.test(l))            return MODEL_IMG.tms;
   if (/dp4k/.test(l))               return MODEL_IMG.dp4k;
   if (/sp4k-\d+b\b|sp2k-\d+b\b/.test(l)) return MODEL_IMG.sp_b;
   if (/sp4k-\d+c\b|sp2k-\d+c\b/.test(l)) return MODEL_IMG.sp_c;
@@ -1562,16 +1563,31 @@ function getModelImage(label) {
   return null;
 }
 
+// ── DATI PARSATI (una volta sola, all'avvio) ─────────────────
+const DATA = {
+  vpn:     parseRaw(RAW),
+  offline: parseRaw(RAW_NOVPN),
+  estivi:  parseRaw(RAW_ESTIVI),
+};
+// IP unici dei cinema VPN: base del contatore globale online/offline
+const VPN_IPS = new Set(
+  DATA.vpn.flatMap(c => Object.values(c.rooms).flat().map(d => d.ip))
+);
+
 // ── PING ─────────────────────────────────────────────────────
 const pingStatusMap = {};
 
 function updateGlobalStatus() {
-  const vals = Object.values(pingStatusMap);
-  const online   = vals.filter(s=>s==='ok').length;
-  const offline  = vals.filter(s=>s==='err').length;
-  const checking = vals.filter(s=>s==='checking').length;
-  const total    = parseRaw(RAW).flatMap(c=>Object.values(c.rooms).flatMap(d=>d)).length;
-  const unknown  = Math.max(0, total - online - offline - checking);
+  // Conta solo gli IP dei cinema VPN: pingStatusMap può contenere anche
+  // IP pingati manualmente nelle viste estivi/tutti
+  let online = 0, offline = 0, checking = 0;
+  VPN_IPS.forEach(ip => {
+    const s = pingStatusMap[ip];
+    if (s === 'ok') online++;
+    else if (s === 'err') offline++;
+    else if (s === 'checking') checking++;
+  });
+  const unknown = VPN_IPS.size - online - offline - checking;
   const onEl  = document.getElementById('gs-online-count');
   const offEl = document.getElementById('gs-offline-count');
   const unkEl = document.getElementById('gs-unknown-count');
@@ -1580,7 +1596,7 @@ function updateGlobalStatus() {
   if(unkEl) unkEl.textContent = unknown;
 }
 
-async function pingDevice(ip, dot, port) {
+async function pingDevice(ip, port) {
   const prev = pingStatusMap[ip];
   pingStatusMap[ip] = 'checking';
   updateGlobalStatus();
@@ -1675,9 +1691,9 @@ async function downloadExcel() {
     });
   };
 
-  addRows(parseRaw(RAW),        'VPN');
-  addRows(parseRaw(RAW_NOVPN),  'Offline');
-  addRows(parseRaw(RAW_ESTIVI), 'Estivo');
+  addRows(DATA.vpn,    'VPN');
+  addRows(DATA.offline,'Offline');
+  addRows(DATA.estivi, 'Estivo');
 
   const buf  = await wb.xlsx.writeBuffer();
   const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -1710,7 +1726,7 @@ function exportCSV() {
 function cinemaId(name) { return 'ms_' + name.replace(/[^a-zA-Z0-9]/g,'_'); }
 
 function updateMapStatus(cinemaName) {
-  const allDots = [...document.querySelectorAll(`.ping-dot[data-cinema="${cinemaName}"]`)];
+  const allDots = [...document.querySelectorAll(`.ping-dot[data-cinema="${CSS.escape(cinemaName)}"]`)];
   if (!allDots.length) return;
   const el = document.getElementById(cinemaId(cinemaName));
   if (!el) return;
@@ -1736,7 +1752,7 @@ function openCard(hdr) {
   if (opening) {
     card.querySelectorAll('.ping-dot[data-ip]').forEach(dot => {
       if (!pingStatusMap[dot.dataset.ip]) {
-        pingDevice(dot.dataset.ip, dot, dot.dataset.port || '').then(() => {
+        pingDevice(dot.dataset.ip, dot.dataset.port || '').then(() => {
           if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
         });
       }
@@ -1757,13 +1773,30 @@ async function autoPing() {
     seen.add(d.dataset.ip);
     return true;
   });
+  const pending = [];
   for (let i = 0; i < dots.length; i++) {
     if (i > 0) await new Promise(r => setTimeout(r, 80));
     const dot = dots[i];
-    pingDevice(dot.dataset.ip, dot, dot.dataset.port || '').then(() => {
+    pending.push(pingDevice(dot.dataset.ip, dot.dataset.port || '').then(() => {
       if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
-    });
+    }));
   }
+  await Promise.all(pending);
+  maybeWarnMixedContent(seen);
+}
+
+// In HTTPS (es. GitHub Pages) il browser blocca le richieste http:// verso
+// gli IP privati (mixed content) e tutti i ping falliscono. Avvisa una sola
+// volta, e solo se nessun dispositivo ha risposto al giro automatico.
+let _mixedWarned = false;
+function maybeWarnMixedContent(checkedIPs) {
+  if (_mixedWarned || location.protocol !== 'https:' || !checkedIPs.size) return;
+  for (const ip of checkedIPs) if (pingStatusMap[ip] === 'ok') return;
+  _mixedWarned = true;
+  showToast('PING BLOCCATI?',
+    'Nessun dispositivo risponde: verifica di essere nella VPN e che il browser ' +
+    'consenta i contenuti http:// per questo sito (lucchetto → Impostazioni sito → ' +
+    'Contenuti non sicuri → Consenti)', 'err', 12000);
 }
 
 // ── COPIA IP ─────────────────────────────────────────────────
@@ -1810,7 +1843,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
   });
 
   const buildCard = (c) => {
-    const color     = cinemaColor(c.name);
+    const color     = cinemaColor(c.name, c.city);
     const rooms     = Object.entries(c.rooms);
     const devCount  = rooms.reduce((s,[,r]) => s+r.length, 0);
     totalDevs  += devCount;
@@ -1821,7 +1854,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
     rooms.forEach(([roomName, devices]) => {
       roomsHTML += `<div class="room-sep">
         <div class="room-sep-dot" style="background:${color}"></div>
-        <div class="room-sep-label">${roomName}</div>
+        <div class="room-sep-label">${esc(roomName)}</div>
         <div class="room-sep-line"></div>
       </div>`;
       devices.forEach(d => {
@@ -1829,9 +1862,9 @@ function buildCinemaGrid(cinemas, gridId, ids) {
         const isRtr = devType(d.label)[0] === 'rtr';
         const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" data-ip="${d.ip}" data-cinema="${c.name}" ${isTms?'data-port="9000"':''} ${(isRtr||isTms)?'data-router="1"':''} ${isRtr?'data-rtr="1"':''} title="Clicca per verificare raggiungibilità"
-            onclick="pingDevice('${d.ip}',this${dPort})"></div>
-          <div class="dev-name" title="${d.label}">${d.label}</div>
+          <div class="ping-dot" role="button" tabindex="0" data-ip="${d.ip}" data-cinema="${esc(c.name)}" ${isTms?'data-port="9000"':''} ${(isRtr||isTms)?'data-router="1"':''} ${isRtr?'data-rtr="1"':''} title="Clicca per verificare raggiungibilità" aria-label="Verifica ${d.ip}"
+            onclick="pingDevice('${d.ip}'${dPort})"></div>
+          <div class="dev-name" title="${esc(d.label)}">${esc(d.label)}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
         </div>`;
       });
@@ -1840,16 +1873,16 @@ function buildCinemaGrid(cinemas, gridId, ids) {
     card.className = 'cinema-card';
     card.style.cssText = `background:${color}0d;border-color:${color}55`;
     card.innerHTML = `
-      <div class="card-hdr" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="openCard(this)">
+      <div class="card-hdr" role="button" tabindex="0" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="openCard(this)">
         <div class="card-title-block">
           <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
           <div>
-            <div class="card-name">${c.name}</div>
-            <div class="card-city" style="color:${color}">📍 ${c.city}</div>
+            <div class="card-name">${esc(c.name)}</div>
+            <div class="card-city" style="color:${color}">📍 ${esc(c.city)}</div>
             ${routerDev ? `<div class="card-rtr">
-              <div class="ping-dot" data-ip="${routerDev.ip}" data-cinema="${c.name}" data-router="1" data-rtr="1"
-                title="MikroTik — clicca per verificare"
-                onclick="event.stopPropagation();pingDevice('${routerDev.ip}',this)"></div>
+              <div class="ping-dot" role="button" tabindex="0" data-ip="${routerDev.ip}" data-cinema="${esc(c.name)}" data-router="1" data-rtr="1"
+                title="MikroTik — clicca per verificare" aria-label="Verifica MikroTik ${routerDev.ip}"
+                onclick="event.stopPropagation();pingDevice('${routerDev.ip}')"></div>
               <span>MikroTik&ensp;${routerDev.ip}</span>
             </div>` : ''}
           </div>
@@ -1882,7 +1915,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
     col.dataset.city = city;
     const hdr = document.createElement('div');
     hdr.className = 'city-col-hdr';
-    hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${city}</span><div class="city-col-hdr-line"></div>`;
+    hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${esc(city)}</span><div class="city-col-hdr-line"></div>`;
     col.appendChild(hdr);
     for (let i = 0; i < cityCinemas.length; i += 3) {
       const wrap = document.createElement('div');
@@ -1918,9 +1951,9 @@ function setTypeFilter(f) {
 }
 
 function buildByType() {
-  const vpnList    = parseRaw(RAW);
-  const novpnList  = parseRaw(RAW_NOVPN);
-  const estiviList = parseRaw(RAW_ESTIVI);
+  const vpnList    = DATA.vpn;
+  const novpnList  = DATA.offline;
+  const estiviList = DATA.estivi;
   const allCinemas = _tFilter === 'vpn'     ? vpnList
                    : _tFilter === 'offline'  ? novpnList
                    : _tFilter === 'estivi'   ? estiviList
@@ -1978,7 +2011,7 @@ function buildByType() {
       const hdr = document.createElement('div');
       hdr.className = 'model-group-header';
       const imgWhite = imgUrl === MODEL_IMG.sp_b || imgUrl === MODEL_IMG.nec_nc2000c;
-      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img${imgWhite?' white-bg':''}" src="${imgUrl}" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${label}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div><span class="mgh-chevron">▼</span>`;
+      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img${imgWhite?' white-bg':''}" src="${imgUrl}" alt="" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${esc(label)}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div><span class="mgh-chevron">▼</span>`;
       grid.appendChild(hdr);
 
       // Cards container (collapsible)
@@ -1991,17 +2024,17 @@ function buildByType() {
 
       // One card per cinema/sala
       entries.forEach(e => {
-        const color = cinemaColor(e.cinema);
+        const color = cinemaColor(e.cinema, e.city);
         const pingPort = bucket === 'tms' ? ',9000' : '';
         const card = document.createElement('div');
         card.className = 'type-card';
         card.style.cssText = `background:${color}0d;border-color:${color}44`;
         card.innerHTML = `
-          <div class="tc-cinema">${e.cinema}${e.estate ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· estate</span>' : e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
-          <div class="tc-name" title="${e.room}">${e.room}</div>
+          <div class="tc-cinema">${esc(e.cinema)}${e.estate ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· estate</span>' : e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
+          <div class="tc-name" title="${esc(e.room)}">${esc(e.room)}</div>
           <div class="tc-btns">
-            <div class="tc-ping" data-ip="${e.ip}" title="Clicca per verificare"
-              onclick="pingDevice('${e.ip}',this${pingPort})"></div>
+            <div class="tc-ping" role="button" tabindex="0" data-ip="${e.ip}" title="Clicca per verificare" aria-label="Verifica ${e.ip}"
+              onclick="pingDevice('${e.ip}'${pingPort})"></div>
             ${e.novpn ? '' : devBtnsHTML(e.ip, e.label)}
           </div>`;
         card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip].join(' ').toLowerCase();
@@ -2020,19 +2053,17 @@ function buildByType() {
 
 // ── MAP ───────────────────────────────────────────────────────
 function buildPopupHTML(c) {
-  const color    = cinemaColor(c.name);
+  const color    = cinemaColor(c.name, c.city);
   const devCount = Object.values(c.rooms).flat().length;
-  const allIPs   = Object.values(c.rooms).flat().map(d => d.ip);
-  const tmsIP    = allIPs.length ? allIPs[0].replace(/\.\d+$/, '.2') : null;
 
   let devRows = '';
   Object.entries(c.rooms).forEach(([room, devices]) => {
-    devRows += `<div class="popup-room-lbl">${room}</div>`;
+    devRows += `<div class="popup-room-lbl">${esc(room)}</div>`;
     devices.forEach(d => {
       const [tc] = devType(d.label);
       devRows += `<div class="popup-dev-row">
-        <div class="ping-dot" data-ip="${d.ip}" title="Clicca per verificare" onclick="pingDevice('${d.ip}',this)" style="flex-shrink:0"></div>
-        <div class="pdev-name" title="${d.label}">${d.label}</div>
+        <div class="ping-dot" role="button" tabindex="0" data-ip="${d.ip}" title="Clicca per verificare" aria-label="Verifica ${d.ip}" onclick="pingDevice('${d.ip}')" style="flex-shrink:0"></div>
+        <div class="pdev-name" title="${esc(d.label)}">${esc(d.label)}</div>
         <div class="pdev-btns">
           <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
           <a class="proto-btn web" href="http://${d.ip}" target="_blank" style="font-size:8px">WEB</a>
@@ -2043,46 +2074,21 @@ function buildPopupHTML(c) {
     });
   });
 
-  const addrLine = c._address ? `<div class="popup-addr">📍 ${c._address}</div>` : '';
   return `<div style="background:${color}0d;border-radius:13px;overflow:hidden">
     <div class="popup-rb" style="background:${color}"></div>
     <div class="popup-hdr" style="background:${color}12">
       <div class="popup-ico" style="background:${color}20;border-color:${color}55">🎬</div>
       <div style="flex:1;min-width:0">
-        <div class="popup-title">${c.name}</div>
-        <div class="popup-city" style="color:${color}">📍 ${c.city}</div>
-        ${addrLine}
+        <div class="popup-title">${esc(c.name)}</div>
+        <div class="popup-city" style="color:${color}">📍 ${esc(c.city)}</div>
         <div class="popup-badges">
           <span class="pbadge" style="color:${color};border-color:${color}55">${devCount} host</span>
           <span class="pbadge" style="color:var(--text2);border-color:var(--border)">${Object.keys(c.rooms).filter(r => r !== 'Rete').length} sale</span>
-          ${tmsIP ? `<a class="tms-btn" href="http://${tmsIP}:9000/tms/" target="_blank" title="Apri TMS ${tmsIP}" style="display:none" data-tms-url="http://${tmsIP}:9000/tms/">TMS</a>` : ''}
         </div>
       </div>
     </div>
     <div class="popup-devs">${devRows}</div>
   </div>`;
-}
-
-async function geocodeCinema(name, city) {
-  const queries = [`${name} ${city} Italia`,`cinema ${name} ${city}`,`${city}, Italia`,`${city} Italia`];
-  for (const q of queries) {
-    try {
-      const r = await fetch(
-        'https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=it&q=' + encodeURIComponent(q),
-        { headers:{'Accept-Language':'it','User-Agent':'SigraFilmNOC/3.1'} }
-      );
-      const d = await r.json();
-      if (!d||!d.length) continue;
-      const best = d.sort((a,b) => {
-        const s = x => /cinema|theatre/i.test((x.type||'')+(x.class||'')) ? 3
-          : /building|amenity/i.test(x.class||'') ? 2 : /city|town/i.test(x.type||'') ? 1 : 0;
-        return s(b)-s(a);
-      })[0];
-      return { lat:parseFloat(best.lat), lng:parseFloat(best.lon),
-               address:best.display_name.split(',').slice(0,3).join(', ') };
-    } catch(e){}
-  }
-  return null;
 }
 
 // ── COORDS ───────────────────────────────────────────────────
@@ -2117,8 +2123,8 @@ const COORDS_ESTIVI = {
 };
 
 // ── LEAFLET MAP (condiviso da Mappa VPN e Mappa offline) ──────
-async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost, coords, geocode=false, showStatus=false}) {
-  const map = L.map(mapId,{center:[43.5,11.2],zoom:geocode?8:9,zoomControl:false,attributionControl:false});
+async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost, coords, showStatus=false}) {
+  const map = L.map(mapId,{center:[43.5,11.2],zoom:9,zoomControl:false,attributionControl:false});
   window[windowKey] = map;
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
@@ -2134,17 +2140,8 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
   document.getElementById(statHost).textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
 
   for (let i=0; i<cinemas.length; i++) {
-    const c=cinemas[i], color=cinemaColor(c.name);
-    let lat, lng;
-    if (geocode) {
-      if (i>0) await new Promise(r=>setTimeout(r,1150));
-      const geo=await geocodeCinema(c.name,c.city);
-      if (geo){lat=geo.lat;lng=geo.lng;c._address=geo.address;}
-      else if(coords[c.city]){[lat,lng]=coords[c.city];c._address=null;}
-      else{lat=43.4+i*0.1;lng=10.9+i*0.12;c._address=null;}
-    } else {
-      [lat,lng]=c.coords||coords[c.city]||[43.5,11.2];
-    }
+    const c=cinemas[i], color=cinemaColor(c.name, c.city);
+    const [lat,lng]=c.coords||coords[c.city]||[43.5,11.2];
     const statusHtml = showStatus ? `<div class="cmarker-status" id="${cinemaId(c.name)}"></div>` : '';
     const icon=L.divIcon({
       html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div>${statusHtml}</div>`,
@@ -2170,7 +2167,7 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
       el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     });
     marker.bindTooltip(
-      `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${c.name}</span>`,
+      `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${esc(c.name)}</span>`,
       {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
     );
     if (showStatus) updateMapStatus(c.name);
@@ -2182,11 +2179,11 @@ let _cFilter = 'vpn', _mFilter = 'vpn';
 const _mapBuilt = {};
 
 function getCinemasForFilter(f) {
-  if (f === 'vpn')     return parseRaw(RAW);
-  if (f === 'offline') return parseRaw(RAW_NOVPN);
-  if (f === 'estivi')  return parseRaw(RAW_ESTIVI);
-  if (f === 'chiuso')  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN)].sort((a,b) => a.city.localeCompare(b.city));
-  return [...parseRaw(RAW), ...parseRaw(RAW_NOVPN), ...parseRaw(RAW_ESTIVI)].sort((a,b) => a.city.localeCompare(b.city));
+  if (f === 'vpn')     return DATA.vpn;
+  if (f === 'offline') return DATA.offline;
+  if (f === 'estivi')  return DATA.estivi;
+  if (f === 'chiuso')  return [...DATA.vpn, ...DATA.offline].sort((a,b) => a.city.localeCompare(b.city));
+  return [...DATA.vpn, ...DATA.offline, ...DATA.estivi].sort((a,b) => a.city.localeCompare(b.city));
 }
 
 function setCinemaFilter(f) {
@@ -2229,7 +2226,7 @@ async function showMap() {
     await buildLeafletMap(cinemas, {
       mapId:'map-'+f, windowKey:'_map_'+f,
       statCinema:'msb-cinema', statHost:'msb-host',
-      coords, geocode: false, showStatus: f !== 'offline' && f !== 'estivi'
+      coords, showStatus: f !== 'offline' && f !== 'estivi'
     });
   } else {
     const inst = window['_map_'+f];
@@ -2262,14 +2259,23 @@ function switchView(v) {
 
 // ── TOAST ─────────────────────────────────────────────────────
 let _tt;
-function showToast(title,msg,type){
+function showToast(title,msg,type,duration){
   const t=document.getElementById('toast'),tl=document.getElementById('toastTitle');
   tl.textContent=title;tl.className='toast-title '+(type||'info');
   document.getElementById('toastMsg').textContent=msg;
-  t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),4000);
+  t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),duration||4000);
 }
 
 // ── INIT ──────────────────────────────────────────────────────
+// Tastiera: Invio/Spazio attivano pallini ping e header card
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') &&
+      e.target.matches('.ping-dot,.tc-ping,.card-hdr')) {
+    e.preventDefault();
+    e.target.click();
+  }
+});
+
 buildCinema();
 buildByType();
 switchView('cinema');
