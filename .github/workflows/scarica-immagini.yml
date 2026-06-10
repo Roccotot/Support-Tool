@@ -2,9 +2,15 @@ name: Scarica immagini modelli
 
 # Esegue scarica_immagini.py su un runner GitHub (che ha accesso a internet)
 # e committa img/ + index.html aggiornato direttamente su main.
-# Lancio manuale: tab Actions → "Scarica immagini modelli" → Run workflow.
+# Parte da solo quando questo file o lo script cambiano su main;
+# lancio manuale: tab Actions → "Scarica immagini modelli" → Run workflow.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/scarica-immagini.yml'
+      - 'scarica_immagini.py'
 
 permissions:
   contents: write
