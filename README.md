@@ -5,6 +5,11 @@ processori audio, router MikroTik, TMS) dei cinema del circuito.
 
 **Sito live:** <https://roccotot.github.io/Support-Tool/>
 
+**Mappa pubblica per i clienti:** <https://roccotot.github.io/Support-Tool/mappa.html> —
+mostra solo nomi, città e numero di sale dei cinema (niente IP né dati tecnici).
+Legge i dati da `index.html` a runtime, quindi si aggiorna da sola quando
+l'inventario cambia.
+
 È una **single-page app senza build e senza backend**: viene pubblicata con
 GitHub Pages, ma funziona anche aprendo `index.html` direttamente nel browser.
 Le uniche dipendenze (Leaflet per la mappa, ExcelJS per l'export) sono caricate
