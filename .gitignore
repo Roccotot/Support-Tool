@@ -9,3 +9,6 @@ __pycache__/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Archivi generati al volo (es. cloni-proiettori.zip)
+*.zip
