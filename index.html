@@ -1763,7 +1763,8 @@ function devBtnsHTML(ip, label) {
   const vncBtn  = tc === 'srv'
     ? `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC">VNC</a>`
     : '';
-  if (tc === 'aud') return copyBtn;
+  // Tra i processori audio, solo il CP950 ha interfaccia web
+  if (tc === 'aud') return (/cp950/i.test(label) ? webBtn : '') + copyBtn;
   if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC">VNC</a>` + copyBtn;
   if (tc === 'tms') {
     const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
