@@ -1756,7 +1756,9 @@ function copyIP(ip, el) {
 function devBtnsHTML(ip, label) {
   const [tc] = devType(label);
   const copyBtn = `<button class="ip-btn" onclick="copyIP('${ip}',this)">${ip}</button>`;
-  const webBtn  = `<a class="proto-btn web" href="http://${ip}" target="_blank" title="Apri interfaccia web">WEB</a>`;
+  // I Barco ICMP espongono la web UI in HTTPS sulla porta 43744
+  const webUrl  = /\bicmp\b/i.test(label) ? `https://${ip}:43744/` : `http://${ip}`;
+  const webBtn  = `<a class="proto-btn web" href="${webUrl}" target="_blank" title="Apri interfaccia web">WEB</a>`;
   const sshBtn  = (tc === 'srv' || tc === 'rtr')
     ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
     : '';
@@ -2006,12 +2008,13 @@ function buildPopupHTML(c) {
     devRows += `<div class="popup-room-lbl">${esc(room)}</div>`;
     devices.forEach(d => {
       const [tc] = devType(d.label);
+      const webUrl = /\bicmp\b/i.test(d.label) ? `https://${d.ip}:43744/` : `http://${d.ip}`;
       devRows += `<div class="popup-dev-row">
         <div class="ping-dot" role="button" tabindex="0" data-ip="${d.ip}" title="Clicca per verificare" aria-label="Verifica ${d.ip}" onclick="pingDevice('${d.ip}')" style="flex-shrink:0"></div>
         <div class="pdev-name" title="${esc(d.label)}">${esc(d.label)}</div>
         <div class="pdev-btns">
           <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
-          <a class="proto-btn web" href="http://${d.ip}" target="_blank" style="font-size:8px">WEB</a>
+          <a class="proto-btn web" href="${webUrl}" target="_blank" style="font-size:8px">WEB</a>
           ${tc==='srv' ? `<a class="proto-btn ssh" href="ssh://${d.ip}" style="font-size:8px">SSH</a>
           <a class="proto-btn vnc" href="vnc://${d.ip}" style="font-size:8px">VNC</a>` : ''}
         </div>
