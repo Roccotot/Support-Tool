@@ -10,6 +10,11 @@ mostra solo nomi, città e numero di sale dei cinema (niente IP né dati tecnici
 Legge lo stesso `dati.js` della dashboard, quindi si aggiorna da sola quando
 l'inventario cambia.
 
+Lo sfondo della mappa (`basemap.js`) usa Esri Dark Gray Canvas, che non
+richiede API key; se i tile non arrivano passa da solo a OpenStreetMap
+scurito via CSS. I basemap CARTO non si usano più: senza API key
+restituiscono tile con scritto "API key required".
+
 È una **single-page app senza build e senza backend**: viene pubblicata con
 GitHub Pages, ma funziona anche aprendo `index.html` direttamente nel browser.
 Le librerie (Leaflet + markercluster per la mappa, ExcelJS per l'export) stanno

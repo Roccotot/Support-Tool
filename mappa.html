@@ -14,6 +14,7 @@
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/leaflet/leaflet.markercluster.js"></script>
 <script src="dati.js"></script>
+<script src="basemap.js"></script>
 <style>
 :root {
   --bg:#07090e; --panel:#0c1018; --accent:#2979ff; --amber:#ff9100;
@@ -56,6 +57,11 @@ header{flex-shrink:0;background:rgba(7,9,14,0.97);border-bottom:1px solid var(--
 .legend .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:8px;vertical-align:middle;border:2px solid}
 .legend .dot.cin{background:rgba(41,121,255,0.25);border-color:var(--accent)}
 .legend .dot.est{background:rgba(255,145,0,0.25);border-color:var(--amber)}
+/* Sfondo di riserva (OpenStreetMap): reso scuro per non spaccare il tema */
+.tiles-dark{filter:invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.12) saturate(0.6)}
+.leaflet-control-attribution{background:rgba(7,9,14,0.7) !important;color:#5c7796 !important;
+  font-size:9px !important;padding:1px 6px !important}
+.leaflet-control-attribution a{color:#7a9bbf !important}
 .cluster-icon{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
   background:rgba(41,121,255,0.22);border:2.5px solid var(--accent);box-shadow:0 0 16px rgba(41,121,255,0.5);
   font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;color:#fff}
@@ -281,10 +287,7 @@ function init(){
   document.getElementById('st-sale').textContent   = _cinemas.reduce((s, c) => s + c.rooms.size, 0);
 
   map = L.map('map', { center: [43.5, 11.2], zoom: 9, zoomControl: false });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd', maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-  }).addTo(map);
+  addBasemap(map);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
 
   // Cluster: separa i cinema sovrapposti o molto vicini (es. Nuova Aurora e

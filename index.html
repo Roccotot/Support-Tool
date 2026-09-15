@@ -17,6 +17,7 @@
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/leaflet/leaflet.markercluster.js"></script>
 <script src="dati.js"></script>
+<script src="basemap.js"></script>
 <style>
 :root {
   --bg:#07090e; --panel:#0c1018; --panel2:#101520; --panel3:#161d2b;
@@ -108,8 +109,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .city-col{display:flex;flex-direction:column;gap:12px;min-width:0}
 .city-col.span-2{grid-column:span 2}
 .city-col.span-3{grid-column:span 3}
-.city-col .cinema-cards{display:flex;gap:14px;align-items:flex-start}
-.city-col .cinema-cards .cinema-card{flex:1;min-width:0}
+/* Le card di una città stanno su colonne di larghezza fissa: l'ultima riga
+   incompleta (es. Firenze, 7 cinema → 3+3+1) non deve allargare la card
+   rimasta a tutta la fascia. */
+.city-col .cinema-cards{display:grid;gap:14px;align-items:start;grid-template-columns:1fr}
+.city-col.span-2 .cinema-cards{grid-template-columns:repeat(2,1fr)}
+.city-col.span-3 .cinema-cards{grid-template-columns:repeat(3,1fr)}
+.city-col .cinema-cards .cinema-card{min-width:0}
 .city-col-hdr{display:flex;align-items:center;gap:14px;padding:14px 4px 2px}
 .city-col-hdr-line{flex:1;height:1px;background:var(--border)}
 .city-col-hdr-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--text2);white-space:nowrap}
@@ -240,6 +246,11 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .msb-sep{color:rgba(255,255,255,0.1)}
 .cmarker{width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
   border:2.5px solid;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+/* Sfondo di riserva (OpenStreetMap): reso scuro per non spaccare il tema */
+.tiles-dark{filter:invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.12) saturate(0.6)}
+.leaflet-control-attribution{background:rgba(7,9,14,0.7) !important;color:#5c7796 !important;
+  font-size:9px !important;padding:1px 6px !important;border-radius:4px 0 0 0}
+.leaflet-control-attribution a{color:#7a9bbf !important}
 .cluster-icon{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
   background:rgba(41,121,255,0.22);border:2.5px solid var(--accent);box-shadow:0 0 16px rgba(41,121,255,0.5);
   font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;color:#fff}
@@ -312,8 +323,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   .main{padding:12px 12px 56px}
   .cinemas-grid{grid-template-columns:1fr}
   .city-col,.city-col.span-2,.city-col.span-3{grid-column:1/-1}
-  .city-col .cinema-cards{flex-direction:column;align-items:stretch}
-  .city-col .cinema-cards .cinema-card{flex:none}
+  .city-col .cinema-cards,
+  .city-col.span-2 .cinema-cards,
+  .city-col.span-3 .cinema-cards{grid-template-columns:1fr}
   .grid-filler{display:none}
   header{padding:0 12px}
 }
@@ -1500,9 +1512,16 @@ const COORDS_ESTIVI  = SIGRA_COORDS.estivi;
 
 // ── LEAFLET MAP (condiviso da Mappa VPN e Mappa offline) ──────
 async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost, coords, showStatus=false}) {
-  const map = L.map(mapId,{center:[43.5,11.2],zoom:9,zoomControl:false,attributionControl:false});
+  // L'attribuzione dei tile è richiesta dal provider: control compatto, senza
+  // il "Leaflet" in testa.
+  const map = L.map(mapId,{center:[43.5,11.2],zoom:9,zoomControl:false,
+    attributionControl:false});
   window[windowKey] = map;
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+  // Il control va aggiunto prima del basemap: Leaflet aggancia la rimozione
+  // dell'attribuzione solo ai layer aggiunti dopo di lui, altrimenti quella
+  // del provider abbandonato resterebbe scritta.
+  L.control.attribution({position:'bottomleft', prefix:false}).addTo(map);
+  addBasemap(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
   if (!window._leafletStyleDone) {
     window._leafletStyleDone = true;

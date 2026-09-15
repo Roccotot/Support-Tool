@@ -255,13 +255,13 @@ Flora - Firenze - Sala 4 - Dolby CP950	10.57.55.44:161	ICMP
 
 Cinema Marconi - Firenze - Coord	43.7581,11.2850	GEO
 Cinema Marconi - Firenze - Rete - MikroTik	10.58.61.1:161	SNMP
-Cinema Marconi - Firenze - Sala Nord - Server auditorium Qube XP-D	10.58.61.10:161	SNMP
+Cinema Marconi - Firenze - Sala Nord - Qube XP-D	10.58.61.10:161	SNMP
 Cinema Marconi - Firenze - Sala Nord - Proiettore	10.58.61.12:161	SNMP
 Cinema Marconi - Firenze - Sala Nord - Dolby CP750	10.58.61.14:161	ICMP
-Cinema Marconi - Firenze - Sala Est - Server auditorium Qube XP-D	10.58.61.20:161	SNMP
+Cinema Marconi - Firenze - Sala Est - Qube XP-D	10.58.61.20:161	SNMP
 Cinema Marconi - Firenze - Sala Est - Proiettore	10.58.61.22:161	SNMP
 Cinema Marconi - Firenze - Sala Est - Dolby CP750	10.58.61.24:161	ICMP
-Cinema Marconi - Firenze - Sala Ovest - Server auditorium Qube XP-D	10.58.61.30:161	SNMP
+Cinema Marconi - Firenze - Sala Ovest - Qube XP-D	10.58.61.30:161	SNMP
 Cinema Marconi - Firenze - Sala Ovest - Proiettore	10.58.61.32:161	SNMP
 Cinema Marconi - Firenze - Sala Ovest - Dolby CP750	10.58.61.34:161	ICMP`,
   offline: `
