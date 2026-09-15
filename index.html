@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIGRA FILM — Support Tool</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<!-- Leaflet e markercluster sono serviti dal repo (cartella vendor/): niente
+     dipendenze da CDN esterni, quindi l'app funziona anche senza internet e
+     nessun codice di terze parti può cambiare sotto i piedi.
+     ExcelJS (~900 KB) viene caricato solo al primo click su "Scarica Excel". -->
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css"/>
+<link rel="stylesheet" href="vendor/leaflet/MarkerCluster.css"/>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="vendor/leaflet/leaflet.markercluster.js"></script>
+<script src="dati.js"></script>
 <style>
 :root {
   --bg:#07090e; --panel:#0c1018; --panel2:#101520; --panel3:#161d2b;
@@ -33,6 +39,18 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     linear-gradient(90deg,rgba(41,121,255,0.022) 1px,transparent 1px);background-size:44px 44px}
 
 .rb-bar{height:3px;background:var(--rb);flex-shrink:0;z-index:300;position:relative}
+
+/* ── ACCESSIBILITÀ ── */
+/* Navigazione da tastiera: prima il focus era invisibile ovunque tranne che
+   sulla casella di ricerca. */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.ping-dot:focus-visible,.tc-ping:focus-visible{outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;scroll-behavior:auto !important}
+}
 
 /* ── HEADER ── */
 header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
@@ -204,6 +222,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .model-group-header.collapsed .mgh-img{display:none}
 .model-group-cards{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;overflow:hidden;transition:opacity .2s}
 .model-group-cards.hidden{display:none}
+/* .hidden = nascosto dalla ricerca, .filtered-out = gruppo rimasto vuoto */
+.cinema-card.hidden,.city-col.hidden,.type-card.hidden,
+.model-group-cards.filtered-out,.model-group-header.filtered-out{display:none}
 
 /* ── MAP ── */
 #view-mappa{position:relative}
@@ -251,6 +272,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .popup-dev-row:hover{background:rgba(41,121,255,0.05)}
 .pdev-name{font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .pdev-btns{display:flex;gap:4px;flex-shrink:0}
+.pdev-btns .proto-btn{font-size:8px}
+.pdev-btns .ip-btn{font-size:9px;padding:2px 6px}
 .cinema-tooltip .leaflet-tooltip{background:transparent !important;border:none !important;box-shadow:none !important}
 
 
@@ -299,6 +322,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   padding:7px 13px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);
   width:230px;outline:none;transition:all 0.2s}
 .search-input::placeholder{color:var(--text2)}
+.search-wrap{position:relative;display:flex;align-items:center;min-width:0}
+.search-wrap .search-input{padding-right:26px}
+.search-clear{display:none;position:absolute;right:6px;background:none;border:none;cursor:pointer;
+  color:var(--text2);font-size:12px;line-height:1;padding:3px 4px;border-radius:4px}
+.search-clear:hover{color:var(--text);background:rgba(41,121,255,0.12)}
+.search-clear.show{display:block}
+.action-btn.busy{opacity:.55;pointer-events:none}
 .search-input:focus{border-color:rgba(41,121,255,0.5);box-shadow:var(--glow)}
 /* ── GLOBAL STATUS BAR ── */
 .global-status-bar{position:relative;z-index:1;display:flex;align-items:center;gap:10px;
@@ -371,8 +401,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <div class="logo-div"></div>
     <div class="logo-text">SUPPORT TOOL<br><b>di Rocco Totaro</b> — V3.1</div>
   </div>
-  <input type="text" class="search-input" id="searchInput" aria-label="Cerca cinema, IP o dispositivo"
-    placeholder="Cerca cinema, IP, dispositivo..." oninput="filterDevices(this.value)">
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="searchInput" autocomplete="off" spellcheck="false"
+      aria-label="Cerca cinema, città, sala, dispositivo o IP"
+      placeholder="Cerca cinema, IP, dispositivo…" oninput="onSearchInput(this.value)">
+    <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()"
+      title="Pulisci ricerca (Esc)" aria-label="Pulisci ricerca">✕</button>
+  </div>
   <div class="header-right">
     <button class="view-cycle-btn" id="viewCycleBtn" onclick="cycleView()" title="Cambia vista">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -384,20 +419,20 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
         <polyline points="9 18 15 12 9 6"/>
       </svg>
     </button>
-    <div class="view-toggle">
-      <button class="view-btn" id="tab-cinema" onclick="switchView('cinema')">
+    <div class="view-toggle" role="tablist" aria-label="Viste">
+      <button class="view-btn" id="tab-cinema" role="tab" aria-controls="view-cinema" aria-selected="false" onclick="switchView('cinema')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
           <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
         </svg>Cinema
       </button>
-      <button class="view-btn" id="tab-mappa" onclick="switchView('mappa')">
+      <button class="view-btn" id="tab-mappa" role="tab" aria-controls="view-mappa" aria-selected="false" onclick="switchView('mappa')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
           <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
         </svg>Mappa
       </button>
-      <button class="view-btn" id="tab-bytype" onclick="switchView('bytype')">
+      <button class="view-btn" id="tab-bytype" role="tab" aria-controls="view-bytype" aria-selected="false" onclick="switchView('bytype')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="3" width="6" height="18"/><rect x="9" y="3" width="6" height="12"/>
           <rect x="16" y="3" width="6" height="8"/>
@@ -408,8 +443,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 </header>
 
 <!-- CINEMA (VPN + OFFLINE) -->
-<div class="view active" id="view-cinema">
-  <div class="cinema-filter-bar">
+<div class="view active" id="view-cinema" role="tabpanel" aria-labelledby="tab-cinema">
+  <div class="cinema-filter-bar" role="group" aria-label="Filtro cinema">
     <button id="cf-vpn" class="cf-btn active" onclick="setCinemaFilter('vpn')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       VPN
@@ -457,8 +492,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 </div>
 
 <!-- PER TIPO -->
-<div class="view" id="view-bytype">
-  <div class="cinema-filter-bar">
+<div class="view" id="view-bytype" role="tabpanel" aria-labelledby="tab-bytype">
+  <div class="cinema-filter-bar" role="group" aria-label="Filtro per tipo">
     <button id="tf-vpn" class="cf-btn" onclick="setTypeFilter('vpn')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       VPN
@@ -525,13 +560,13 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 </div>
 
 <!-- MAPPA (VPN + OFFLINE) -->
-<div class="view" id="view-mappa">
+<div class="view" id="view-mappa" role="tabpanel" aria-labelledby="tab-mappa">
   <div class="map-container" id="map-vpn"></div>
   <div class="map-container" id="map-offline"></div>
   <div class="map-container" id="map-tutti"></div>
   <div class="map-container" id="map-estivi"></div>
   <div class="map-container" id="map-chiuso"></div>
-  <div class="map-filter-bar">
+  <div class="map-filter-bar" role="group" aria-label="Filtro mappa">
     <button id="mf-vpn" class="mf-btn active" onclick="setMapFilter('vpn')">VPN</button>
     <button id="mf-offline" class="mf-btn" onclick="setMapFilter('offline')">OFFLINE</button>
     <button id="mf-estivi" class="mf-btn" onclick="setMapFilter('estivi')">☀️ ESTIVI</button>
@@ -545,776 +580,18 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   </div>
 </div>
 
-<div class="toast" id="toast">
+<div class="toast" id="toast" role="status" aria-live="polite">
   <div class="toast-title info" id="toastTitle"></div>
   <div id="toastMsg"></div>
 </div>
 
 <script>
 // ── DATI ─────────────────────────────────────────────────────
-const RAW = `
+const RAW        = SIGRA_RAW.vpn;
 
-Italia - Soci - Coord	43.7363,11.8113	GEO
-Italia - Soci - Rete - MikroTik	10.58.85.1:161	SNMP
-Italia - Soci - Sala 1 - Doremi ShowVault	10.58.85.10:161	ICMP
-Italia - Soci - Sala 1 - Cinemeccanica DPC-80	10.58.85.12:161	ICMP
-Italia - Soci - Sala 1 - Dolby CP500	10.58.85.14:161	ICMP
+const RAW_NOVPN  = SIGRA_RAW.offline;
 
-
-
-Aurelia Antica - Grosseto - Coord	42.7429,11.1068	GEO
-Aurelia Antica - Grosseto - Rete - MikroTik	10.57.91.1:161	SNMP
-Aurelia Antica - Grosseto - Rete - TMS\t10.57.91.2:161\tSNMP
-Aurelia Antica - Grosseto - Sala 1 - Barco DP4K-19B\t10.57.91.12:161	SNMP
-Aurelia Antica - Grosseto - Sala 1 - Barco ICMP\t10.57.91.12:161	SNMP
-Aurelia Antica - Grosseto - Sala 1 - Dolby CP850\t10.57.91.14:161\tICMP
-Aurelia Antica - Grosseto - Sala 2 - Barco DP2K-10S\t10.57.91.22:161	SNMP
-Aurelia Antica - Grosseto - Sala 2 - Barco ICMP\t10.57.91.22:161	SNMP
-Aurelia Antica - Grosseto - Sala 2 - Dolby CP750\t10.57.91.24:161\tICMP
-Aurelia Antica - Grosseto - Sala 3 - Barco DP2K-10S\t10.57.91.32:161	SNMP
-Aurelia Antica - Grosseto - Sala 3 - Barco ICMP\t10.57.91.32:161	SNMP
-Aurelia Antica - Grosseto - Sala 3 - Dolby CP750\t10.57.91.34:161\tICMP
-Aurelia Antica - Grosseto - Sala 4 - Barco DP2K-10S\t10.57.91.42:161	SNMP
-Aurelia Antica - Grosseto - Sala 4 - Barco ICMP\t10.57.91.42:161	SNMP
-Aurelia Antica - Grosseto - Sala 4 - Dolby CP750\t10.57.91.44:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Clev Village - Chiusi -SI - Coord	43.0190,11.9430	GEO
-Clev Village - Chiusi -SI - Rete - MikroTik\t10.56.70.1:161\tSNMP
-Clev Village - Chiusi -SI - Sala 01 - Doremi DCP2000\t10.56.70.10:161\tSNMP
-Clev Village - Chiusi -SI - Sala 01 - Cinemeccanica CMC4 D2\t10.56.70.12:161\tSNMP
-Clev Village - Chiusi -SI - Sala 01 - Dolby CP650\t10.56.70.14:161\tICMP
-Clev Village - Chiusi -SI - Sala 02 - Doremi DCP2000\t10.56.70.20:161\tSNMP
-Clev Village - Chiusi -SI - Sala 02 - Cinemeccanica CMC4 D2\t10.56.70.22:161\tSNMP
-Clev Village - Chiusi -SI - Sala 02 - Dolby CP650\t10.56.70.24:161\tICMP
-Clev Village - Chiusi -SI - Sala 03 - Doremi DCP2000\t10.56.70.30:161\tSNMP
-Clev Village - Chiusi -SI - Sala 03 - Barco DP2K-20C\t10.56.70.32:161\tSNMP
-Clev Village - Chiusi -SI - Sala 03 - Dolby CP650\t10.56.70.34:161\tICMP
-Clev Village - Chiusi -SI - Sala 04 - Doremi DCP2000\t10.56.70.40:161\tSNMP
-Clev Village - Chiusi -SI - Sala 04 - Barco DP2K-20C\t10.56.70.42:161\tSNMP
-Clev Village - Chiusi -SI - Sala 04 - Dolby CP650\t10.56.70.44:161\tICMP
-Clev Village - Chiusi -SI - Sala 05 - Doremi ShowVault\t10.56.70.50:161\tSNMP
-Clev Village - Chiusi -SI - Sala 05 - Barco DP2K-10S\t10.56.70.52:161\tSNMP
-Clev Village - Chiusi -SI - Sala 05 - Dolby CP650\t10.56.70.54:161\tICMP
-Clev Village - Chiusi -SI - Sala 06 - Doremi ShowVault\t10.56.70.60:161\tSNMP
-Clev Village - Chiusi -SI - Sala 06 - Barco DP2K-10S\t10.56.70.62:161\tSNMP
-Clev Village - Chiusi -SI - Sala 06 - Dolby CP650\t10.56.70.64:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Imperiale - Montecatini Terme - Coord	43.8838,10.7725	GEO
-Imperiale - Montecatini Terme - Rete - MikroTik\t10.57.97.1:161\tSNMP
-Imperiale - Montecatini Terme - Rete - TMS\t10.57.97.2:161\tSNMP
-Imperiale - Montecatini Terme - Sala 1 - Dolby IMS3000\t10.57.97.10:161\tSNMP
-Imperiale - Montecatini Terme - Sala 1 - Cinemeccanica DPC-80\t10.57.97.12:161\tSNMP
-Imperiale - Montecatini Terme - Sala 1 - Dolby CP750\t10.57.97.14:161\tICMP
-Imperiale - Montecatini Terme - Sala 2 - Dolby IMS3000\t10.57.97.20:161\tSNMP
-Imperiale - Montecatini Terme - Sala 2 - Barco DP2K-20C\t10.57.97.22:161\tSNMP
-Imperiale - Montecatini Terme - Sala 2 - Dolby CP750\t10.57.97.24:161\tICMP
-Imperiale - Montecatini Terme - Sala 3 - Barco DP2K-6E\t10.57.97.32:161	SNMP
-Imperiale - Montecatini Terme - Sala 3 - Barco ICMP\t10.57.97.32:161	SNMP
-Imperiale - Montecatini Terme - Sala 3 - Dolby CP750\t10.57.97.34:161\tICMP
-Imperiale - Montecatini Terme - Sala 4 - Barco DP2K-6E\t10.57.97.42:161	SNMP
-Imperiale - Montecatini Terme - Sala 4 - Barco ICMP\t10.57.97.42:161	SNMP
-Imperiale - Montecatini Terme - Sala 4 - Dolby CP750\t10.57.97.44:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Isola Verde - Pisa - Coord	43.7102,10.4336	GEO
-Isola Verde - Pisa - Rete - MikroTik\t10.58.70.1:161\tSNMP
-Isola Verde - Pisa - Sala 01 - Doremi DCP2000\t10.58.70.10:161\tSNMP
-Isola Verde - Pisa - Sala 01 - Barco DP2000\t10.58.70.12:161\tSNMP
-Isola Verde - Pisa - Sala 01 - Dolby CP650\t10.58.70.14:161\tICMP
-Isola Verde - Pisa - Sala 02 - Doremi DCP2000\t10.58.70.20:161\tSNMP
-Isola Verde - Pisa - Sala 02 - Barco DP2K-20C\t10.58.70.22:161\tSNMP
-Isola Verde - Pisa - Sala 02 - Dolby CP650\t10.58.70.24:161\tICMP
-Isola Verde - Pisa - Sala 03 - Doremi ShowVault\t10.58.70.30:161\tSNMP
-Isola Verde - Pisa - Sala 03 - Barco DP2K-15C\t10.58.70.32:161\tSNMP
-Isola Verde - Pisa - Sala 03 - Dolby CP650\t10.58.70.34:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Multisala Odeon - Pisa - Coord	43.7188,10.4038	GEO
-Multisala Odeon - Pisa - Rete - MikroTik\t10.55.76.1:161\tSNMP
-Multisala Odeon - Pisa - Rete - TMS\t10.55.76.2:161\tSNMP
-Multisala Odeon - Pisa - Sala 1 Venezia - Dolby IMS3000\t10.55.76.10:161\tSNMP
-Multisala Odeon - Pisa - Sala 1 Venezia - Cinemeccanica DPC-80\t10.55.76.12:161\tSNMP
-Multisala Odeon - Pisa - Sala 1 Venezia - Dolby CP750\t10.55.76.14:161\tICMP
-Multisala Odeon - Pisa - Sala 1 Venezia - PC Lucilla	10.55.76.209:161	SNMP
-Multisala Odeon - Pisa - Sala 2 Amalfi - Dolby IMS3000\t10.55.76.20:161\tSNMP
-Multisala Odeon - Pisa - Sala 2 Amalfi - Barco DP2K-19B\t10.55.76.22:161\tSNMP
-Multisala Odeon - Pisa - Sala 2 Amalfi - Dolby CP750\t10.55.76.24:161\tICMP
-Multisala Odeon - Pisa - Sala 3 Pisa - Dolby IMS3000\t10.55.76.30:161\tSNMP
-Multisala Odeon - Pisa - Sala 3 Pisa - Cinemeccanica DPC-80\t10.55.76.32:161\tSNMP
-Multisala Odeon - Pisa - Sala 3 Pisa - Dolby CP750\t10.55.76.34:161\tICMP
-Multisala Odeon - Pisa - Sala 4 Genova - Dolby IMS3000\t10.55.76.40:161\tSNMP
-Multisala Odeon - Pisa - Sala 4 Genova - Barco DP2K-19B\t10.55.76.42:161\tSNMP
-Multisala Odeon - Pisa - Sala 4 Genova - Dolby CP750\t10.55.76.44:161\tICMP
-Multisala Odeon - Pisa - Sala 5 Kinzica - Dolby IMS3000\t10.55.76.50:161\tSNMP
-Multisala Odeon - Pisa - Sala 5 Kinzica - Barco DP2K-8S\t10.55.76.52:161\tSNMP
-Multisala Odeon - Pisa - Sala 5 Kinzica - Dolby CP750\t10.55.76.54:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Scipione Ammirato - Montaione - Coord	43.5526,10.9146	GEO
-Scipione Ammirato - Montaione - Rete - MikroTik\t10.58.76.1:161\tSNMP
-Scipione Ammirato - Montaione - Sala 1 - Doremi DCP2000\t10.58.76.10:161\tSNMP
-Scipione Ammirato - Montaione - Sala 1 - Cinemeccanica CMC4 D2\t10.58.76.12:161\tSNMP
-Scipione Ammirato - Montaione - Sala 1 - Dolby CP650\t10.58.76.14:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Giunti Odeon - Firenze - Coord	43.7710,11.2525	GEO
-Giunti Odeon - Firenze - Rete - MikroTik\t10.58.79.1:161\tSNMP
-Giunti Odeon - Firenze - Sala 1 - Barco DP4K-19B\t10.58.79.12:161\tSNMP
-Giunti Odeon - Firenze - Sala 1 - Barco ICMP\t10.58.79.12:161\tSNMP
-Giunti Odeon - Firenze - Sala 1 - Dolby CP750\t10.58.79.14:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Spazio Alfieri - Firenze - Coord	43.7693,11.2668	GEO
-Spazio Alfieri - Firenze - Rete - MikroTik\t10.58.77.1:161\tSNMP
-Spazio Alfieri - Firenze - Sala 1 - Doremi ShowVault\t10.58.77.10:161\tSNMP
-Spazio Alfieri - Firenze - Sala 1 - Barco DP2K-12C\t10.58.77.12:161\tSNMP
-Spazio Alfieri - Firenze - Sala 1 - JBL CPI2000\t10.58.77.14:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Excelsior - Empoli - Coord	43.7187,10.9479	GEO
-Excelsior - Empoli - Rete - MikroTik\t10.58.75.1:161\tSNMP
-Excelsior - Empoli - Sala 1 - Doremi ShowVault\t10.58.75.10:161\tSNMP
-Excelsior - Empoli - Sala 1 - Barco DP2K-10S\t10.58.75.12:161\tSNMP
-Excelsior - Empoli - Sala 1 - Dolby CP650\t10.58.75.14:161\tICMP
-Excelsior - Empoli - Sala 2 - Doremi DCP2000\t10.58.75.20:161\tSNMP
-Excelsior - Empoli - Sala 2 - NEC NC2000C	10.58.75.22:161	SNMP
-Excelsior - Empoli - Sala 2 - Dolby CP650\t10.58.75.24:161\tICMP
-Excelsior - Empoli - Sala 3 - Doremi ShowVault\t10.58.75.30:161\tSNMP
-Excelsior - Empoli - Sala 3 - Barco DP2K-8S\t10.58.75.32:161\tSNMP
-Excelsior - Empoli - Sala 3 - Dolby CP650\t10.58.75.34:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Nuova Aurora - Sansepolcro - Coord	43.5726,12.1386	GEO
-Nuova Aurora - Sansepolcro - Rete - MikroTik\t10.58.78.1:161\tSNMP
-Nuova Aurora - Sansepolcro - Sala 1 - Doremi ShowVault\t10.58.78.10:161\tSNMP
-Nuova Aurora - Sansepolcro - Sala 1 - Barco DP2K-10SLP\t10.58.78.12:161\tSNMP
-Nuova Aurora - Sansepolcro - Sala 1 - Dolby CP750\t10.58.78.14:161\tICMP
-Nuova Aurora - Sansepolcro - Sala 2 - Barco DP2K-10S\t10.58.78.22:161\tSNMP
-Nuova Aurora - Sansepolcro - Sala 2 - Barco ICMP\t10.58.78.22:161\tSNMP
-Nuova Aurora - Sansepolcro - Sala 2 - Dolby CP750\t10.58.78.24:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Splendor - Massa - Coord	44.0277,10.1055	GEO
-Splendor - Massa - Rete - MikroTik\t10.58.71.1:161\tSNMP
-Splendor - Massa - Sala 01 - Doremi DCP2000\t10.58.71.10:161\tSNMP
-Splendor - Massa - Sala 01 - Cinemeccanica DPC-80\t10.58.71.12:161\tSNMP
-Splendor - Massa - Sala 01 - Dolby CP750\t10.58.71.14:161\tICMP
-Splendor - Massa - Sala 02 - Doremi DCP2000\t10.58.71.20:161\tSNMP
-Splendor - Massa - Sala 02 - Barco DP2K-15C\t10.58.71.22:161\tSNMP
-Splendor - Massa - Sala 02 - Dolby CP750\t10.58.71.24:161\tICMP
-Splendor - Massa - Sala 03 - Dolby IMS3000\t10.58.71.30:161\tSNMP
-Splendor - Massa - Sala 03 - Barco DP2K-15C\t10.58.71.32:161\tSNMP
-Splendor - Massa - Sala 03 - Dolby CP750\t10.58.71.34:161\tICMP
-Splendor - Massa - Sala 04 - Dolby IMS3000\t10.58.71.40:161\tSNMP
-Splendor - Massa - Sala 04 - Barco DP2K-12C\t10.58.71.42:161\tSNMP
-Splendor - Massa - Sala 04 - Dolby CP650\t10.58.71.44:161\tICMP
-Splendor - Massa - Sala 05 - Doremi DCP2000\t10.58.71.50:161\tSNMP
-Splendor - Massa - Sala 05 - Barco DP2K-12C\t10.58.71.52:161\tSNMP
-Splendor - Massa - Sala 05 - Dolby CP750\t10.58.71.54:161\tICMP
-Splendor - Massa - Sala 06 - Dolby IMS3000\t10.58.71.60:161\tSNMP
-Splendor - Massa - Sala 06 - Barco DP2K-20C\t10.58.71.62:161\tSNMP
-Splendor - Massa - Sala 06 - Dolby CP750\t10.58.71.64:161\tICMP
-Splendor - Massa - Sala 07 - Dolby IMS3000\t10.58.71.70:161\tSNMP
-Splendor - Massa - Sala 07 - Barco DP2K-20C\t10.58.71.72:161\tSNMP
-Splendor - Massa - Sala 07 - Dolby CP650\t10.58.71.74:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-4 Mori - Livorno - Coord	43.5510,10.3050	GEO
-4 Mori - Livorno - Rete - MikroTik\t10.58.84.1:161\tSNMP
-4 Mori - Livorno - Sala 1 - Doremi DCP2000\t10.58.84.10:161\tSNMP
-4 Mori - Livorno - Sala 1 - Christie CP2210\t10.58.84.12:161\tSNMP
-4 Mori - Livorno - Sala 1 - Dolby CP650\t10.58.84.14:161\tICMP
-4 Mori - Livorno - Sala 2 - Doremi ShowVault\t10.58.84.20:161\tSNMP
-4 Mori - Livorno - Sala 2 - Barco DP2K-10S\t10.58.84.22:161\tSNMP
-4 Mori - Livorno - Sala 2 - Dolby CP650\t10.58.84.24:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Teatro Giotto - Borgo San Lorenzo - Coord	43.9531,11.3895	GEO
-Teatro Giotto - Borgo San Lorenzo - Rete - MikroTik\t10.58.82.1:161\tSNMP
-Teatro Giotto - Borgo San Lorenzo - Sala 1 - Doremi DCP-2K4\t10.58.82.10:161\tSNMP
-Teatro Giotto - Borgo San Lorenzo - Sala 1 - Barco DP2K-20C\t10.58.82.12:161\tSNMP
-Teatro Giotto - Borgo San Lorenzo - Sala 1 - Dolby CP650\t10.58.82.14:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Centro Pecci - Prato - Coord	43.8613,11.1095	GEO
-Centro Pecci - Prato - Rete - MikroTik\t10.58.81.1:161\tSNMP
-Centro Pecci - Prato - Sala 1 - Barco DP2K-6E\t10.58.81.12:161	SNMP
-Centro Pecci - Prato - Sala 1 - Barco ICMP\t10.58.81.12:161	SNMP
-Centro Pecci - Prato - Sala 1 - Dolby CP750\t10.58.81.14:161\tICMP
-
-// ─────────────────────────────────────────────────────────
-
-Roma AB - Figline e Incisa Valdarno - Coord	43.6220,11.4720	GEO
-Roma AB - Figline e Incisa Valdarno - Rete - MikroTik\t10.56.89.1:161\tSNMP
-Roma AB - Figline e Incisa Valdarno - Sala 1 - Doremi ShowVault\t10.56.89.10:161\tSNMP
-Roma AB - Figline e Incisa Valdarno - Sala 1 - Barco DP2K-20C\t10.56.89.12:161\tSNMP
-Roma AB - Figline e Incisa Valdarno - Sala 1 - Dolby CP750	10.56.89.14:161	ICMP
-
-// ─────────────────────────────────────────────────────────
-
-Goldoni - Viareggio - Coord	43.8682,10.2547	GEO
-Goldoni - Viareggio - Rete - MikroTik	10.58.83.1:161	SNMP
-Goldoni - Viareggio - Sala 1 - Barco SP2K-11S	10.58.83.12:161	SNMP
-Goldoni - Viareggio - Sala 1 - Barco ICMP	10.58.83.12:161	SNMP
-Goldoni - Viareggio - Sala 1 - JBL CPI2000	10.58.83.14:161	ICMP
-Goldoni - Viareggio - Sala 2 - Barco SP2K-9S	10.58.83.22:161	SNMP
-Goldoni - Viareggio - Sala 2 - Barco ICMP	10.58.83.22:161	SNMP
-Goldoni - Viareggio - Sala 2 - JBL CPI2000	10.58.83.24:161	ICMP
-
-// ─────────────────────────────────────────────────────────
-
-Flora - Firenze - Coord	43.7963,11.2410	GEO
-Flora - Firenze - Rete - MikroTik	10.57.55.1:161	SNMP
-Flora - Firenze - Rete - TMS	10.57.55.2:161	SNMP
-Flora - Firenze - Sala 1 - Barco SP2K-9S	10.57.55.12:161	SNMP
-Flora - Firenze - Sala 1 - Barco ICMP	10.57.55.12:161	SNMP
-Flora - Firenze - Sala 1 - Dolby CP950	10.57.55.14:161	ICMP
-Flora - Firenze - Sala 2 - Barco SP2K-7S	10.57.55.22:161	SNMP
-Flora - Firenze - Sala 2 - Barco ICMP	10.57.55.22:161	SNMP
-Flora - Firenze - Sala 2 - Dolby CP950	10.57.55.24:161	ICMP
-Flora - Firenze - Sala 3 - Barco SP2K-7S	10.57.55.32:161	SNMP
-Flora - Firenze - Sala 3 - Barco ICMP	10.57.55.32:161	SNMP
-Flora - Firenze - Sala 3 - Dolby CP950	10.57.55.34:161	ICMP
-Flora - Firenze - Sala 4 - Barco SP2K-9S	10.57.55.42:161	SNMP
-Flora - Firenze - Sala 4 - Barco ICMP	10.57.55.42:161	SNMP
-Flora - Firenze - Sala 4 - Dolby CP950	10.57.55.44:161	ICMP`;
-
-const RAW_NOVPN = `
-Teatro Bucci - San Giovanni in Valdarno - Coord	43.5610,11.5310	GEO
-Puccini - Altopascio - Coord	43.8138,10.6763	GEO
-Puccini - Altopascio - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Puccini - Altopascio - Sala 1 - Barco SP2K-11S	192.168.1.12:161	ICMP
-Puccini - Altopascio - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
-
-CRC Antella - Antella - Coord	43.7272,11.3225	GEO
-CRC Antella - Antella - Sala 1 - Barco DP2K-20C\t192.168.1.134:161\tICMP
-CRC Antella - Antella - Sala 1 - Barco ICMP\t192.168.1.134:161\tICMP
-CRC Antella - Antella - Sala 1 - Dolby CP650\t192.168.1.136:161\tICMP
-
-Eden - Arezzo - Coord	43.4630,11.8820	GEO
-Eden - Arezzo - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Eden - Arezzo - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Eden - Arezzo - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Eden - Arezzo - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
-Eden - Arezzo - Sala 2 - Barco DP2K-8S	192.168.1.22:161	ICMP
-Eden - Arezzo - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-
-Corsini - Barberino di Mugello - Coord	43.9988,11.2388	GEO
-Corsini - Barberino di Mugello - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Corsini - Barberino di Mugello - Sala 1 - Cinemeccanica DPC-80	192.168.1.12:161	ICMP
-Corsini - Barberino di Mugello - Sala 1 - Dolby CP65	192.168.1.14:161	ICMP
-
-Roma - Barga - Coord	44.0756,10.4806	GEO
-Roma - Barga - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Roma - Barga - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Roma - Barga - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-
-Borsalino - Camaiore - Coord	43.9369,10.3010	GEO
-Borsalino - Camaiore - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Borsalino - Camaiore - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Borsalino - Camaiore - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Artè - Capannori - Coord	43.8440,10.5760	GEO
-Artè - Capannori - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Artè - Capannori - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Artè - Capannori - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Flamingo - Capoliveri - Coord	42.7456,10.3785	GEO
-Flamingo - Capoliveri - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Flamingo - Capoliveri - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Flamingo - Capoliveri - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Italia - Castellina in Chianti - Coord	43.4694,11.2840	GEO
-Italia - Castellina in Chianti - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Italia - Castellina in Chianti - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Italia - Castellina in Chianti - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Nuovo Cinema Caporali - Castiglione del Lago - Coord	43.1210,12.0510	GEO
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 1 - Christie IMB-S4	192.168.1.12:161	ICMP
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 1 - Christie CP2411-RBe	192.168.1.12:161	ICMP
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 2 - Christie IMB-S4	192.168.1.22:161	ICMP
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 2 - Christie CP2406-RBe	192.168.1.22:161	ICMP
-Nuovo Cinema Caporali - Castiglione del Lago - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-
-Teatro Signorelli - Cortona - Coord	43.2754,11.9853	GEO
-Teatro Signorelli - Cortona - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Teatro Signorelli - Cortona - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Teatro Signorelli - Cortona - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-
-Astra - Firenze - Coord	43.7713,11.2715	GEO
-Astra - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Astra - Firenze - Sala 1 - Barco DP2K-10SLP	192.168.1.12:161	ICMP
-Astra - Firenze - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
-
-Cinema Castello - Firenze - Coord	43.8080,11.2200	GEO
-Cinema Castello - Firenze - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Cinema Castello - Firenze - Sala 1 - Barco DP2K-12C	192.168.1.12:161	ICMP
-Cinema Castello - Firenze - Sala 1 - Dolby CP65	192.168.1.14:161	ICMP
-Cinema Castello - Firenze - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
-Cinema Castello - Firenze - Sala 2 - Barco DP2K-10S	192.168.1.22:161	ICMP
-Cinema Castello - Firenze - Sala 2 - Dolby CP65	192.168.1.24:161	ICMP
-
-Cinema Marconi - Firenze - Coord	43.7581,11.2850	GEO
-Cinema Marconi - Firenze - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Cinema Marconi - Firenze - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Cinema Marconi - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Cinema Marconi - Firenze - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Cinema Marconi - Firenze - Sala 2 - Proiettore	192.168.1.22:161	ICMP
-Cinema Marconi - Firenze - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-Cinema Marconi - Firenze - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Cinema Marconi - Firenze - Sala 3 - Proiettore	192.168.1.32:161	ICMP
-Cinema Marconi - Firenze - Sala 3 - Dolby CP750	192.168.1.34:161	ICMP
-
-Cinema Odeon - Firenze - Coord	43.7710,11.2525	GEO
-Cinema Odeon - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Cinema Odeon - Firenze - Sala 1 - Barco DP4K-19B	192.168.1.12:161	ICMP
-Cinema Odeon - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Everest - Firenze - Coord	43.7363,11.2227	GEO
-Everest - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Everest - Firenze - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Everest - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Fiamma - Firenze - Coord	43.7831,11.2715	GEO
-Fiamma - Firenze - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Fiamma - Firenze - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Fiamma - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Fiamma - Firenze - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Fiamma - Firenze - Sala 2 - Proiettore	192.168.1.22:161	ICMP
-Fiamma - Firenze - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-
-Flora - Firenze - Coord	43.7963,11.2410	GEO
-Flora - Firenze - Sala 1 - Server	192.168.1.10:161	ICMP
-Flora - Firenze - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Flora - Firenze - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
-Flora - Firenze - Sala 2 - Server	192.168.1.20:161	ICMP
-Flora - Firenze - Sala 2 - Proiettore	192.168.1.22:161	ICMP
-Flora - Firenze - Sala 2 - Processore Audio	192.168.1.24:161	ICMP
-Flora - Firenze - Sala 3 - Server	192.168.1.30:161	ICMP
-Flora - Firenze - Sala 3 - Proiettore	192.168.1.32:161	ICMP
-Flora - Firenze - Sala 3 - Processore Audio	192.168.1.34:161	ICMP
-Flora - Firenze - Sala 4 - Server	192.168.1.40:161	ICMP
-Flora - Firenze - Sala 4 - Proiettore	192.168.1.42:161	ICMP
-Flora - Firenze - Sala 4 - Processore Audio	192.168.1.44:161	ICMP
-
-Il Portico - Firenze - Coord	43.7745,11.2780	GEO
-Il Portico - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Il Portico - Firenze - Sala 1 - Barco SP4K-12B	192.168.1.12:161	ICMP
-Il Portico - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Il Portico - Firenze - Sala 2 - Doremi DCP2000	192.168.1.20:161	ICMP
-Il Portico - Firenze - Sala 2 - Barco DP2K-15C	192.168.1.22:161	ICMP
-Il Portico - Firenze - Sala 2 - Dolby CP65	192.168.1.24:161	ICMP
-
-Principe - Firenze - Coord	43.7825,11.2628	GEO
-Principe - Firenze - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Principe - Firenze - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Principe - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Principe - Firenze - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Principe - Firenze - Sala 2 - Proiettore	192.168.1.22:161	ICMP
-Principe - Firenze - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-
-Sala Esse - Firenze - Coord	43.7688,11.2763	GEO
-Sala Esse - Firenze - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Sala Esse - Firenze - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Sala Esse - Firenze - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-
-Don Otello Puccetti - Firenzuola - Coord	44.1188,11.3780	GEO
-Don Otello Puccetti - Firenzuola - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Don Otello Puccetti - Firenzuola - Sala 1 - Barco DP2K-12C	192.168.1.12:161	ICMP
-Don Otello Puccetti - Firenzuola - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
-
-Puccini - Fornaci di Barga - Coord	44.0456,10.4785	GEO
-Puccini - Fornaci di Barga - Sala 1 - Doremi DCP2000	192.168.1.10:161	ICMP
-Puccini - Fornaci di Barga - Sala 1 - Cinemeccanica DPC-80	192.168.1.12:161	ICMP
-Puccini - Fornaci di Barga - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-
-Nuovo Lido - Forte dei Marmi - Coord	43.9556,10.1695	GEO
-Nuovo Lido - Forte dei Marmi - Sala 1 - Doremi DCP2000	192.168.1.10:161	ICMP
-Nuovo Lido - Forte dei Marmi - Sala 1 - Barco DP2000	192.168.1.12:161	ICMP
-Nuovo Lido - Forte dei Marmi - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-Nuovo Lido - Forte dei Marmi - Sala 2 - Barco ICMP	192.168.1.20:161	ICMP
-Nuovo Lido - Forte dei Marmi - Sala 2 - Barco DP2K-15C	192.168.1.22:161	ICMP
-Nuovo Lido - Forte dei Marmi - Sala 2 - Dolby CP650	192.168.1.24:161	ICMP
-
-Teatro Pacini - Fucecchio - Coord	43.7263,10.8088	GEO
-Teatro Pacini - Fucecchio - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Teatro Pacini - Fucecchio - Sala 1 - Barco SP2K-11S	192.168.1.12:161	ICMP
-Teatro Pacini - Fucecchio - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Teatro Boito - Greve in Chianti - Coord	43.5831,11.3189	GEO
-Teatro Boito - Greve in Chianti - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Teatro Boito - Greve in Chianti - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Teatro Boito - Greve in Chianti - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Florentia - Larderello - Coord	43.2394,10.8875	GEO
-Florentia - Larderello - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Florentia - Larderello - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Florentia - Larderello - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Teatro delle Arti - Lastra a Signa - Coord	43.7618,11.1077	GEO
-Teatro delle Arti - Lastra a Signa - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Teatro delle Arti - Lastra a Signa - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Teatro delle Arti - Lastra a Signa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-La Gran Guardia - Livorno - Coord	43.5513,10.3113	GEO
-La Gran Guardia - Livorno - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-La Gran Guardia - Livorno - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-La Gran Guardia - Livorno - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-La Gran Guardia - Livorno - Sala 2 - Barco ICMP	192.168.1.20:161	ICMP
-La Gran Guardia - Livorno - Sala 2 - Barco DP2K-20C	192.168.1.22:161	ICMP
-La Gran Guardia - Livorno - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-
-Teatro dei Servi - Massa - Coord	44.0397,10.1426	GEO
-Teatro dei Servi - Massa - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Teatro dei Servi - Massa - Sala 1 - Barco SP2K-9S	192.168.1.12:161	ICMP
-Teatro dei Servi - Massa - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
-
-Teatro Verdi - Monte San Savino - Coord	43.3290,11.7230	GEO
-Teatro Verdi - Monte San Savino - Sala 1 - Barco DP2K-8S\t192.168.1.134:161\tICMP
-Teatro Verdi - Monte San Savino - Sala 1 - Cinemeccanica Cinecloud\t192.168.1.10:161\tICMP
-Teatro Verdi - Monte San Savino - Sala 1 - Dolby CP45\t192.168.1.136:161\tICMP
-
-Cinema Excelsior - Montecatini Terme - Coord	43.8846,10.7734	GEO
-Cinema Excelsior - Montecatini Terme - Sala 1 - Dolby IMS3000	192.168.1.10:161	ICMP
-Cinema Excelsior - Montecatini Terme - Sala 1 - Barco DP4K-32B	192.168.1.12:161	ICMP
-Cinema Excelsior - Montecatini Terme - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-Cinema Excelsior - Montecatini Terme - Sala 2 - Doremi DCP2000	192.168.1.20:161	ICMP
-Cinema Excelsior - Montecatini Terme - Sala 2 - Barco DP2K-20C	192.168.1.22:161	ICMP
-Cinema Excelsior - Montecatini Terme - Sala 2 - Dolby CP950	192.168.1.24:161	ICMP
-
-Cine8 - Montevarchi - Coord	43.5363,11.5628	GEO
-Cine8 - Montevarchi - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Cine8 - Montevarchi - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Cine8 - Montevarchi - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
-Cine8 - Montevarchi - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Cine8 - Montevarchi - Sala 2 - Proiettore	192.168.1.22:161	ICMP
-Cine8 - Montevarchi - Sala 2 - Processore Audio	192.168.1.24:161	ICMP
-Cine8 - Montevarchi - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Cine8 - Montevarchi - Sala 3 - Proiettore	192.168.1.32:161	ICMP
-Cine8 - Montevarchi - Sala 3 - Processore Audio	192.168.1.34:161	ICMP
-Cine8 - Montevarchi - Sala 4 - Qube XP-D	192.168.1.40:161	ICMP
-Cine8 - Montevarchi - Sala 4 - Proiettore	192.168.1.42:161	ICMP
-Cine8 - Montevarchi - Sala 4 - Processore Audio	192.168.1.44:161	ICMP
-Cine8 - Montevarchi - Sala 5 - Qube XP-D	192.168.1.50:161	ICMP
-Cine8 - Montevarchi - Sala 5 - Proiettore	192.168.1.52:161	ICMP
-Cine8 - Montevarchi - Sala 5 - Processore Audio	192.168.1.54:161	ICMP
-Cine8 - Montevarchi - Sala 6 - Qube XP-D	192.168.1.60:161	ICMP
-Cine8 - Montevarchi - Sala 6 - Proiettore	192.168.1.62:161	ICMP
-Cine8 - Montevarchi - Sala 6 - Processore Audio	192.168.1.64:161	ICMP
-Cine8 - Montevarchi - Sala 7 - Qube XP-D	192.168.1.70:161	ICMP
-Cine8 - Montevarchi - Sala 7 - Proiettore	192.168.1.72:161	ICMP
-Cine8 - Montevarchi - Sala 7 - Processore Audio	192.168.1.74:161	ICMP
-Cine8 - Montevarchi - Sala 8 - Qube XP-D	192.168.1.80:161	ICMP
-Cine8 - Montevarchi - Sala 8 - Proiettore	192.168.1.82:161	ICMP
-Cine8 - Montevarchi - Sala 8 - Processore Audio	192.168.1.84:161	ICMP
-
-Comunale - Pietrasanta - Coord	43.9575,10.2305	GEO
-Comunale - Pietrasanta - Sala 1 - Doremi DCP-2K4	192.168.1.10:161	ICMP
-Comunale - Pietrasanta - Sala 1 - Cinemeccanica DPC-80	192.168.1.12:161	ICMP
-Comunale - Pietrasanta - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Cinema Metropolitan - Piombino - Coord	42.9240,10.5310	GEO
-Cinema Metropolitan - Piombino - Sala 1 - Doremi DCP2000	192.168.1.10:161	ICMP
-Cinema Metropolitan - Piombino - Sala 1 - Cinemeccanica DPC-80	192.168.1.12:161	ICMP
-Cinema Metropolitan - Piombino - Sala 1 - Dolby CP55	192.168.1.14:161	ICMP
-
-Arno - Pisa - Coord	43.7106,10.3865	GEO
-Arno - Pisa - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Arno - Pisa - Sala 1 - Barco DP2K-12C	192.168.1.12:161	ICMP
-Arno - Pisa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Arsenale - Pisa - Coord	43.7138,10.4035	GEO
-Arsenale - Pisa - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Arsenale - Pisa - Sala 1 - Christie CP2210	192.168.1.12:161	ICMP
-Arsenale - Pisa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Caffè Lanteri - Pisa - Coord	43.7140,10.4200	GEO
-Caffè Lanteri - Pisa - Sala 1 - Christie IMB-S4	192.168.1.12:161	ICMP
-Caffè Lanteri - Pisa - Sala 1 - Christie CP2411-RBe	192.168.1.12:161	ICMP
-Caffè Lanteri - Pisa - Sala 1 - JBL CPI2000	192.168.1.14:161	ICMP
-
-Lux - Pistoia - Coord	43.9313,10.9138	GEO
-Lux - Pistoia - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Lux - Pistoia - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Lux - Pistoia - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Lux - Pistoia - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Lux - Pistoia - Sala 2 - Proiettore	192.168.1.22:161	ICMP
-Lux - Pistoia - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-Lux - Pistoia - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Lux - Pistoia - Sala 3 - Proiettore	192.168.1.32:161	ICMP
-Lux - Pistoia - Sala 3 - Dolby CP750	192.168.1.34:161	ICMP
-Lux - Pistoia - Sala 4 - Qube XP-D	192.168.1.40:161	ICMP
-Lux - Pistoia - Sala 4 - Proiettore	192.168.1.42:161	ICMP
-Lux - Pistoia - Sala 4 - Dolby CP650	192.168.1.44:161	ICMP
-
-Accademia - Pontassieve - Coord	43.7744,11.4400	GEO
-Accademia - Pontassieve - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Accademia - Pontassieve - Sala 1 - Barco DP2K-19B	192.168.1.12:161	ICMP
-Accademia - Pontassieve - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Agorà - Pontedera - Coord	43.6640,10.6370	GEO
-Agorà - Pontedera - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Agorà - Pontedera - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Agorà - Pontedera - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-
-Nello Santi - Portoferraio - Coord	42.8163,10.3313	GEO
-Nello Santi - Portoferraio - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Nello Santi - Portoferraio - Sala 1 - Barco DP2K-19B	192.168.1.12:161	ICMP
-Nello Santi - Portoferraio - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
-
-Cinema Eden - Prato - Coord	43.8800,11.0960	GEO
-Cinema Eden - Prato - Sala 1 - Doremi DCP2000	192.168.1.10:161	ICMP
-Cinema Eden - Prato - Sala 1 - Barco DP2000	192.168.1.12:161	ICMP
-Cinema Eden - Prato - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Cinema Eden - Prato - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
-Cinema Eden - Prato - Sala 2 - Barco DP2K-10S	192.168.1.22:161	ICMP
-Cinema Eden - Prato - Sala 2 - Dolby CP65	192.168.1.24:161	ICMP
-Cinema Eden - Prato - Sala 3 - Doremi ShowVault	192.168.1.30:161	ICMP
-Cinema Eden - Prato - Sala 3 - Barco DP2K-10S	192.168.1.32:161	ICMP
-Cinema Eden - Prato - Sala 3 - Dolby CP65	192.168.1.34:161	ICMP
-
-Terminale - Prato - Coord	43.8769,11.0955	GEO
-Terminale - Prato - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Terminale - Prato - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Terminale - Prato - Sala 1 - Dolby CP55	192.168.1.14:161	ICMP
-
-Misericordia - Radda in Chianti - Coord	43.4876,11.3758	GEO
-Misericordia - Radda in Chianti - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Misericordia - Radda in Chianti - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Misericordia - Radda in Chianti - Sala 1 - Dolby CP65	192.168.1.14:161	ICMP
-
-Cinema Excelsior - Reggello - Coord	43.6870,11.5370	GEO
-Cinema Excelsior - Reggello - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Cinema Excelsior - Reggello - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Cinema Excelsior - Reggello - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Barco SP4K-15B\t192.168.1.134:161\tICMP
-Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Barco ICMP\t192.168.1.134:161\tICMP
-Teatro Bucci - San Giovanni in Valdarno - Sala 1 - Dolby CP950\t192.168.1.136:161\tICMP
-
-Cinema Verdi - San Vincenzo - Coord	43.1030,10.5390	GEO
-Cinema Verdi - San Vincenzo - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Cinema Verdi - San Vincenzo - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Cinema Verdi - San Vincenzo - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Lami - Santa Croce sull'Arno - Coord	43.7088,10.7788	GEO
-Lami - Santa Croce sull'Arno - Sala 1 - Qube XP-D	192.168.1.10:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 1 - Proiettore	192.168.1.12:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 2 - Qube XP-D	192.168.1.20:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 2 - Proiettore	192.168.1.22:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 2 - Processore Audio	192.168.1.24:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 3 - Qube XP-D	192.168.1.30:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 3 - Proiettore	192.168.1.32:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 3 - Processore Audio	192.168.1.34:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 4 - Qube XP-D	192.168.1.40:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 4 - Proiettore	192.168.1.42:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 4 - Processore Audio	192.168.1.44:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 5 - Qube XP-D	192.168.1.50:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 5 - Proiettore	192.168.1.52:161	ICMP
-Lami - Santa Croce sull'Arno - Sala 5 - Processore Audio	192.168.1.54:161	ICMP
-
-Cabiria - Scandicci - Coord	43.7540,11.1820	GEO
-Cabiria - Scandicci - Sala 1 - Doremi DCP-2K4	192.168.1.10:161	ICMP
-Cabiria - Scandicci - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Cabiria - Scandicci - Sala 1 - JBL CPI2000	192.168.1.14:161	ICMP
-Cabiria - Scandicci - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
-Cabiria - Scandicci - Sala 2 - Barco DP2K-10S	192.168.1.22:161	ICMP
-Cabiria - Scandicci - Sala 2 - Dolby CP45	192.168.1.24:161	ICMP
-
-Cinema Garibaldi - Scarperia e San Piero - Coord	43.9950,11.3557	GEO
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Cinemeccanica CMC4	192.168.1.10:161	ICMP
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Barco DP2000	192.168.1.12:161	ICMP
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Dolby CP45	192.168.1.14:161	ICMP
-
-Scuderie Granducali - Seravezza - Coord	43.9940,10.2200	GEO
-Scuderie Granducali - Seravezza - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Scuderie Granducali - Seravezza - Sala 1 - Barco DP2K-6E	192.168.1.12:161	ICMP
-Scuderie Granducali - Seravezza - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Metropolitan - Siena - Coord	43.3204,11.3285	GEO
-Metropolitan - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Metropolitan - Siena - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Metropolitan - Siena - Sala 1 - Dolby CP65	192.168.1.14:161	ICMP
-
-Pendola - Siena - Coord	43.3138,11.3288	GEO
-Pendola - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Pendola - Siena - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Pendola - Siena - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-
-Cinema Centrale - Viareggio - Coord	43.8676,10.2487	GEO
-Cinema Centrale - Viareggio - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Cinema Centrale - Viareggio - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Cinema Centrale - Viareggio - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Città di Villafranca - Villafranca in Lunigiana - Coord	44.2940,9.9490	GEO
-Città di Villafranca - Villafranca in Lunigiana - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Città di Villafranca - Villafranca in Lunigiana - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Città di Villafranca - Villafranca in Lunigiana - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Centrale - Volterra - Coord	43.4019,10.8615	GEO
-Centrale - Volterra - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Centrale - Volterra - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Centrale - Volterra - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-Centrale - Volterra - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
-Centrale - Volterra - Sala 2 - Barco DP2K-20C	192.168.1.22:161	ICMP
-Centrale - Volterra - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
-
-Teatro delle Arti - Lastra a Signa - Coord	43.769211802783055,11.106375036015722	GEO
-Teatro delle Arti - Lastra a Signa - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Teatro delle Arti - Lastra a Signa - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Teatro delle Arti - Lastra a Signa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-25hours Hotel - Firenze - Coord	43.7712,11.2490	GEO
-25hours Hotel - Firenze - Sala 1 - Barco DP2K-6E	192.168.1.10:161	ICMP
-25hours Hotel - Firenze - Sala 1 - Barco Alchemy	192.168.1.12:161	ICMP
-25hours Hotel - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-La Compagnia - Firenze - Coord	43.7788,11.2591	GEO
-La Compagnia - Firenze - Sala 1 - Barco DP4K-B	192.168.1.10:161	ICMP
-La Compagnia - Firenze - Sala 1 - Barco Alchemy	192.168.1.12:161	ICMP
-La Compagnia - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-`;
-
-const RAW_ESTIVI = `
-Flog - Firenze - Coord	43.7930,11.2460	GEO
-Flog - Firenze - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Flog - Firenze - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-
-Rocca del Leone - Castiglione del Lago - Coord	43.1276,12.0556	GEO
-Rocca del Leone - Castiglione del Lago - Sala 1 - Doremi DCP2000	192.168.1.10:161	ICMP
-Rocca del Leone - Castiglione del Lago - Sala 1 - Barco DP2K-12C	192.168.1.12:161	ICMP
-Rocca del Leone - Castiglione del Lago - Sala 1 - Mixer Amplificato	192.168.1.14:161	ICMP
-
-Cinema Estivo - Scarperia e San Piero - Coord	43.9937,11.3533	GEO
-Cinema Estivo - Scarperia e San Piero - Sala 1 - Proiettore Acer	192.168.1.10:161	ICMP
-Cinema Estivo - Scarperia e San Piero - Sala 1 - Blu-ray Denon	192.168.1.12:161	ICMP
-Cinema Estivo - Scarperia e San Piero - Sala 1 - Mixer Amplificato	192.168.1.14:161	ICMP
-
-Cinema Chiardiluna - Firenze - Coord	43.7697,11.2345	GEO
-Cinema Chiardiluna - Firenze - Sala 1 - Doremi DCP-2K4	192.168.1.10:161	ICMP
-Cinema Chiardiluna - Firenze - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Cinema Chiardiluna - Firenze - Sala 1 - JBL CPI2000	192.168.1.14:161	ICMP
-Cinema Chiardiluna - Firenze - Sala 2 - Doremi DCP-2K4	192.168.1.20:161	ICMP
-Cinema Chiardiluna - Firenze - Sala 2 - Barco DP2K-15C	192.168.1.22:161	ICMP
-
-Cinema Estivo Roma - Pisa - Coord	43.7260,10.3976	GEO
-Cinema Estivo Roma - Pisa - Sala 1 - Cinemeccanica CMC4	192.168.1.10:161	ICMP
-Cinema Estivo Roma - Pisa - Sala 1 - Doremi ShowVault	192.168.1.12:161	ICMP
-Cinema Estivo Roma - Pisa - Sala 2 - Barco DP2K-12C	192.168.1.20:161	ICMP
-Cinema Estivo Roma - Pisa - Sala 2 - Doremi DCP2000	192.168.1.22:161	ICMP
-Cinema Estivo Roma - Pisa - Sala 2 - Mixer Amplificato	192.168.1.24:161	ICMP
-
-Arena Estiva Castello - Firenze - Coord	43.8080,11.2200	GEO
-Arena Estiva Castello - Firenze - Giardino - Doremi ShowVault	192.168.1.10:161	ICMP
-Arena Estiva Castello - Firenze - Giardino - Barco DP2K-12C	192.168.1.12:161	ICMP
-Arena Estiva Castello - Firenze - Giardino - Mixer Amplificato	192.168.1.14:161	ICMP
-
-Arena Estiva - Lastra a Signa - Coord	43.7618,11.1077	GEO
-
-Castello dell'Imperatore - Prato - Coord	43.8800,11.0940	GEO
-Castello dell'Imperatore - Prato - Arena - Doremi ShowVault	192.168.1.10:161	ICMP
-Castello dell'Imperatore - Prato - Arena - Barco DP2K-15C	192.168.1.12:161	ICMP
-Castello dell'Imperatore - Prato - Arena - Dolby CP55	192.168.1.14:161	ICMP
-
-Cinema Castello - Castiglione della Pescaia - Coord	42.7610,10.8800	GEO
-Cinema Castello - Castiglione della Pescaia - Arena - Barco DP2K-10S	192.168.1.10:161	ICMP
-Cinema Castello - Castiglione della Pescaia - Arena - Barco ICMP	192.168.1.12:161	ICMP
-Cinema Castello - Castiglione della Pescaia - Arena - Mixer Amplificato	192.168.1.14:161	ICMP
-
-Cinema Estivo - Montespertoli - Coord	43.6426,11.0733	GEO
-Cinema Estivo - Montespertoli - Giardino - Barco DP2K-10S	192.168.1.10:161	ICMP
-Cinema Estivo - Montespertoli - Giardino - Barco ICMP	192.168.1.12:161	ICMP
-Cinema Estivo - Montespertoli - Giardino - Mixer Amplificato	192.168.1.14:161	ICMP
-
-Arena Pitti - Firenze - Coord	43.7654,11.2497	GEO
-Arena Pitti - Firenze - Piazza - Videoproiettore digitale	192.168.1.10:161	ICMP
-Arena Pitti - Firenze - Piazza - Mixer Amplificato	192.168.1.12:161	ICMP
-
-Cinema sotto le stelle - Sansepolcro - Coord	43.5726,12.1386	GEO
-Cinema sotto le stelle - Sansepolcro - Chiostro - Barco DP2K-10S	192.168.1.10:161	ICMP
-Cinema sotto le stelle - Sansepolcro - Chiostro - Dolby CP750	192.168.1.12:161	ICMP
-
-Arena Ardenza - Livorno - Coord	43.5270,10.3010	GEO
-
-Arena Fabbricotti - Livorno - Coord	43.5540,10.3080	GEO
-
-Arena Estiva Eden - Arezzo - Coord	43.4630,11.8820	GEO
-Arena Estiva Eden - Arezzo - Giardino - Doremi ShowVault	192.168.1.10:161	ICMP
-Arena Estiva Eden - Arezzo - Giardino - Barco DP2K-15C	192.168.1.12:161	ICMP
-Arena Estiva Eden - Arezzo - Giardino - Dolby CP750	192.168.1.14:161	ICMP
-
-Arena Stadio - Siena - Coord	43.3120,11.3175	GEO
-Arena Stadio - Siena - Stadio - Doremi ShowVault	192.168.1.10:161	ICMP
-Arena Stadio - Siena - Stadio - Barco DP2K-20C	192.168.1.12:161	ICMP
-Arena Stadio - Siena - Stadio - Dolby CP650	192.168.1.14:161	ICMP
-
-Cinema nel Parco Villa Renatico Martini - Monsummano Terme - Coord	43.8692,10.8146	GEO
-Cinema nel Parco Villa Renatico Martini - Monsummano Terme - Arena - Cinemeccanica CMC4	192.168.1.10:161	ICMP
-Cinema nel Parco Villa Renatico Martini - Monsummano Terme - Arena - Doremi DCP2000	192.168.1.12:161	ICMP
-
-Cinema Estivo Cinquale - Montignoso - Coord	43.9790,10.1422	GEO
-Cinema Estivo Cinquale - Montignoso - Arena - Barco DP2K-10S	192.168.1.10:161	ICMP
-Cinema Estivo Cinquale - Montignoso - Arena - Barco ICMP	192.168.1.12:161	ICMP
-Cinema Estivo Cinquale - Montignoso - Arena - Mixer Amplificato	192.168.1.14:161	ICMP
-
-Cinema sotto le stelle - Pontedera - Coord	43.6614,10.6307	GEO
-Cinema sotto le stelle - Pontedera - Arena - Doremi ShowVault	192.168.1.10:161	ICMP
-Cinema sotto le stelle - Pontedera - Arena - Barco DP2K-20C	192.168.1.12:161	ICMP
-Cinema sotto le stelle - Pontedera - Arena - Dolby CP650	192.168.1.14:161	ICMP
-
-Cinema nel Chiostro - Firenze - Coord	43.7793,11.2463	GEO
-Cinema nel Chiostro - Firenze - Arena - Doremi ShowVault	192.168.1.10:161	ICMP
-Cinema nel Chiostro - Firenze - Arena - Barco DP2K-12C	192.168.1.12:161	ICMP
-Cinema nel Chiostro - Firenze - Arena - JBL CPI2000	192.168.1.14:161	ICMP
-
-Arena Dentro Le Mura - San Casciano in Val di Pesa - Coord	43.6598,11.1849	GEO
-Arena Dentro Le Mura - San Casciano in Val di Pesa - Arena - Barco DP2K-15C	192.168.1.10:161	ICMP
-Arena Dentro Le Mura - San Casciano in Val di Pesa - Arena - Doremi DCP2000	192.168.1.12:161	ICMP
-Arena Dentro Le Mura - San Casciano in Val di Pesa - Arena - Mixer Amplificato	192.168.1.14:161	ICMP
-
-Arena Estiva - Chiusi - Coord	43.0019,11.9550	GEO
-Arena Estiva - Chiusi - Arena - Doremi DCP2000	192.168.1.10:161	ICMP
-Arena Estiva - Chiusi - Arena - Barco DP2K-20C	192.168.1.12:161	ICMP
-Arena Estiva - Chiusi - Arena - Dolby CP650	192.168.1.14:161	ICMP
-Arena Estiva - Chiusi - Arena - Barco DP2K-10S	192.168.1.16:161	ICMP
-
-Arena Estiva - Chianciano Terme - Coord	43.0418,11.8121	GEO
-Arena Estiva - Chianciano Terme - Arena - Doremi ShowVault	192.168.1.10:161	ICMP
-Arena Estiva - Chianciano Terme - Arena - Barco DP2K-10S	192.168.1.12:161	ICMP
-Arena Estiva - Chianciano Terme - Arena - Dolby CP650	192.168.1.14:161	ICMP
-
-Tassignano Artemisia - Capannori - Coord	43.8270,10.5840	GEO
-Tassignano Artemisia - Capannori - Arena - Barco DP2K-10S	192.168.1.10:161	ICMP
-
-Arena Estiva - Poggio a Caiano - Coord	43.8155,11.0583	GEO
-
-Schermo Quinto Martini - Seano - Coord	43.8308,11.0211	GEO
-
-La Meta - Livorno - Coord	43.5242,10.3164	GEO
-La Meta - Livorno - Arena - Doremi ShowVault	192.168.1.10:161	ICMP
-La Meta - Livorno - Arena - Barco DP2K-10S	192.168.1.12:161	ICMP
-La Meta - Livorno - Arena - Dolby CP65	192.168.1.14:161	ICMP
-
-Cinema Estivo - Pistoia - Coord	43.9371,10.9126	GEO
-`;
+const RAW_ESTIVI = SIGRA_RAW.estivi;
 
 // ── PALETTE ───────────────────────────────────────────────────
 // 15 colori distinti e vividi — un colore unico per ogni cinema fino a 15
@@ -1350,7 +627,27 @@ function esc(s) {
 
 const IP_RE = /^\d{1,3}(\.\d{1,3}){3}(:\d+)?$/;
 
-function parseRaw(raw) {
+// ── IDENTITÀ ──────────────────────────────────────────────────
+// Un cinema non è identificato dal solo nome: ci sono omonimi in città
+// diverse (Italia a Soci e a Castellina in Chianti, Puccini ad Altopascio e
+// a Fornaci di Barga, Cinema Castello a Firenze e a Castiglione della
+// Pescaia...). Chiave = nome + città, sempre.
+// La rete fa parte della chiave: lo stesso cinema può comparire in due
+// blocchi dati (Flora a Firenze è sia in VPN sia fra gli offline), e i due
+// elenchi di dispositivi non vanno mescolati.
+function cinemaKey(c) { return c.name + '|' + c.city + (c.net ? '|' + c.net : ''); }
+
+// Un dispositivo non è identificato dal solo IP: le reti locali dei cinema
+// offline ed estivi riusano gli stessi indirizzi ovunque (192.168.1.10
+// compare in 77 cinema diversi). Chiave = cinema + città + IP, altrimenti
+// un ping colora i pallini di decine di cinema sbagliati.
+function devKey(c, ip) { return cinemaKey(c) + '|' + ip; }
+
+// Porta su cui ha senso tentare il probe HTTP: i TMS espongono la loro UI
+// sulla 9000, tutto il resto sulla 80.
+function probePort(label) { return devType(label)[0] === 'tms' ? '9000' : ''; }
+
+function parseRaw(raw, net) {
   const cinemas = {};
   raw.split('\n').forEach(line => {
     line = line.trim();
@@ -1363,7 +660,7 @@ function parseRaw(raw) {
       const name = parts[0].trim();
       const city = parts[1].trim().replace(/\s*-\s*[A-Z]{2}$/,'').trim();
       const key  = name + '|||' + city;
-      if (!cinemas[key]) cinemas[key] = { name, city, rooms:{} };
+      if (!cinemas[key]) cinemas[key] = { name, city, net, rooms:{} };
       const [lat, lng] = (cols[1]||'').split(',').map(Number);
       if (!isNaN(lat) && !isNaN(lng)) cinemas[key].coords = [lat, lng];
       return;
@@ -1372,8 +669,12 @@ function parseRaw(raw) {
       console.warn('parseRaw: riga ignorata (manca IP):', line);
       return;
     }
-    const full  = cols[0];
-    const ip    = cols[1].trim().replace(/:\d+$/,'');
+    const full   = cols[0];
+    const ipPort = cols[1].trim();
+    const ip     = ipPort.replace(/:\d+$/,'');
+    // La porta scritta nei dati è quella del monitoraggio SNMP (161/UDP):
+    // la conserviamo solo come informazione, non ci si può fare un probe HTTP.
+    const snmpPort = (ipPort.match(/:(\d+)$/) || [])[1] || '';
     const parts = full.split(' - ');
     if (parts.length < 2) return;
     const name = parts[0].trim();
@@ -1381,9 +682,9 @@ function parseRaw(raw) {
     const room = (parts[2] ? parts[2].trim() : 'Dispositivi').replace(/^(Sala)\s+0*(\d+)$/, '$1 $2');
     const dev  = parts.slice(3).join(' - ').trim() || 'Unità';
     const key  = name + '|||' + city;
-    if (!cinemas[key]) cinemas[key] = { name, city, rooms:{} };
+    if (!cinemas[key]) cinemas[key] = { name, city, net, rooms:{} };
     if (!cinemas[key].rooms[room]) cinemas[key].rooms[room] = [];
-    cinemas[key].rooms[room].push({ label:dev, ip });
+    cinemas[key].rooms[room].push({ label:dev, ip, snmpPort, cinema:name, city });
   });
   const result = Object.values(cinemas).sort((a,b) => a.city.localeCompare(b.city));
   result.forEach(c => Object.keys(c.rooms).forEach(r => {
@@ -1529,29 +830,34 @@ function getModelImage(label) {
 
 // ── DATI PARSATI (una volta sola, all'avvio) ─────────────────
 const DATA = {
-  vpn:     parseRaw(RAW),
-  offline: parseRaw(RAW_NOVPN),
-  estivi:  parseRaw(RAW_ESTIVI),
+  vpn:     parseRaw(RAW,        'vpn'),
+  offline: parseRaw(RAW_NOVPN,  'offline'),
+  estivi:  parseRaw(RAW_ESTIVI, 'estivi'),
 };
-// IP unici dei cinema VPN: base del contatore globale online/offline
-const VPN_IPS = new Set(
-  DATA.vpn.flatMap(c => Object.values(c.rooms).flat().map(d => d.ip))
+const ALL_CINEMAS = [...DATA.vpn, ...DATA.offline, ...DATA.estivi];
+// I colori si assegnano una volta sola su tutti i cinema: così lo stesso
+// cinema ha lo stesso colore in vista Cinema, Per tipo e Mappa.
+initColors(ALL_CINEMAS);
+// Dispositivi dei cinema VPN: base del contatore globale online/offline
+const VPN_KEYS = new Set(
+  DATA.vpn.flatMap(c => Object.values(c.rooms).flat().map(d => devKey(c, d.ip)))
 );
 
 // ── PING ─────────────────────────────────────────────────────
-const pingStatusMap = {};
+const pingState = {};   // chiave dispositivo → 'ok' | 'err' | 'checking'
+const pingMs    = {};   // chiave dispositivo → latenza dell'ultima risposta
 
 function updateGlobalStatus() {
-  // Conta solo gli IP dei cinema VPN: pingStatusMap può contenere anche
-  // IP pingati manualmente nelle viste estivi/tutti
+  // Conta solo i dispositivi dei cinema VPN: pingState può contenere anche
+  // dispositivi pingati a mano nelle viste estivi/tutti
   let online = 0, offline = 0, checking = 0;
-  VPN_IPS.forEach(ip => {
-    const s = pingStatusMap[ip];
+  VPN_KEYS.forEach(k => {
+    const s = pingState[k];
     if (s === 'ok') online++;
     else if (s === 'err') offline++;
     else if (s === 'checking') checking++;
   });
-  const unknown = VPN_IPS.size - online - offline - checking;
+  const unknown = VPN_KEYS.size - online - offline - checking;
   const onEl  = document.getElementById('gs-online-count');
   const offEl = document.getElementById('gs-offline-count');
   const unkEl = document.getElementById('gs-unknown-count');
@@ -1560,70 +866,179 @@ function updateGlobalStatus() {
   if(unkEl) unkEl.textContent = unknown;
 }
 
-async function pingDevice(ip, port) {
-  const prev = pingStatusMap[ip];
-  pingStatusMap[ip] = 'checking';
-  updateGlobalStatus();
-  // Aggiorna TUTTI i pallini con questo IP (header + body sincronizzati)
-  document.querySelectorAll(`[data-ip="${ip}"]`).forEach(d => {
-    d.className = d.className.split(' ')
-      .filter(c => !['ok','err','checking'].includes(c)).join(' ') + ' checking';
+// Applica uno stato a tutti i pallini dello stesso dispositivo (lo stesso
+// dispositivo compare nella card, nell'header del cinema, nel popup mappa e
+// nella vista Per tipo): la chiave è cinema+IP, non l'IP.
+function setDotState(pk, state, title) {
+  document.querySelectorAll(`[data-pk="${CSS.escape(pk)}"]`).forEach(d => {
+    d.classList.remove('ok','err','checking');
+    if (state) d.classList.add(state);
+    if (title) d.title = title;
   });
+}
+
+const PING_TIMEOUT = 3000;
+
+async function pingDevice(pk, ip, port) {
+  if (!pk || !ip) return false;
+  const prev = pingState[pk];
+  pingState[pk] = 'checking';
+  updateGlobalStatus();
+  setDotState(pk, 'checking', 'Verifica in corso…');
+  const t0 = performance.now();
   const ok = await new Promise(res => {
     const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); res(false); }, 3000);
+    const t = setTimeout(() => { c.abort(); res(false); }, PING_TIMEOUT);
     const path = port == 9000 ? '/?redirect=/tms/' : '';
     fetch('http://' + ip + (port ? ':' + port : '') + path, { signal:c.signal, mode:'no-cors', cache:'no-store' })
       .then(() => { clearTimeout(t); res(true); })
       .catch(() => { clearTimeout(t); res(false); });
   });
-  pingStatusMap[ip] = ok ? 'ok' : 'err';
+  const ms = Math.round(performance.now() - t0);
+  pingState[pk] = ok ? 'ok' : 'err';
+  if (ok) pingMs[pk] = ms; else delete pingMs[pk];
   updateGlobalStatus();
-  document.querySelectorAll(`[data-ip="${ip}"]`).forEach(d => {
-    d.className = d.className.split(' ')
-      .filter(c => !['checking','ok','err'].includes(c)).join(' ');
-    d.classList.add(ok ? 'ok' : 'err');
-    d.title = ok ? '✓ Risponde' : '✗ Non risponde';
-  });
-  if (prev === 'ok' && !ok) showToast('ALERT', ip + ' non risponde', 'err');
+  setDotState(pk, ok ? 'ok' : 'err',
+    ok ? `✓ Risponde — ${ms} ms` : `✗ Non risponde (timeout ${PING_TIMEOUT / 1000} s)`);
+  if (prev === 'ok' && !ok) {
+    const [nome, citta] = pk.split('|');
+    showToast('ALERT', `${nome} (${citta}) — ${ip} non risponde`, 'err');
+  }
+  return ok;
 }
 
+// Ping a partire da un pallino nel DOM: tutte le informazioni stanno nei
+// data-attribute, così non serve interpolare nomi di cinema negli onclick.
+function pingFromEl(el) {
+  return pingDevice(el.dataset.pk, el.dataset.ip, el.dataset.port || '')
+    .then(ok => { if (el.dataset.ck) updateMapStatus(el.dataset.ck); return ok; });
+}
+
+// ── RICERCA ───────────────────────────────────────────────────
+// Le card nascoste usano la classe .hidden invece di style.display, così si
+// può sempre distinguere "nascosto dalla ricerca" da "nascosto da altro".
 function filterDevices(q) {
-  q = q.toLowerCase().trim();
+  q = (q || '').toLowerCase().trim();
+  const match = el => !q || el.dataset.search.includes(q);
+
   let visibleCinema = 0;
   document.querySelectorAll('.cinema-card[data-search]').forEach(card => {
-    const show = !q || card.dataset.search.includes(q);
-    card.style.display = show ? '' : 'none';
+    const show = match(card);
+    card.classList.toggle('hidden', !show);
     if (show) visibleCinema++;
   });
   document.querySelectorAll('.city-col[data-city]').forEach(col => {
-    const anyVisible = !!col.querySelector('.cinema-card[data-search]:not([style*="none"])');
-    col.style.display = anyVisible || !q ? '' : 'none';
+    col.classList.toggle('hidden', !col.querySelector('.cinema-card:not(.hidden)'));
   });
+
+  // Vista Per tipo: nascondi anche le intestazioni rimaste senza card e
+  // ricalcola i contatori di sezione su quello che si vede davvero.
+  const shown = {rtr:0, tms:0, srv:0, proj:0, aud:0};
   document.querySelectorAll('.type-card[data-search]').forEach(card => {
-    card.style.display = !q || card.dataset.search.includes(q) ? '' : 'none';
+    const show = match(card);
+    card.classList.toggle('hidden', !show);
+    if (show) shown[card.closest('.model-group-cards').dataset.bucket]++;
   });
-  const noRes = document.getElementById('noResults');
+  document.querySelectorAll('.model-group-cards').forEach(wrap => {
+    const empty = !wrap.querySelector('.type-card:not(.hidden)');
+    wrap.classList.toggle('filtered-out', empty);
+    wrap.previousElementSibling.classList.toggle('filtered-out', empty);
+  });
+  Object.entries(shown).forEach(([b, n]) => {
+    const el = document.getElementById('count-' + b);
+    if (el) el.textContent = n + ' dispositivi';
+  });
+
+  const noRes  = document.getElementById('noResults');
   const noResQ = document.getElementById('noResultsQuery');
-  if (noRes)  noRes.style.display  = q && visibleCinema === 0 ? '' : 'none';
-  if (noResQ) noResQ.textContent   = q;
+  if (noRes)  noRes.style.display = q && visibleCinema === 0 ? '' : 'none';
+  if (noResQ) noResQ.textContent  = q;
+
+  const clear = document.getElementById('searchClear');
+  if (clear) clear.classList.toggle('show', !!q);
+  saveUiState({q});
+}
+
+// La ricerca gira su ~600 card: un filo di debounce evita di rifare tutto a
+// ogni tasto premuto.
+let _searchTimer;
+function onSearchInput(v) {
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => filterDevices(v), 120);
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  filterDevices('');
+  input.focus();
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+// CSV ed Excel esportano le stesse colonne e ciascuno rispetta il filtro
+// della propria vista: quello che scarichi è quello che vedi.
+const EXPORT_COLS = ['Cinema','Città','Rete','Sala','Dispositivo','IP','Stato'];
+const NET_LABEL = {vpn:'VPN', offline:'Offline', estivi:'Estivo'};
+
+function exportRows(cinemas) {
+  const rows = [];
+  cinemas.forEach(c => {
+    Object.entries(c.rooms).forEach(([sala, devices]) => {
+      devices.forEach(d => rows.push([
+        c.name, c.city, NET_LABEL[c.net] || c.net, sala, d.label, d.ip,
+        pingState[devKey(c, d.ip)] || 'non verificato',
+      ]));
+    });
+  });
+  return rows;
+}
+
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ExcelJS pesa ~900 KB: si carica solo quando serve davvero.
+let _exceljsPromise;
+function loadExcelJS() {
+  if (window.ExcelJS) return Promise.resolve(window.ExcelJS);
+  if (!_exceljsPromise) {
+    _exceljsPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'vendor/exceljs.min.js';
+      s.onload  = () => resolve(window.ExcelJS);
+      s.onerror = () => { _exceljsPromise = null; reject(new Error('exceljs')); };
+      document.head.appendChild(s);
+    });
+  }
+  return _exceljsPromise;
 }
 
 async function downloadExcel() {
-  const wb = new ExcelJS.Workbook();
-  wb.creator = 'NOC Dashboard';
+  let ExcelJSLib;
+  try {
+    showToast('EXCEL', 'Preparazione del file…', 'info');
+    ExcelJSLib = await loadExcelJS();
+  } catch (e) {
+    return showToast('ERRORE', 'Libreria Excel non disponibile: usa l\'export CSV', 'err', 8000);
+  }
+  const wb = new ExcelJSLib.Workbook();
+  wb.creator = 'SIGRA FILM — Support Tool';
+  wb.created = new Date();
   const ws = wb.addWorksheet('Dispositivi');
 
   ws.columns = [
     {header:'Cinema',      key:'cinema',      width:32},
     {header:'Città',       key:'citta',       width:22},
-    {header:'Tipo',        key:'tipo',        width:10},
+    {header:'Rete',        key:'rete',        width:10},
     {header:'Sala',        key:'sala',        width:16},
     {header:'Dispositivo', key:'dispositivo', width:32},
     {header:'IP',          key:'ip',          width:22},
+    {header:'Stato',       key:'stato',       width:16},
   ];
 
-  // Header style
   ws.getRow(1).eachCell(cell => {
     cell.fill   = {type:'pattern',pattern:'solid',fgColor:{argb:'FF1F3864'}};
     cell.font   = {color:{argb:'FFFFFFFF'},bold:true,size:11};
@@ -1631,68 +1046,43 @@ async function downloadExcel() {
     cell.alignment = {vertical:'middle'};
   });
   ws.getRow(1).height = 20;
+  ws.views = [{state:'frozen', ySplit:1}];
+  ws.autoFilter = {from:'A1', to:'G1'};
 
-  const COLORS = {
-    'Proiettore':      'FFFFB3B3',
-    'Server':          'FFFFFF99',
-    'Processore Audio':'FFFFD580',
-    'Processore audio':'FFFFD580',
-  };
+  // Colore per categoria di dispositivo, non per etichetta esatta
+  const FILL = {proj:'FFFFB3B3', srv:'FFFFFF99', aud:'FFFFD580', tms:'FFD6E4FF', rtr:'FFE2E2E2'};
 
-  const addRows = (cinemas, tipo) => {
-    cinemas.forEach(c => {
-      Object.entries(c.rooms).forEach(([sala, devices]) => {
-        devices.forEach(d => {
-          const row = ws.addRow({cinema:c.name, citta:c.city, tipo, sala, dispositivo:d.label, ip:d.ip.split(':')[0]});
-          const argb = COLORS[d.label];
-          if (argb) {
-            row.eachCell(cell => {
-              cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb}};
-            });
-          }
-        });
-      });
-    });
-  };
+  exportRows(getCinemasForTypeFilter()).forEach(r => {
+    const row  = ws.addRow(r);
+    const argb = FILL[devType(r[4])[0]];
+    if (argb) row.eachCell(cell => { cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb}}; });
+  });
 
-  addRows(DATA.vpn,    'VPN');
-  addRows(DATA.offline,'Offline');
-  addRows(DATA.estivi, 'Estivo');
-
-  const buf  = await wb.xlsx.writeBuffer();
-  const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = 'dispositivi-noc.xlsx'; a.click();
-  URL.revokeObjectURL(url);
+  const buf = await wb.xlsx.writeBuffer();
+  saveBlob(new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    `dispositivi-${_tFilter}.xlsx`);
 }
 
 function exportCSV() {
-  const cinemas = getCinemasForFilter(_cFilter);
-  const rows = [['Cinema','Città','Sala','Dispositivo','IP','Stato']];
-  cinemas.forEach(c => {
-    Object.entries(c.rooms).forEach(([room, devs]) => {
-      devs.forEach(d => {
-        rows.push([c.name, c.city, room, d.label, d.ip,
-          pingStatusMap[d.ip] || 'non verificato']);
-      });
-    });
-  });
-  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = 'noc-dispositivi.csv'; a.click();
-  URL.revokeObjectURL(url);
+  const rows = [EXPORT_COLS, ...exportRows(getCinemasForFilter(_cFilter))];
+  const csv  = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\r\n');
+  saveBlob(new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'}), `dispositivi-${_cFilter}.csv`);
 }
 
 // ── AUTO PING ────────────────────────────────────────────────
-function cinemaId(name) { return 'ms_' + name.replace(/[^a-zA-Z0-9]/g,'_'); }
+// Id del pallino di stato dentro il marker: nome + città, altrimenti due
+// cinema omonimi finirebbero sullo stesso id e si sovrascriverebbero.
+function cinemaId(ck) {
+  return 'ms_' + ck.replace(/[^a-zA-Z0-9]/g,'_');
+}
 
-function updateMapStatus(cinemaName) {
-  const allDots = [...document.querySelectorAll(`.ping-dot[data-cinema="${CSS.escape(cinemaName)}"]`)];
+function updateMapStatus(ck) {
+  // Solo i pallini della vista Cinema: quelli nei popup mappa rispecchiano
+  // gli stessi dispositivi e li conterebbero due volte.
+  const allDots = [...document.querySelectorAll(
+    `#cinemasGrid .ping-dot[data-ck="${CSS.escape(ck)}"]`)];
   if (!allDots.length) return;
-  const el = document.getElementById(cinemaId(cinemaName));
+  const el = document.getElementById(cinemaId(ck));
   if (!el) return;
   el.className = 'cmarker-status';
   // MikroTik non ancora online → nessun colore
@@ -1713,49 +1103,58 @@ function openCard(hdr) {
   const card = hdr.closest('.cinema-card');
   const opening = card.classList.contains('collapsed');
   card.classList.toggle('collapsed');
+  hdr.setAttribute('aria-expanded', String(opening));
+  rememberCollapsed(card.dataset.ck, !opening);
   if (opening) {
-    card.querySelectorAll('.ping-dot[data-ip]').forEach(dot => {
-      if (!pingStatusMap[dot.dataset.ip]) {
-        pingDevice(dot.dataset.ip, dot.dataset.port || '').then(() => {
-          if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
-        });
-      }
+    // Pinga i dispositivi mai verificati della card appena aperta
+    card.querySelectorAll('.ping-dot[data-pk]').forEach(dot => {
+      if (!pingState[dot.dataset.pk]) pingFromEl(dot);
     });
   }
 }
 
+let _autoPinging = false;
+let _lastAutoPing = 0;
+
 async function autoPing() {
   if (_cFilter === 'offline' || _cFilter === 'estivi') return;
-  const seen = new Set();
-  const grid = document.getElementById('cinemasGrid');
-  const dots = [...(grid ? grid.querySelectorAll('[data-ip]') : [])].filter(d => {
-    if ((_cFilter === 'tutti' || _cFilter === 'chiuso') && !d.dataset.ip.startsWith('10.')) return false;
-    if (seen.has(d.dataset.ip)) return false;
-    const card = d.closest('.cinema-card');
-    const isRouter = d.dataset.router === '1';
-    if (card && card.classList.contains('collapsed') && !isRouter) return false;
-    seen.add(d.dataset.ip);
-    return true;
-  });
-  const pending = [];
-  for (let i = 0; i < dots.length; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 80));
-    const dot = dots[i];
-    pending.push(pingDevice(dot.dataset.ip, dot.dataset.port || '').then(() => {
-      if (dot.dataset.cinema) updateMapStatus(dot.dataset.cinema);
-    }));
+  if (_autoPinging) return;            // niente giri sovrapposti
+  _autoPinging = true;
+  const btn = document.getElementById('refreshBtn');
+  if (btn) { btn.classList.add('busy'); btn.disabled = true; }
+  try {
+    const seen = new Set();
+    const grid = document.getElementById('cinemasGrid');
+    const dots = [...(grid ? grid.querySelectorAll('[data-pk]') : [])].filter(d => {
+      if ((_cFilter === 'tutti' || _cFilter === 'chiuso') && !d.dataset.ip.startsWith('10.')) return false;
+      if (seen.has(d.dataset.pk)) return false;
+      const card = d.closest('.cinema-card');
+      const isRouter = d.dataset.router === '1';
+      if (card && card.classList.contains('collapsed') && !isRouter) return false;
+      seen.add(d.dataset.pk);
+      return true;
+    });
+    const pending = [];
+    for (let i = 0; i < dots.length; i++) {
+      if (i > 0) await new Promise(r => setTimeout(r, 80));
+      pending.push(pingFromEl(dots[i]));
+    }
+    await Promise.all(pending);
+    maybeWarnMixedContent(seen);
+  } finally {
+    _autoPinging = false;
+    _lastAutoPing = Date.now();
+    if (btn) { btn.classList.remove('busy'); btn.disabled = false; }
   }
-  await Promise.all(pending);
-  maybeWarnMixedContent(seen);
 }
 
 // In HTTPS (es. GitHub Pages) il browser blocca le richieste http:// verso
 // gli IP privati (mixed content) e tutti i ping falliscono. Avvisa una sola
 // volta, e solo se nessun dispositivo ha risposto al giro automatico.
 let _mixedWarned = false;
-function maybeWarnMixedContent(checkedIPs) {
-  if (_mixedWarned || location.protocol !== 'https:' || !checkedIPs.size) return;
-  for (const ip of checkedIPs) if (pingStatusMap[ip] === 'ok') return;
+function maybeWarnMixedContent(checkedKeys) {
+  if (_mixedWarned || location.protocol !== 'https:' || !checkedKeys.size) return;
+  for (const k of checkedKeys) if (pingState[k] === 'ok') return;
   _mixedWarned = true;
   showToast('PING BLOCCATI?',
     'Nessun dispositivo risponde: verifica di essere nella VPN e che il browser ' +
@@ -1765,20 +1164,23 @@ function maybeWarnMixedContent(checkedIPs) {
 
 // ── COPIA IP ─────────────────────────────────────────────────
 function copyIP(ip, el) {
-  navigator.clipboard.writeText(ip).then(() => {
-    const orig = el.textContent;
+  const done = () => {
+    const orig = el.dataset.ip;
     el.classList.add('copied'); el.textContent = '✓ copiato';
     setTimeout(() => { el.classList.remove('copied'); el.textContent = orig; }, 1500);
-  }).catch(() => showToast('ERRORE','Copia non disponibile','err'));
+  };
+  if (!navigator.clipboard) return showToast('ERRORE','Copia non disponibile','err');
+  navigator.clipboard.writeText(ip).then(done)
+    .catch(() => showToast('ERRORE','Copia non disponibile','err'));
 }
 
 // ── COSTRUISCE PULSANTI DISPOSITIVO ──────────────────────────
 function devBtnsHTML(ip, label) {
   const [tc] = devType(label);
-  const copyBtn = `<button class="ip-btn" onclick="copyIP('${ip}',this)">${ip}</button>`;
+  const copyBtn = `<button class="ip-btn" type="button" data-ip="${ip}" title="Copia ${ip}">${ip}</button>`;
   // I Barco ICMP espongono la web UI in HTTPS sulla porta 43744
   const webUrl  = /\bicmp\b/i.test(label) ? `https://${ip}:43744/` : `http://${ip}`;
-  const webBtn  = `<a class="proto-btn web" href="${webUrl}" target="_blank" title="Apri interfaccia web">WEB</a>`;
+  const webBtn  = `<a class="proto-btn web" href="${webUrl}" target="_blank" rel="noopener" title="Apri interfaccia web">WEB</a>`;
   const sshBtn  = (tc === 'srv' || tc === 'rtr')
     ? `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`
     : '';
@@ -1790,15 +1192,37 @@ function devBtnsHTML(ip, label) {
   if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC">VNC</a>` + copyBtn;
   if (tc === 'tms') {
     const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
-    const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/?redirect=/tms/" target="_blank" title="Apri TMS porta 9000">WEB</a>`;
+    const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/?redirect=/tms/" target="_blank" rel="noopener" title="Apri TMS porta 9000">WEB</a>`;
     return tmsSsh + tmsWeb + copyBtn;
   }
   return vncBtn + sshBtn + webBtn + copyBtn;
 }
 
+// ── PALLINO DI STATO ─────────────────────────────────────────
+// Markup condiviso da vista Cinema, Per tipo e popup mappa. Tutte le
+// informazioni stanno nei data-attribute e il click è gestito in
+// delegazione: così non si interpolano nomi di cinema dentro gli onclick
+// (molti contengono apostrofi) e lo stato già noto viene ripristinato
+// quando la griglia si ricostruisce.
+function dotHTML(c, dev, cls) {
+  const [tc]  = devType(dev.label);
+  const pk    = devKey(c, dev.ip);
+  const st    = pingState[pk] || '';
+  const port  = probePort(dev.label);
+  const ms    = pingMs[pk];
+  const title = st === 'ok'  ? `✓ Risponde${ms != null ? ' — ' + ms + ' ms' : ''}`
+              : st === 'err' ? '✗ Non risponde'
+              : 'Clicca per verificare raggiungibilità';
+  return `<div class="${cls || 'ping-dot'}${st ? ' ' + st : ''}" role="button" tabindex="0"`
+    + ` data-pk="${esc(pk)}" data-ck="${esc(cinemaKey(c))}" data-ip="${dev.ip}"`
+    + ` data-cinema="${esc(c.name)}" data-city="${esc(c.city)}"`
+    + (port ? ` data-port="${port}"` : '')
+    + (tc === 'rtr' ? ' data-router="1" data-rtr="1"' : tc === 'tms' ? ' data-router="1"' : '')
+    + ` title="${title}" aria-label="Verifica ${esc(dev.label)} ${dev.ip}"></div>`;
+}
+
 // ── CINEMA GRID (condiviso da Dashboard e Offline) ────────────
 function buildCinemaGrid(cinemas, gridId, ids) {
-  initColors(cinemas);
   const grid = document.getElementById(gridId);
   grid.innerHTML = '';
   let totalDevs = 0, totalRooms = 0;
@@ -1825,37 +1249,33 @@ function buildCinemaGrid(cinemas, gridId, ids) {
         <div class="room-sep-line"></div>
       </div>`;
       devices.forEach(d => {
-        const isTms = devType(d.label)[0] === 'tms';
-        const isRtr = devType(d.label)[0] === 'rtr';
-        const dPort = isTms ? ',9000' : '';
         roomsHTML += `<div class="dev-row">
-          <div class="ping-dot" role="button" tabindex="0" data-ip="${d.ip}" data-cinema="${esc(c.name)}" ${isTms?'data-port="9000"':''} ${(isRtr||isTms)?'data-router="1"':''} ${isRtr?'data-rtr="1"':''} title="Clicca per verificare raggiungibilità" aria-label="Verifica ${d.ip}"
-            onclick="pingDevice('${d.ip}'${dPort})"></div>
+          ${dotHTML(c, d)}
           <div class="dev-name" title="${esc(d.label)}">${esc(d.label)}</div>
           <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
         </div>`;
       });
     });
     const card = document.createElement('div');
-    card.className = 'cinema-card';
+    const ck   = cinemaKey(c);
+    const collapsed = _state.collapsed.includes(ck);
+    card.className = 'cinema-card' + (collapsed ? ' collapsed' : '');
     card.style.cssText = `background:${color}0d;border-color:${color}55`;
     card.innerHTML = `
-      <div class="card-hdr" role="button" tabindex="0" style="background:linear-gradient(135deg,${color}18,${color}10)" onclick="openCard(this)">
+      <div class="card-hdr" role="button" tabindex="0" aria-expanded="${!collapsed}" style="background:linear-gradient(135deg,${color}18,${color}10)">
         <div class="card-title-block">
           <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
           <div>
             <div class="card-name">${esc(c.name)}</div>
             <div class="card-city" style="color:${color}">📍 ${esc(c.city)}</div>
             ${routerDev ? `<div class="card-rtr">
-              <div class="ping-dot" role="button" tabindex="0" data-ip="${routerDev.ip}" data-cinema="${esc(c.name)}" data-router="1" data-rtr="1"
-                title="MikroTik — clicca per verificare" aria-label="Verifica MikroTik ${routerDev.ip}"
-                onclick="event.stopPropagation();pingDevice('${routerDev.ip}')"></div>
+              ${dotHTML(c, routerDev)}
               <span>MikroTik&ensp;${routerDev.ip}</span>
             </div>` : ''}
           </div>
         </div>
         <div class="card-actions">
-          ${tmsDev ? `<a class="proto-btn tms-web" href="http://${tmsDev.ip}:9000/?redirect=/tms/" target="_blank" onclick="event.stopPropagation()" title="Apri TMS">TMS</a>` : ''}
+          ${tmsDev ? `<a class="proto-btn tms-web" href="http://${tmsDev.ip}:9000/?redirect=/tms/" target="_blank" rel="noopener" title="Apri TMS">TMS</a>` : ''}
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
@@ -1867,6 +1287,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
       ...rooms.flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])
     ].join(' ').toLowerCase();
     card.dataset.city = c.city;
+    card.dataset.ck   = ck;
     return card;
   };
 
@@ -1913,20 +1334,25 @@ let _tFilter = 'tutti';
 
 function setTypeFilter(f) {
   _tFilter = f;
-  ['vpn','offline','estivi','chiuso','tutti'].forEach(x => document.getElementById('tf-'+x).classList.toggle('active', x===f));
+  setActiveBtn('tf-', f);
+  saveUiState({tFilter: f});
   buildByType();
+  filterDevices(document.getElementById('searchInput').value);
+}
+
+// Cinema mostrati dalla vista Per tipo (e quindi esportati nell'Excel)
+function getCinemasForTypeFilter() {
+  if (_tFilter === 'vpn')     return DATA.vpn;
+  if (_tFilter === 'offline') return DATA.offline;
+  if (_tFilter === 'estivi')  return DATA.estivi;
+  if (_tFilter === 'chiuso')  return [...DATA.vpn, ...DATA.offline];
+  return ALL_CINEMAS;
 }
 
 function buildByType() {
   const vpnList    = DATA.vpn;
   const novpnList  = DATA.offline;
   const estiviList = DATA.estivi;
-  const allCinemas = _tFilter === 'vpn'     ? vpnList
-                   : _tFilter === 'offline'  ? novpnList
-                   : _tFilter === 'estivi'   ? estiviList
-                   : _tFilter === 'chiuso'   ? [...vpnList, ...novpnList]
-                   : [...vpnList, ...novpnList, ...estiviList];
-  initColors(allCinemas);
   const grids = {
     rtr:  document.getElementById('grid-rtr'),
     tms:  document.getElementById('grid-tms'),
@@ -1952,7 +1378,7 @@ function buildByType() {
             .trim() || d.label;
           buckets.forEach(b => {
             if (!modelMap[b][key]) modelMap[b][key] = [];
-            modelMap[b][key].push({cinema: c.name, city: c.city, room, ip: d.ip, label: d.label, novpn, estate});
+            modelMap[b][key].push({cinema: c.name, city: c.city, net: c.net, room, ip: d.ip, label: d.label, novpn, estate});
           });
         });
       });
@@ -1977,31 +1403,41 @@ function buildByType() {
       const imgUrl = getModelImage(label);
       const hdr = document.createElement('div');
       hdr.className = 'model-group-header';
+      hdr.setAttribute('role', 'button');
+      hdr.setAttribute('tabindex', '0');
+      hdr.setAttribute('aria-expanded', 'true');
+      hdr.dataset.bucket = bucket;
       const imgWhite = imgUrl === MODEL_IMG.sp_b || imgUrl === MODEL_IMG.nec_nc2000c;
-      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img${imgWhite?' white-bg':''}" src="${imgUrl}" alt="" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${esc(label)}</span><span class="mgh-count">${entries.length} cinema</span><div class="mgh-line"></div><span class="mgh-chevron">▼</span>`;
+      // entries sono dispositivi, non cinema: un modello può essere presente
+      // in più sale dello stesso cinema
+      const nCinema = new Set(entries.map(e => e.cinema + '|' + e.city)).size;
+      hdr.innerHTML = `${imgUrl ? `<img class="mgh-img${imgWhite?' white-bg':''}" src="${imgUrl}" alt="" onerror="this.style.display='none'" loading="lazy">` : ''}<span class="mgh-label">${esc(label)}</span><span class="mgh-count">${entries.length} in ${nCinema} cinema</span><div class="mgh-line"></div><span class="mgh-chevron" aria-hidden="true">▼</span>`;
       grid.appendChild(hdr);
 
       // Cards container (collapsible)
       const cardsWrap = document.createElement('div');
       cardsWrap.className = 'model-group-cards';
+      cardsWrap.dataset.bucket = bucket;
       hdr.addEventListener('click', () => {
         const collapsed = hdr.classList.toggle('collapsed');
+        hdr.setAttribute('aria-expanded', String(!collapsed));
         cardsWrap.classList.toggle('hidden', collapsed);
+      });
+      hdr.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hdr.click(); }
       });
 
       // One card per cinema/sala
       entries.forEach(e => {
         const color = cinemaColor(e.cinema, e.city);
-        const pingPort = bucket === 'tms' ? ',9000' : '';
         const card = document.createElement('div');
         card.className = 'type-card';
         card.style.cssText = `background:${color}0d;border-color:${color}44`;
         card.innerHTML = `
-          <div class="tc-cinema">${esc(e.cinema)}${e.estate ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· estate</span>' : e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
+          <div class="tc-cinema" title="${esc(e.cinema + ' — ' + e.city)}">${esc(e.cinema)}${e.estate ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· estate</span>' : e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
           <div class="tc-name" title="${esc(e.room)}">${esc(e.room)}</div>
           <div class="tc-btns">
-            <div class="tc-ping" role="button" tabindex="0" data-ip="${e.ip}" title="Clicca per verificare" aria-label="Verifica ${e.ip}"
-              onclick="pingDevice('${e.ip}'${pingPort})"></div>
+            ${dotHTML({name:e.cinema, city:e.city, net:e.net}, e, 'tc-ping')}
             ${e.novpn ? '' : devBtnsHTML(e.ip, e.label)}
           </div>`;
         card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip].join(' ').toLowerCase();
@@ -2023,21 +1459,17 @@ function buildPopupHTML(c) {
   const color    = cinemaColor(c.name, c.city);
   const devCount = Object.values(c.rooms).flat().length;
 
+  // Stessi pallini e stessi pulsanti della vista Cinema: una sola fonte di
+  // verità, così il TMS viene pingato sulla 9000 anche da qui e i processori
+  // audio senza web UI non mostrano un tasto WEB che non porta da nessuna parte.
   let devRows = '';
   Object.entries(c.rooms).forEach(([room, devices]) => {
     devRows += `<div class="popup-room-lbl">${esc(room)}</div>`;
     devices.forEach(d => {
-      const [tc] = devType(d.label);
-      const webUrl = /\bicmp\b/i.test(d.label) ? `https://${d.ip}:43744/` : `http://${d.ip}`;
       devRows += `<div class="popup-dev-row">
-        <div class="ping-dot" role="button" tabindex="0" data-ip="${d.ip}" title="Clicca per verificare" aria-label="Verifica ${d.ip}" onclick="pingDevice('${d.ip}')" style="flex-shrink:0"></div>
+        ${dotHTML(c, d)}
         <div class="pdev-name" title="${esc(d.label)}">${esc(d.label)}</div>
-        <div class="pdev-btns">
-          <button class="ip-btn" onclick="copyIP('${d.ip}',this)" style="font-size:9px;padding:2px 6px">${d.ip}</button>
-          <a class="proto-btn web" href="${webUrl}" target="_blank" style="font-size:8px">WEB</a>
-          ${tc==='srv' ? `<a class="proto-btn ssh" href="ssh://${d.ip}" style="font-size:8px">SSH</a>
-          <a class="proto-btn vnc" href="vnc://${d.ip}" style="font-size:8px">VNC</a>` : ''}
-        </div>
+        <div class="pdev-btns">${devBtnsHTML(d.ip, d.label)}</div>
       </div>`;
     });
   });
@@ -2062,33 +1494,9 @@ function buildPopupHTML(c) {
 // ── COORDS ───────────────────────────────────────────────────
 // Per aggiungere un nuovo cinema: aggiungi 'Città':[lat,lng] qui sotto.
 // Città non presenti appariranno al centro della Toscana come fallback.
-const COORDS_VPN = {
-  'Grosseto':                    [42.7629, 11.1121],
-  'Chiusi':                      [43.0146, 11.9454],
-  'Montecatini Terme':           [43.8847, 10.7728],
-  'Pisa':                        [43.7228, 10.4017],
-  'Sansepolcro':                 [43.5693, 12.1396],
-  'Massa':                       [44.0355, 10.1398],
-  'Empoli':                      [43.7193, 10.9497],
-  'Firenze':                     [43.7696, 11.2558],
-  'Prato':                       [43.8799, 10.9970],
-  'Figline e Incisa Valdarno':   [43.6248, 11.4672],
-  'Montaione':                   [43.5586, 10.9137],
-  'Borgo San Lorenzo':           [43.9552, 11.3876],
-  'Livorno':                     [43.5479, 10.3146],
-  'Viareggio':                   [43.8677, 10.2519],
-};
-const COORDS_OFFLINE = {
-  'San Giovanni in Valdarno':    [43.5632, 11.5218],
-  'Antella':                     [43.7398, 11.3047],
-  'Monte San Savino':            [43.3294, 11.7268],
-};
-const COORDS_ESTIVI = {
-  'Firenze':                     [43.7696, 11.2558],
-  'Castiglione del Lago':        [43.1210, 12.0510],
-  'Scarperia e San Piero':       [43.9950, 11.3557],
-  'Pisa':                        [43.7228, 10.4017],
-};
+const COORDS_VPN     = SIGRA_COORDS.vpn;
+const COORDS_OFFLINE = SIGRA_COORDS.offline;
+const COORDS_ESTIVI  = SIGRA_COORDS.estivi;
 
 // ── LEAFLET MAP (condiviso da Mappa VPN e Mappa offline) ──────
 async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost, coords, showStatus=false}) {
@@ -2103,7 +1511,6 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
     document.head.appendChild(s);
   }
 
-  initColors(cinemas);
   document.getElementById(statCinema).textContent = cinemas.length;
   document.getElementById(statHost).textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
 
@@ -2121,7 +1528,7 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
   for (let i=0; i<cinemas.length; i++) {
     const c=cinemas[i], color=cinemaColor(c.name, c.city);
     const [lat,lng]=c.coords||coords[c.city]||[43.5,11.2];
-    const statusHtml = showStatus ? `<div class="cmarker-status" id="${cinemaId(c.name)}"></div>` : '';
+    const statusHtml = showStatus ? `<div class="cmarker-status" id="${cinemaId(cinemaKey(c))}"></div>` : '';
     const icon=L.divIcon({
       html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div>${statusHtml}</div>`,
       className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
@@ -2134,14 +1541,16 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
     marker.on('mouseout', ()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     marker.on('popupopen',()=>{
       const el=marker.getPopup().getElement(); if(!el) return;
-      if (showStatus) {
-        el.querySelectorAll('.ping-dot[data-ip]').forEach(dot=>{
-          const src=document.querySelector(`.ping-dot[data-cinema][data-ip="${dot.dataset.ip}"]`);
-          if(!src) return;
-          ['ok','err','checking'].forEach(cls=>dot.classList.toggle(cls,src.classList.contains(cls)));
-          dot.title=src.title;
-        });
-      }
+      // Il contenuto del popup entra nel DOM solo all'apertura: riallinea i
+      // pallini allo stato corrente, che vive in pingState e non nel DOM.
+      el.querySelectorAll('[data-pk]').forEach(dot=>{
+        const st = pingState[dot.dataset.pk];
+        dot.classList.remove('ok','err','checking');
+        if (st) dot.classList.add(st);
+        const ms = pingMs[dot.dataset.pk];
+        if (st === 'ok')  dot.title = '✓ Risponde' + (ms != null ? ` — ${ms} ms` : '');
+        if (st === 'err') dot.title = '✗ Non risponde';
+      });
       el.addEventListener('mouseenter',()=>clearTimeout(ct));
       el.addEventListener('mouseleave',()=>{ct=setTimeout(()=>marker.closePopup(),300)});
     });
@@ -2150,32 +1559,88 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
       {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
     );
     cluster.addLayer(marker);
-    if (showStatus) updateMapStatus(c.name);
+    if (showStatus) updateMapStatus(cinemaKey(c));
   }
   map.addLayer(cluster);
   if (showStatus) {
     // I pallini di stato dentro i marker esistono solo quando il marker è
     // visibile: riapplica lo stato quando i cluster si aprono/chiudono
-    cluster.on('animationend spiderfied', () => cinemas.forEach(c => updateMapStatus(c.name)));
-    cinemas.forEach(c => updateMapStatus(c.name));
+    const refresh = () => cinemas.forEach(c => updateMapStatus(cinemaKey(c)));
+    cluster.on('animationend spiderfied', refresh);
+    refresh();
   }
 }
 
 // ── FILTER HELPERS ────────────────────────────────────────────
+const FILTERS = ['vpn','offline','estivi','chiuso','tutti'];
+const _VIEWS  = ['cinema','mappa','bytype'];
+const _VIEW_LABELS = {cinema:'Cinema', mappa:'Mappa', bytype:'Per tipo'};
+
 let _cFilter = 'vpn', _mFilter = 'vpn';
 const _mapBuilt = {};
+
+// ── STATO PERSISTENTE ────────────────────────────────────────
+// Vista, filtri, ricerca e card chiuse sopravvivono al reload; l'hash
+// dell'URL rende condivisibile esattamente quello che si sta guardando
+// (es. #view=cinema&f=offline&q=flora).
+const LS_KEY = 'sigra-support-tool/v1';
+const _state = {view:'cinema', cFilter:'vpn', mFilter:'vpn', tFilter:'tutti', q:'', collapsed:[]};
+
+function loadUiState() {
+  try { Object.assign(_state, JSON.parse(localStorage.getItem(LS_KEY)) || {}); } catch (e) {}
+  // L'hash vince sullo stato salvato: un link condiviso deve aprire ciò che dice
+  const p = new URLSearchParams(location.hash.replace(/^#/, ''));
+  if (p.get('view')) _state.view = p.get('view');
+  if (p.get('f'))    _state.cFilter = _state.mFilter = p.get('f');
+  if (p.get('t'))    _state.tFilter = p.get('t');
+  if (p.has('q'))    _state.q = p.get('q');
+  if (!Array.isArray(_state.collapsed)) _state.collapsed = [];
+  if (!_VIEWS.includes(_state.view)) _state.view = 'cinema';
+  if (!FILTERS.includes(_state.cFilter)) _state.cFilter = 'vpn';
+  if (!FILTERS.includes(_state.mFilter)) _state.mFilter = 'vpn';
+  if (!FILTERS.includes(_state.tFilter)) _state.tFilter = 'tutti';
+  if (typeof _state.q !== 'string') _state.q = '';
+}
+
+let _stateReady = false;
+function saveUiState(patch) {
+  Object.assign(_state, patch || {});
+  if (!_stateReady) return;
+  try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {}
+  const p = new URLSearchParams();
+  p.set('view', _state.view);
+  if (_state.view === 'bytype')      p.set('t', _state.tFilter);
+  else if (_state.view === 'mappa')  p.set('f', _state.mFilter);
+  else                               p.set('f', _state.cFilter);
+  if (_state.q) p.set('q', _state.q);
+  history.replaceState(null, '', location.pathname + location.search + '#' + p);
+}
+
+function rememberCollapsed(ck, collapsed) {
+  if (!ck) return;
+  const set = new Set(_state.collapsed);
+  if (collapsed) set.add(ck); else set.delete(ck);
+  saveUiState({collapsed: [...set]});
+}
+
+function setActiveBtn(prefix, f) {
+  FILTERS.forEach(x => {
+    const b = document.getElementById(prefix + x);
+    if (b) { b.classList.toggle('active', x === f); b.setAttribute('aria-pressed', String(x === f)); }
+  });
+}
 
 function getCinemasForFilter(f) {
   if (f === 'vpn')     return DATA.vpn;
   if (f === 'offline') return DATA.offline;
   if (f === 'estivi')  return DATA.estivi;
   if (f === 'chiuso')  return [...DATA.vpn, ...DATA.offline].sort((a,b) => a.city.localeCompare(b.city));
-  return [...DATA.vpn, ...DATA.offline, ...DATA.estivi].sort((a,b) => a.city.localeCompare(b.city));
+  return ALL_CINEMAS.slice().sort((a,b) => a.city.localeCompare(b.city));
 }
 
 function setCinemaFilter(f) {
   _cFilter = f;
-  ['vpn','offline','estivi','chiuso','tutti'].forEach(x => document.getElementById('cf-'+x).classList.toggle('active', x===f));
+  setActiveBtn('cf-', f);
   const titles = {
     vpn:    'Cinema VPN — Dispositivi Monitorati',
     offline:'Cinema Offline — Rete Locale',
@@ -2185,7 +1650,9 @@ function setCinemaFilter(f) {
   };
   const t = document.getElementById('cinemaTitle'); if(t) t.textContent = titles[f];
   const sb = document.querySelector('.global-status-bar'); if(sb) sb.style.display = f==='vpn' ? '' : 'none';
+  saveUiState({cFilter: f});
   buildCinema();
+  filterDevices(document.getElementById('searchInput').value);
   autoPing();
 }
 
@@ -2197,7 +1664,8 @@ function buildCinema() {
 
 async function setMapFilter(f) {
   _mFilter = f;
-  ['vpn','offline','estivi','chiuso','tutti'].forEach(x => document.getElementById('mf-'+x).classList.toggle('active', x===f));
+  setActiveBtn('mf-', f);
+  saveUiState({mFilter: f});
   await showMap();
   if (f !== 'offline' && f !== 'estivi') autoPing();
 }
@@ -2225,22 +1693,21 @@ async function showMap() {
 }
 
 // ── VIEW SWITCHER ─────────────────────────────────────────────
-const _VIEWS=['cinema','mappa','bytype'];
-const _VIEW_LABELS={cinema:'Cinema',mappa:'Mappa',bytype:'Per tipo'};
-
 function cycleView(){
   const cur=(document.querySelector('.view.active')||{id:'view-cinema'}).id.replace('view-','');
-  const next=_VIEWS[(_VIEWS.indexOf(cur)+1)%_VIEWS.length];
-  switchView(next);
+  switchView(_VIEWS[(_VIEWS.indexOf(cur)+1)%_VIEWS.length]);
 }
 
 function switchView(v) {
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.view-btn').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.view-btn').forEach(el=>{el.classList.remove('active');el.setAttribute('aria-selected','false')});
   document.getElementById('view-'+v).classList.add('active');
-  document.getElementById('tab-'+v).classList.add('active');
+  const tab=document.getElementById('tab-'+v);
+  tab.classList.add('active'); tab.setAttribute('aria-selected','true');
   const lbl=document.getElementById('viewCycleLabel');
-  if(lbl) lbl.textContent=_VIEW_LABELS[v]||v;
+  // Il pulsante compatto mostra la vista in cui si va, non quella attuale
+  if(lbl) lbl.textContent=_VIEW_LABELS[_VIEWS[(_VIEWS.indexOf(v)+1)%_VIEWS.length]];
+  saveUiState({view: v});
   if(v==='mappa') showMap();
 }
 
@@ -2253,22 +1720,74 @@ function showToast(title,msg,type,duration){
   t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),duration||4000);
 }
 
-// ── INIT ──────────────────────────────────────────────────────
-// Tastiera: Invio/Spazio attivano pallini ping e header card
+// ── INTERAZIONI (delegazione) ─────────────────────────────────
+// Un solo listener per tutta la pagina: i pallini e i pulsanti portano le
+// informazioni nei data-attribute, così non si interpolano nomi di cinema
+// (che contengono apostrofi) dentro gli attributi onclick.
+document.addEventListener('click', e => {
+  const dot = e.target.closest('.ping-dot,.tc-ping');
+  if (dot && dot.dataset.pk) { pingFromEl(dot); return; }
+  const copy = e.target.closest('.ip-btn[data-ip]');
+  if (copy) { copyIP(copy.dataset.ip, copy); return; }
+  if (e.target.closest('a,button')) return;   // link e pulsanti fanno il loro mestiere
+  const hdr = e.target.closest('.card-hdr');
+  if (hdr) openCard(hdr);
+});
+
 document.addEventListener('keydown', e => {
-  if ((e.key === 'Enter' || e.key === ' ') &&
-      e.target.matches('.ping-dot,.tc-ping,.card-hdr')) {
-    e.preventDefault();
-    e.target.click();
+  const input  = document.getElementById('searchInput');
+  const typing = /^(input|textarea)$/i.test(e.target.tagName);
+  // "/" o Ctrl/Cmd+K portano alla ricerca, Esc la svuota
+  if (!typing && (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'))) {
+    e.preventDefault(); input.focus(); input.select(); return;
+  }
+  if (e.key === 'Escape' && typing) { clearSearch(); input.blur(); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.ping-dot,.tc-ping,.card-hdr')) {
+    e.preventDefault(); e.target.click();
   }
 });
 
-buildCinema();
-buildByType();
-switchView('cinema');
+// ── INIT ──────────────────────────────────────────────────────
+const POLL_MS = 5 * 60 * 1000;
+
+// Applica _state all'interfaccia. Durante l'applicazione lo stato non si
+// risalva (sarebbe solo un giro a vuoto sopra a se stesso).
+function applyState() {
+  const wasReady = _stateReady;
+  _stateReady = false;
+  // La ricerca va scritta nella casella prima di costruire le viste: i
+  // costruttori rifiltrano leggendo da lì.
+  const input = document.getElementById('searchInput');
+  input.value = _state.q || '';
+  setTypeFilter(_state.tFilter);
+  _mFilter = _state.mFilter;
+  setActiveBtn('mf-', _mFilter);
+  setCinemaFilter(_state.cFilter);
+  switchView(_state.view);
+  _stateReady = wasReady;
+}
+
+loadUiState();
+applyState();
 updateGlobalStatus();
-autoPing();
-setInterval(autoPing, 5 * 60 * 1000);
+_stateReady = true;   // da qui in poi le modifiche si salvano
+saveUiState();
+
+// Un link con hash incollato in una scheda già aperta cambia solo l'hash,
+// senza ricaricare: intercettalo e riapplica lo stato.
+window.addEventListener('hashchange', () => {
+  const before = JSON.stringify([_state.view, _state.cFilter, _state.mFilter, _state.tFilter, _state.q]);
+  loadUiState();
+  if (JSON.stringify([_state.view, _state.cFilter, _state.mFilter, _state.tFilter, _state.q]) === before) return;
+  applyState();
+});
+
+// Il giro automatico non gira a scheda nascosta (nessuno lo sta guardando e
+// ogni giro sono centinaia di fetch); al ritorno recupera se è passato troppo.
+setInterval(() => { if (!document.hidden) autoPing(); }, POLL_MS);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - _lastAutoPing > POLL_MS) autoPing();
+});
 </script>
 </body>
 </html>

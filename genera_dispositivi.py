@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Genera dispositivi_mancanti.xlsx leggendo i template RAW, RAW_NOVPN e
-RAW_ESTIVI da index.html (nella stessa cartella di questo script).
+Genera dispositivi_mancanti.xlsx leggendo i blocchi dati da dati.js
+(nella stessa cartella di questo script) — la stessa sorgente usata dal
+sito, così l'Excel generato da riga di comando e quello scaricato dall'app
+contengono le stesse righe.
 """
 
 import re
@@ -12,25 +14,24 @@ from openpyxl.styles import PatternFill, Font, Alignment
 from openpyxl.utils import get_column_letter
 
 BASE_DIR    = Path(__file__).resolve().parent
-HTML_PATH   = BASE_DIR / 'index.html'
+DATA_PATH   = BASE_DIR / 'dati.js'
 OUTPUT_PATH = BASE_DIR / 'dispositivi_mancanti.xlsx'
 
-# ── Leggi index.html ──────────────────────────────────────────────────────────
-with open(HTML_PATH, 'r', encoding='utf-8') as f:
-    html = f.read()
+# ── Leggi dati.js ─────────────────────────────────────────────────────────────
+with open(DATA_PATH, 'r', encoding='utf-8') as f:
+    source = f.read()
 
-# ── Estrai i blocchi RAW e RAW_NOVPN ─────────────────────────────────────────
-def extract_block(text, varname):
-    """Estrae il contenuto del template literal `const VARNAME = \`...\`;`"""
-    pattern = r'const\s+' + re.escape(varname) + r'\s*=\s*`(.*?)`\s*;'
-    m = re.search(pattern, text, re.DOTALL)
+# ── Estrai i blocchi di SIGRA_RAW ────────────────────────────────────────────
+def extract_block(text, key):
+    """Estrae il template literal `key: \`...\`,` dentro SIGRA_RAW"""
+    m = re.search(r'\b' + re.escape(key) + r':\s*`(.*?)`\s*,', text, re.DOTALL)
     if not m:
-        raise ValueError(f"Blocco {varname} non trovato in index.html")
+        raise ValueError(f"Blocco {key} non trovato in dati.js")
     return m.group(1)
 
-raw_vpn    = extract_block(html, 'RAW')
-raw_novpn  = extract_block(html, 'RAW_NOVPN')
-raw_estivi = extract_block(html, 'RAW_ESTIVI')
+raw_vpn    = extract_block(source, 'vpn')
+raw_novpn  = extract_block(source, 'offline')
+raw_estivi = extract_block(source, 'estivi')
 
 # ── Parser righe ─────────────────────────────────────────────────────────────
 # Formato atteso (separatore: TAB reale o \t letterale):
@@ -77,7 +78,9 @@ def parse_block(block, tipo):
             continue
 
         cinema     = tokens[0]
-        citta      = tokens[1]
+        # Come fa il sito: "Chiusi -SI" → "Chiusi" (la sigla provincia non
+        # fa parte del nome della città)
+        citta      = re.sub(r'\s*-\s*[A-Z]{2}$', '', tokens[1]).strip()
         sala       = tokens[2]
         dispositivo = ' - '.join(tokens[3:])  # nel caso ci siano ulteriori " - "
 
@@ -113,7 +116,7 @@ ws.title = 'Dispositivi'
 columns = [
     ('Cinema',      32),
     ('Città',       22),
-    ('Tipo',        10),
+    ('Rete',        10),
     ('Sala',        16),
     ('Dispositivo', 32),
     ('IP',          22),
@@ -136,13 +139,20 @@ FILL_PROIETTORE = PatternFill(fill_type='solid', fgColor='FFB3B3')
 FILL_SERVER     = PatternFill(fill_type='solid', fgColor='FFFF99')
 FILL_AUDIO      = PatternFill(fill_type='solid', fgColor='FFD580')
 
+# Stesse categorie usate dal sito (devType in index.html)
+RE_SERVER = re.compile(r'server|ims3000|dcp2000|dcp-2k4|cinecloud|doremi|qube|showvault|alchemy|\bicmp\b|\bimb\b', re.I)
+RE_PROJ   = re.compile(r'proiettore|barco|christie|\bnec\b|projector|dp2k|sp2k|dp4k|sp4k|cinemeccanica|dpc-', re.I)
+RE_AUDIO  = re.compile(r'processore audio|mixer|dolby|jbl|cp[0-9]|cpi[0-9]', re.I)
+
+
 def get_fill(dispositivo):
-    d = dispositivo.lower()
-    if 'proiettore' in d:
-        return FILL_PROIETTORE
-    if 'server' in d:
+    if re.search(r'mikrotik|router|\btms\b', dispositivo, re.I):
+        return None
+    if RE_SERVER.search(dispositivo):
         return FILL_SERVER
-    if 'processore audio' in d:
+    if RE_PROJ.search(dispositivo):
+        return FILL_PROIETTORE
+    if RE_AUDIO.search(dispositivo):
         return FILL_AUDIO
     return None
 

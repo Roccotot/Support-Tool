@@ -6,11 +6,14 @@
 <title>SIGRA FILM — I Nostri Cinema</title>
 <meta name="description" content="La mappa dei cinema serviti da Sigra Film in Toscana e dintorni.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css"/>
+<link rel="stylesheet" href="vendor/leaflet/MarkerCluster.css"/>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="vendor/leaflet/leaflet.markercluster.js"></script>
+<script src="dati.js"></script>
 <style>
 :root {
   --bg:#07090e; --panel:#0c1018; --accent:#2979ff; --amber:#ff9100;
@@ -152,13 +155,9 @@ header{flex-shrink:0;background:rgba(7,9,14,0.97);border-bottom:1px solid var(--
 <script>
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-// Estrae da index.html solo nome, città, coordinate e numero sale di ogni
-// cinema: nessun IP o dato tecnico arriva su questa pagina.
-function extractBlock(src, name){
-  const m = src.match(new RegExp('const ' + name + ' = `([^`]*)`'));
-  return m ? m[1] : '';
-}
-
+// Dai dati condivisi (dati.js) questa pagina tiene solo nome, città,
+// coordinate e numero di sale: nessun IP o dato tecnico finisce nella
+// mappa pubblica.
 function parseCinemas(text, estivo){
   const map = {};
   text.split('\n').forEach(line => {
@@ -264,22 +263,17 @@ function switchView(v){
   if (v === 'map' && map) setTimeout(() => map.invalidateSize(), 60);
 }
 
-async function init(){
-  let src;
-  try {
-    const r = await fetch('index.html', { cache: 'no-store' });
-    if (!r.ok) throw new Error(r.status);
-    src = await r.text();
-  } catch (e) {
+function init(){
+  if (typeof SIGRA_RAW === 'undefined') {
     document.getElementById('map').insertAdjacentHTML('beforeend',
       '<div class="load-err">Impossibile caricare i dati della mappa.<br>Riprova più tardi.</div>');
     return;
   }
 
   _cinemas = [
-    ...parseCinemas(extractBlock(src, 'RAW'),        false),
-    ...parseCinemas(extractBlock(src, 'RAW_NOVPN'),  false),
-    ...parseCinemas(extractBlock(src, 'RAW_ESTIVI'), true),
+    ...parseCinemas(SIGRA_RAW.vpn,     false),
+    ...parseCinemas(SIGRA_RAW.offline, false),
+    ...parseCinemas(SIGRA_RAW.estivi,  true),
   ];
 
   document.getElementById('st-cinema').textContent = _cinemas.length;
