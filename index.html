@@ -8,14 +8,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap" rel="stylesheet">
-<!-- Leaflet e markercluster sono serviti dal repo (cartella vendor/): niente
-     dipendenze da CDN esterni, quindi l'app funziona anche senza internet e
-     nessun codice di terze parti può cambiare sotto i piedi.
+<!-- Leaflet è servito dal repo (cartella vendor/): niente dipendenze da CDN
+     esterni, quindi l'app funziona anche senza internet e nessun codice di
+     terze parti può cambiare sotto i piedi.
      ExcelJS (~900 KB) viene caricato solo al primo click su "Scarica Excel". -->
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css"/>
-<link rel="stylesheet" href="vendor/leaflet/MarkerCluster.css"/>
 <script src="vendor/leaflet/leaflet.js"></script>
-<script src="vendor/leaflet/leaflet.markercluster.js"></script>
 <script src="dati.js"></script>
 <script src="basemap.js"></script>
 <style>
@@ -40,13 +38,14 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(rgba(41,121,255,0.022) 1px,transparent 1px),
     linear-gradient(90deg,rgba(41,121,255,0.022) 1px,transparent 1px);background-size:44px 44px}
 
-/* La barra in alto scorre lentamente: il gradiente si ripete e finisce con
-   lo stesso rosso da cui parte, così il ciclo non ha stacchi. Con
-   prefers-reduced-motion attivo si ferma (regola più sotto). */
+/* La barra in alto scorre. Il gradiente si ripete ogni 600px invece di
+   essere spalmato su tutto lo schermo: così il movimento si vede davvero
+   (prima le tinte cambiavano troppo gradualmente per accorgersene).
+   Con prefers-reduced-motion attivo si ferma (regola più sotto). */
 .rb-bar{height:3px;flex-shrink:0;z-index:300;position:relative;
-  background:linear-gradient(90deg,#e8192c,#1db954,#1565c0,#e8192c);
-  background-size:200% 100%;animation:rb-scorre 10s linear infinite}
-@keyframes rb-scorre{from{background-position:0 0}to{background-position:200% 0}}
+  background:repeating-linear-gradient(90deg,#e8192c 0,#1db954 200px,#1565c0 400px,#e8192c 600px);
+  animation:rb-scorre 6s linear infinite}
+@keyframes rb-scorre{from{background-position:0 0}to{background-position:600px 0}}
 
 /* ── ACCESSIBILITÀ ── */
 /* Navigazione da tastiera: prima il focus era invisibile ovunque tranne che
@@ -95,7 +94,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 /* Sta nella fascia vuota a sinistra della colonna centrale: sparisce da
    solo quando lo schermo non è abbastanza largo da contenerlo senza
    finire sopra le card. */
-.city-index{position:fixed;left:16px;top:132px;max-height:calc(100vh - 154px);width:196px;z-index:120;
+.side-index{position:fixed;left:16px;top:132px;max-height:calc(100vh - 154px);width:196px;z-index:120;
   display:flex;flex-direction:column;background:rgba(12,16,24,0.72);
   backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:12px;
   padding:10px 6px 8px;overflow:hidden}
@@ -115,8 +114,12 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .ci-item{position:relative}
 .ci-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ci-count{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2)}
-.ci-item.hidden{display:none}
-@media(max-width:1180px){.city-index{display:none}}
+.ci-item.hidden,.ci-sez.hidden{display:none}
+.ci-sez{font-family:'Share Tech Mono',monospace;font-size:8.5px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text2);padding:9px 8px 3px;opacity:.75}
+.ci-sez:first-child{padding-top:2px}
+.ci-item.ci-sotto{padding-left:16px;font-size:12.5px}
+@media(max-width:1180px){.side-index{display:none}}
 
 /* ── STATS ── */
 /* Statistiche, barra di stato e intestazione stanno sulla stessa colonna
@@ -237,7 +240,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .type-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .type-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;text-transform:uppercase}
 .type-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:#c0d8f0;letter-spacing:1px;margin-left:auto}
-.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.type-grid{display:grid;grid-template-columns:1fr;gap:10px}
 .type-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;
   padding:11px 14px;transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s;animation:fadeUp 0.4s ease both}
 .type-card:hover{border-color:rgba(41,121,255,0.4);box-shadow:0 4px 18px rgba(0,0,0,0.4);transform:translateY(-1px)}
@@ -253,14 +256,18 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .model-group-header{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:0;cursor:pointer;user-select:none}
 .model-group-header:hover .mgh-label{color:#fff}
 .model-group-header .mgh-line{flex:1;height:1px;background:rgba(255,255,255,0.08)}
-.model-group-header .mgh-img{width:240px;height:152px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.04);flex-shrink:0;padding:4px}
+/* La foto del modello era tarata sulla griglia larga: nella colonna da
+   640px si prendeva un terzo della riga. */
+.model-group-header .mgh-img{width:132px;height:84px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.04);flex-shrink:0;padding:4px}
 .model-group-header .mgh-img.white-bg{background:#fff}
 .model-group-header .mgh-label{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#c0d8f0;white-space:nowrap;text-transform:uppercase;transition:color .15s}
 .model-group-header .mgh-count{font-size:9px;color:var(--text2);background:rgba(255,255,255,0.06);border-radius:10px;padding:1px 8px;letter-spacing:.5px}
 .model-group-header .mgh-chevron{font-size:10px;color:var(--text2);transition:transform .2s;flex-shrink:0}
+.model-group-header{scroll-margin-top:14px}
 .model-group-header.collapsed .mgh-chevron{transform:rotate(-90deg)}
 .model-group-header.collapsed .mgh-img{display:none}
-.model-group-cards{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;overflow:hidden;transition:opacity .2s}
+/* Un dispositivo per riga, come nella vista Cinema */
+.model-group-cards{grid-column:1/-1;display:grid;grid-template-columns:1fr;gap:10px;overflow:hidden;transition:opacity .2s}
 .model-group-cards.hidden{display:none}
 /* .hidden = nascosto dalla ricerca, .filtered-out = gruppo rimasto vuoto */
 .cinema-card.hidden,.city-col.hidden,.type-card.hidden,
@@ -286,9 +293,6 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .leaflet-control-attribution{background:rgba(7,9,14,0.7) !important;color:#5c7796 !important;
   font-size:9px !important;padding:1px 6px !important;border-radius:4px 0 0 0}
 .leaflet-control-attribution a{color:#7a9bbf !important}
-.cluster-icon{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
-  background:rgba(41,121,255,0.22);border:2.5px solid var(--accent);box-shadow:0 0 16px rgba(41,121,255,0.5);
-  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;color:#fff}
 .cmarker-inner{transform:rotate(45deg);display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:15px}
 .cmarker-status{position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:50%;
   background:rgba(122,155,191,0.35);border:2px solid rgba(7,9,14,0.9);
@@ -534,7 +538,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <button class="action-btn refresh" id="refreshBtn" onclick="autoPing()" title="Verifica tutti i dispositivi">⟳ Refresh All</button>
     <button class="action-btn export" onclick="exportCSV()" title="Scarica lista dispositivi CSV">↓ Export CSV</button>
   </div>
-  <nav class="city-index" id="cityIndex" aria-label="Indice delle città">
+  <nav class="side-index" id="cityIndex" aria-label="Indice delle città">
     <div class="ci-title">Città</div>
     <div class="ci-list" id="cityIndexList"></div>
   </nav>
@@ -573,6 +577,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     </button>
     <button class="action-btn export" onclick="downloadExcel()" title="Scarica lista dispositivi Excel" style="margin-left:auto">↓ Scarica Excel</button>
   </div>
+  <nav class="side-index" id="typeIndex" aria-label="Indice dei dispositivi">
+    <div class="ci-title">Dispositivi</div>
+    <div class="ci-list" id="typeIndexList"></div>
+  </nav>
   <div class="main">
     <div class="type-section">
       <div class="type-hdr">
@@ -1069,6 +1077,7 @@ function filterDevices(q) {
   const clear = document.getElementById('searchClear');
   if (clear) clear.classList.toggle('show', !!q);
   syncCityIndex();
+  syncTypeIndex();
   saveUiState({q});
 }
 
@@ -1385,7 +1394,8 @@ function buildCinemaGrid(cinemas, gridId, ids) {
     card.innerHTML = `
       <div class="card-hdr" role="button" tabindex="0" aria-expanded="${!collapsed}" style="background:linear-gradient(135deg,${color}18,${color}10)">
         <div class="card-title-block">
-          <div class="card-icon" style="background:${color}20;border-color:${color}55">🎬</div>
+          <div class="card-icon" style="background:${color}20;border-color:${color}55"
+            title="${c.net === 'vpn' ? 'In VPN' : c.net === 'offline' ? 'Rete locale' : 'Arena estiva'}">${cinemaIcon(c)}</div>
           <div>
             <div class="card-name">${esc(c.name)}</div>
             <div class="card-city" style="color:${color}">📍 ${esc(c.city)}</div>
@@ -1448,6 +1458,7 @@ function setTypeFilter(f) {
   setActiveBtn('tf-', f);
   saveUiState({tFilter: f});
   buildByType();
+  buildTypeIndex();
   filterDevices(document.getElementById('searchInput').value);
 }
 
@@ -1533,6 +1544,7 @@ function buildByType() {
         const collapsed = hdr.classList.toggle('collapsed');
         hdr.setAttribute('aria-expanded', String(!collapsed));
         cardsWrap.classList.toggle('hidden', collapsed);
+        spyType();
       });
       hdr.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hdr.click(); }
@@ -1632,16 +1644,9 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
   document.getElementById(statCinema).textContent = cinemas.length;
   document.getElementById(statHost).textContent   = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
 
-  // Cluster: separa i cinema con coordinate identiche o molto vicine
-  // (es. Nuova Aurora + Cinema sotto le stelle a Sansepolcro)
-  const cluster = L.markerClusterGroup({
-    showCoverageOnHover: false,
-    maxClusterRadius: 30,
-    iconCreateFunction: cl => L.divIcon({
-      html: `<div class="cluster-icon">${cl.getChildCount()}</div>`,
-      className: '', iconSize: [40, 40]
-    })
-  });
+  // Niente raggruppamento a numeri: i marker si vedono tutti, anche quando
+  // si sovrappongono. Chi cerca un cinema preciso ingrandisce e li separa.
+  const marker_layer = L.layerGroup();
 
   for (let i=0; i<cinemas.length; i++) {
     const c=cinemas[i], color=cinemaColor(c.name, c.city);
@@ -1676,17 +1681,11 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
       `<span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:${color};background:rgba(7,9,14,0.95);border:1px solid ${color}55;padding:4px 11px;border-radius:5px;white-space:nowrap;font-weight:700">${esc(c.name)}</span>`,
       {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
     );
-    cluster.addLayer(marker);
-    if (showStatus) updateMapStatus(cinemaKey(c));
+    marker_layer.addLayer(marker);
   }
-  map.addLayer(cluster);
-  if (showStatus) {
-    // I pallini di stato dentro i marker esistono solo quando il marker è
-    // visibile: riapplica lo stato quando i cluster si aprono/chiudono
-    const refresh = () => cinemas.forEach(c => updateMapStatus(cinemaKey(c)));
-    cluster.on('animationend spiderfied', refresh);
-    refresh();
-  }
+  map.addLayer(marker_layer);
+  // I pallini di stato esistono solo dopo che i marker sono nel DOM
+  if (showStatus) cinemas.forEach(c => updateMapStatus(cinemaKey(c)));
 }
 
 // ── INDICE CITTÀ ──────────────────────────────────────────────
@@ -1722,7 +1721,9 @@ function scrollToCity(city) {
 }
 
 function setActiveCity(city) {
-  document.querySelectorAll('.ci-item').forEach(b => {
+  // Solo le voci dell'indice città: '.ci-item' da solo prendeva anche
+  // quelle dell'indice dispositivi e ne cancellava l'evidenziazione.
+  document.querySelectorAll('#cityIndexList .ci-item').forEach(b => {
     const attiva = b.dataset.city === city;
     if (attiva && !b.classList.contains('active')) b.scrollIntoView({block:'nearest'});
     b.classList.toggle('active', attiva);
@@ -1749,12 +1750,98 @@ function spyCity() {
 
 // Nasconde dall'indice le città che la ricerca ha svuotato.
 function syncCityIndex() {
-  document.querySelectorAll('.ci-item').forEach(b => {
+  document.querySelectorAll('#cityIndexList .ci-item').forEach(b => {
     const col = document.querySelector(
       `#cinemasGrid .city-col[data-city="${CSS.escape(b.dataset.city)}"]`);
     b.classList.toggle('hidden', !col || col.classList.contains('hidden'));
   });
   spyCity();
+}
+
+// ── INDICE DISPOSITIVI (vista Per tipo) ───────────────────────
+// Stesso meccanismo dell'indice città: le sezioni fanno da intestazione e
+// sotto ognuna ci sono i modelli, che portano al gruppo corrispondente.
+function buildTypeIndex() {
+  const list = document.getElementById('typeIndexList');
+  if (!list) return;
+  list.innerHTML = '';
+  let n = 0;
+  document.querySelectorAll('#view-bytype .type-section').forEach(sez => {
+    const gruppi = [...sez.querySelectorAll('.model-group-header')];
+    if (!gruppi.length) return;
+    const tit = document.createElement('div');
+    tit.className = 'ci-sez';
+    tit.textContent = sez.querySelector('.type-title').textContent;
+    tit.dataset.sezione = '1';
+    list.appendChild(tit);
+    gruppi.forEach(g => {
+      if (!g.id) g.id = 'mg' + (++n);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ci-item ci-sotto';
+      b.dataset.target = g.id;
+      const etichetta = g.querySelector('.mgh-label').textContent;
+      const conto = (g.querySelector('.mgh-count').textContent.match(/^\d+/) || [''])[0];
+      b.title = etichetta;
+      b.innerHTML = `<span class="ci-name">${esc(etichetta)}</span><span class="ci-count">${esc(conto)}</span>`;
+      list.appendChild(b);
+    });
+  });
+  spyType();
+}
+
+function scrollToTarget(id, contenitore) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const lontano = Math.abs(el.getBoundingClientRect().top) > innerHeight * 1.5;
+  el.scrollIntoView({behavior: lontano ? 'auto' : 'smooth', block:'start'});
+  setActiveTarget(id);
+}
+
+function setActiveTarget(id) {
+  document.querySelectorAll('#typeIndexList .ci-item').forEach(b => {
+    const attiva = b.dataset.target === id;
+    if (attiva && !b.classList.contains('active')) b.scrollIntoView({block:'nearest'});
+    b.classList.toggle('active', attiva);
+  });
+}
+
+let _spyTypePending = false;
+function spyType() {
+  if (_spyTypePending) return;
+  _spyTypePending = true;
+  requestAnimationFrame(() => {
+    _spyTypePending = false;
+    const gruppi = [...document.querySelectorAll(
+      '#view-bytype .model-group-header:not(.filtered-out)')];
+    if (!gruppi.length) return setActiveTarget(null);
+    let corrente = gruppi[0];
+    for (const g of gruppi) {
+      if (g.getBoundingClientRect().top <= 160) corrente = g; else break;
+    }
+    setActiveTarget(corrente.id);
+  });
+}
+
+// Nasconde dall'indice i modelli svuotati dalla ricerca, e con loro le
+// sezioni rimaste senza modelli.
+function syncTypeIndex() {
+  const list = document.getElementById('typeIndexList');
+  if (!list) return;
+  let sezione = null, vuota = true;
+  [...list.children].forEach(el => {
+    if (el.dataset.sezione) {
+      if (sezione) sezione.classList.toggle('hidden', vuota);
+      sezione = el; vuota = true;
+      return;
+    }
+    const g = document.getElementById(el.dataset.target);
+    const fuori = !g || g.classList.contains('filtered-out');
+    el.classList.toggle('hidden', fuori);
+    if (!fuori) vuota = false;
+  });
+  if (sezione) sezione.classList.toggle('hidden', vuota);
+  spyType();
 }
 
 // ── FILTER HELPERS ────────────────────────────────────────────
@@ -1896,7 +1983,11 @@ function switchView(v) {
   // Il pulsante compatto mostra la vista in cui si va, non quella attuale
   if(lbl) lbl.textContent=_VIEW_LABELS[_VIEWS[(_VIEWS.indexOf(v)+1)%_VIEWS.length]];
   saveUiState({view: v});
+  // Entrando in una vista l'indice va riallineato: a vista nascosta le
+  // posizioni sullo schermo sono tutte a zero e la spia non può calcolarle.
   if(v==='mappa') showMap();
+  else if(v==='bytype') spyType();
+  else spyCity();
 }
 
 // ── TOAST ─────────────────────────────────────────────────────
@@ -1913,8 +2004,12 @@ function showToast(title,msg,type,duration){
 // informazioni nei data-attribute, così non si interpolano nomi di cinema
 // (che contengono apostrofi) dentro gli attributi onclick.
 document.addEventListener('click', e => {
-  const city = e.target.closest('.ci-item');
-  if (city) { scrollToCity(city.dataset.city); return; }
+  const voce = e.target.closest('.ci-item');
+  if (voce) {
+    if (voce.dataset.target) scrollToTarget(voce.dataset.target);
+    else scrollToCity(voce.dataset.city);
+    return;
+  }
   const dot = e.target.closest('.ping-dot,.tc-ping');
   if (dot && dot.dataset.pk) { pingFromEl(dot); return; }
   const copy = e.target.closest('.ip-btn[data-ip]');
@@ -1938,6 +2033,7 @@ document.addEventListener('keydown', e => {
 });
 
 document.getElementById('view-cinema').addEventListener('scroll', spyCity, {passive:true});
+document.getElementById('view-bytype').addEventListener('scroll', spyType, {passive:true});
 
 // ── INIT ──────────────────────────────────────────────────────
 const POLL_MS = 5 * 60 * 1000;
