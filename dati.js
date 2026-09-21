@@ -414,11 +414,6 @@ Florentia - Larderello - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Florentia - Larderello - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
 Florentia - Larderello - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
-Teatro delle Arti - Lastra a Signa - Coord	43.7618,11.1077	GEO
-Teatro delle Arti - Lastra a Signa - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Teatro delle Arti - Lastra a Signa - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Teatro delle Arti - Lastra a Signa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
 La Gran Guardia - Livorno - Coord	43.5513,10.3113	GEO
 La Gran Guardia - Livorno - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
 La Gran Guardia - Livorno - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
@@ -623,7 +618,7 @@ Centrale - Volterra - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
 Centrale - Volterra - Sala 2 - Barco DP2K-20C	192.168.1.22:161	ICMP
 Centrale - Volterra - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
 
-Teatro delle Arti - Lastra a Signa - Coord	43.769211802783055,11.106375036015722	GEO
+Teatro delle Arti - Lastra a Signa - Coord	43.7692,11.1064	GEO
 Teatro delle Arti - Lastra a Signa - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Teatro delle Arti - Lastra a Signa - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
 Teatro delle Arti - Lastra a Signa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP

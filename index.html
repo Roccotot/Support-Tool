@@ -661,6 +661,10 @@ function probePort(label) { return devType(label)[0] === 'tms' ? '9000' : ''; }
 
 function parseRaw(raw, net) {
   const cinemas = {};
+  // Firme già viste: una riga incollata due volte (stesso cinema, stessa
+  // sala, stesso dispositivo, stesso IP) sdoppiava tutto in card, popup e
+  // contatori senza che nulla lo segnalasse.
+  const visti = new Set();
   raw.split('\n').forEach(line => {
     line = line.trim();
     if (!line || line.startsWith('//')) return;
@@ -674,7 +678,13 @@ function parseRaw(raw, net) {
       const key  = name + '|||' + city;
       if (!cinemas[key]) cinemas[key] = { name, city, net, rooms:{} };
       const [lat, lng] = (cols[1]||'').split(',').map(Number);
-      if (!isNaN(lat) && !isNaN(lng)) cinemas[key].coords = [lat, lng];
+      if (isNaN(lat) || isNaN(lng)) return;
+      const prec = cinemas[key].coords;
+      if (prec && (prec[0] !== lat || prec[1] !== lng)) {
+        console.warn(`parseRaw: ${name} (${city}) ha due righe GEO diverse, ` +
+          `vince l'ultima: ${prec} → ${[lat, lng]}`);
+      }
+      cinemas[key].coords = [lat, lng];
       return;
     }
     if (!IP_RE.test((cols[1]||'').trim())) {
@@ -694,6 +704,12 @@ function parseRaw(raw, net) {
     const room = (parts[2] ? parts[2].trim() : 'Dispositivi').replace(/^(Sala)\s+0*(\d+)$/, '$1 $2');
     const dev  = parts.slice(3).join(' - ').trim() || 'Unità';
     const key  = name + '|||' + city;
+    const firma = key + '|||' + room + '|||' + dev + '|||' + ip;
+    if (visti.has(firma)) {
+      console.warn('parseRaw: riga duplicata, ignorata:', line);
+      return;
+    }
+    visti.add(firma);
     if (!cinemas[key]) cinemas[key] = { name, city, net, rooms:{} };
     if (!cinemas[key].rooms[room]) cinemas[key].rooms[room] = [];
     cinemas[key].rooms[room].push({ label:dev, ip, snmpPort, cinema:name, city });
