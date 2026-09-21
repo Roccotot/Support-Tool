@@ -27,6 +27,7 @@
   --border:rgba(41,121,255,0.14); --border2:rgba(41,121,255,0.06);
   --glow:0 0 28px rgba(41,121,255,0.3);
   --rb:linear-gradient(90deg,#e8192c,#1db954,#1565c0);
+  --col:640px;        /* larghezza della colonna centrale dei cinema */
 }
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -84,6 +85,33 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 #view-cinema::-webkit-scrollbar,#view-bytype::-webkit-scrollbar{width:5px}
 #view-cinema::-webkit-scrollbar-thumb,#view-bytype::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
+/* ── INDICE CITTÀ ── */
+/* Sta nella fascia vuota a sinistra della colonna centrale: sparisce da
+   solo quando lo schermo non è abbastanza largo da contenerlo senza
+   finire sopra le card. */
+.city-index{position:fixed;left:16px;top:132px;bottom:22px;width:196px;z-index:120;
+  display:flex;flex-direction:column;background:rgba(12,16,24,0.72);
+  backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:12px;
+  padding:10px 6px 8px;overflow:hidden}
+.ci-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--text2);padding:2px 8px 8px;flex-shrink:0}
+.ci-list{overflow-y:auto;display:flex;flex-direction:column;gap:1px;padding-right:2px}
+.ci-list::-webkit-scrollbar{width:4px}
+.ci-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.ci-item{display:flex;align-items:center;gap:7px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;color:#c0d8f0;border-radius:7px;
+  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:0.6px;
+  padding:5px 8px;transition:background 0.15s,color 0.15s}
+.ci-item:hover{background:rgba(41,121,255,0.12);color:#fff}
+.ci-item.active{background:rgba(41,121,255,0.16);color:#fff}
+.ci-item.active::before{content:'';position:absolute;left:0;width:3px;height:16px;
+  background:var(--rb);border-radius:0 2px 2px 0}
+.ci-item{position:relative}
+.ci-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ci-count{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text2)}
+.ci-item.hidden{display:none}
+@media(max-width:1180px){.city-index{display:none}}
+
 /* ── STATS ── */
 .stats-strip{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);
   gap:14px;padding:22px 28px 0;max-width:1600px;margin:0 auto;width:100%}
@@ -105,22 +133,19 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 
 /* ── CINEMA GRID ── */
-.cinemas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.city-col{display:flex;flex-direction:column;gap:12px;min-width:0}
-.city-col.span-2{grid-column:span 2}
-.city-col.span-3{grid-column:span 3}
-/* Le card di una città stanno su colonne di larghezza fissa: l'ultima riga
-   incompleta (es. Firenze, 7 cinema → 3+3+1) non deve allargare la card
-   rimasta a tutta la fascia. */
-.city-col .cinema-cards{display:grid;gap:14px;align-items:start;grid-template-columns:1fr}
-.city-col.span-2 .cinema-cards{grid-template-columns:repeat(2,1fr)}
-.city-col.span-3 .cinema-cards{grid-template-columns:repeat(3,1fr)}
+/* Colonna unica centrata: i cinema stanno uno sotto l'altro, con le fasce
+   laterali vuote. La larghezza è limitata apposta — più larga la card,
+   più si allontanano i nomi dei modelli dagli IP e dai tasti a destra
+   (a 640px restano ~280px di vuoto, a 760px diventano 400). */
+.cinemas-grid{display:flex;flex-direction:column;gap:18px;
+  max-width:var(--col);margin:0 auto;width:100%}
+.city-col{display:flex;flex-direction:column;gap:12px;min-width:0;scroll-margin-top:14px}
+.city-col .cinema-cards{display:flex;flex-direction:column;gap:14px}
 .city-col .cinema-cards .cinema-card{min-width:0}
-.city-col-hdr{display:flex;align-items:center;gap:14px;padding:14px 4px 2px}
+.city-col-hdr{display:flex;align-items:center;gap:14px;padding:14px 4px 2px;scroll-margin-top:12px}
 .city-col-hdr-line{flex:1;height:1px;background:var(--border)}
-.city-col-hdr-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--text2);white-space:nowrap}
+.city-col-hdr-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;letter-spacing:3px;text-transform:uppercase;color:#c0d8f0;white-space:nowrap}
 .city-divider{display:flex;align-items:center;gap:14px;padding:22px 4px 6px;margin-top:4px;grid-column:1/-1}
-.grid-filler{visibility:hidden;pointer-events:none}
 .city-divider-line{flex:1;height:1px;background:var(--border)}
 .city-divider-label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text2);white-space:nowrap}
 .cinema-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
@@ -242,6 +267,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   border:1px solid var(--border);border-radius:30px;padding:9px 22px;
   backdrop-filter:blur(14px);pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
 .msb-item{font-family:'Share Tech Mono',monospace;font-size:11px;color:#c0d8f0;letter-spacing:1px}
+.msb-legend{color:var(--text2);letter-spacing:0.5px}
 .msb-item span{font-weight:700;margin-left:4px;color:var(--accent)}
 .msb-sep{color:rgba(255,255,255,0.1)}
 .cmarker{width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
@@ -321,12 +347,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 @media(max-width:900px){
   .stats-strip{grid-template-columns:repeat(3,1fr);padding:12px}
   .main{padding:12px 12px 56px}
-  .cinemas-grid{grid-template-columns:1fr}
-  .city-col,.city-col.span-2,.city-col.span-3{grid-column:1/-1}
-  .city-col .cinema-cards,
-  .city-col.span-2 .cinema-cards,
-  .city-col.span-3 .cinema-cards{grid-template-columns:1fr}
-  .grid-filler{display:none}
+  .cinemas-grid{max-width:none}
   header{padding:0 12px}
 }
 /* ── SEARCH ── */
@@ -492,6 +513,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <button class="action-btn refresh" id="refreshBtn" onclick="autoPing()" title="Verifica tutti i dispositivi">⟳ Refresh All</button>
     <button class="action-btn export" onclick="exportCSV()" title="Scarica lista dispositivi CSV">↓ Export CSV</button>
   </div>
+  <nav class="city-index" id="cityIndex" aria-label="Indice delle città">
+    <div class="ci-title">Città</div>
+    <div class="ci-list" id="cityIndexList"></div>
+  </nav>
   <div class="main">
     <div class="section-hdr">
       <div class="section-title" id="cinemaTitle">Cinema VPN — Dispositivi Monitorati</div>
@@ -589,6 +614,8 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <div class="msb-item">CINEMA <span id="msb-cinema">—</span></div>
     <div class="msb-sep">|</div>
     <div class="msb-item">HOST <span id="msb-host">—</span></div>
+    <div class="msb-sep">|</div>
+    <div class="msb-item msb-legend">🛡️ VPN&ensp;🔓 LOCALE&ensp;☀️ ESTIVO</div>
   </div>
 </div>
 
@@ -984,6 +1011,7 @@ function filterDevices(q) {
 
   const clear = document.getElementById('searchClear');
   if (clear) clear.classList.toggle('show', !!q);
+  syncCityIndex();
   saveUiState({q});
 }
 
@@ -1226,6 +1254,14 @@ function devBtnsHTML(ip, label) {
   return vncBtn + sshBtn + webBtn + copyBtn;
 }
 
+// ── ICONA DEL CINEMA ─────────────────────────────────────────
+// Stessa simbologia dei pulsanti filtro: scudo = dentro la VPN,
+// lucchetto aperto = rete locale non raggiungibile, sole = arena estiva.
+// Il ciak resta per i cinema al chiuso di cui non si conosce la rete
+// (è l'icona usata dalla mappa pubblica).
+const NET_ICON = {vpn:'🛡️', offline:'🔓', estivi:'☀️'};
+function cinemaIcon(c) { return NET_ICON[c.net] || '🎬'; }
+
 // ── PALLINO DI STATO ─────────────────────────────────────────
 // Markup condiviso da vista Cinema, Per tipo e popup mappa. Tutte le
 // informazioni stanno nei data-attribute e il click è gestito in
@@ -1319,33 +1355,23 @@ function buildCinemaGrid(cinemas, gridId, ids) {
     return card;
   };
 
-  let colPos = 0;
   cityMap.forEach((cityCinemas, city) => {
-    const span = Math.min(cityCinemas.length, 3);
-    if (colPos > 0 && colPos + span > 3) {
-      for (let i = colPos; i < 3; i++) { const f = document.createElement('div'); f.className='city-col grid-filler'; grid.appendChild(f); }
-      colPos = 0;
-    }
     const col = document.createElement('div');
-    col.className = 'city-col' + (span > 1 ? ` span-${span}` : '');
+    col.className = 'city-col';
     col.dataset.city = city;
     const hdr = document.createElement('div');
     hdr.className = 'city-col-hdr';
     hdr.innerHTML = `<div class="city-col-hdr-line"></div><span class="city-col-hdr-label">📍 ${esc(city)}</span><div class="city-col-hdr-line"></div>`;
     col.appendChild(hdr);
-    for (let i = 0; i < cityCinemas.length; i += 3) {
-      const wrap = document.createElement('div');
-      wrap.className = 'cinema-cards';
-      cityCinemas.slice(i, i + 3).forEach(c => wrap.appendChild(buildCard(c)));
-      col.appendChild(wrap);
-    }
+    const wrap = document.createElement('div');
+    wrap.className = 'cinema-cards';
+    cityCinemas.forEach(c => wrap.appendChild(buildCard(c)));
+    col.appendChild(wrap);
     col.dataset.search = cityCinemas.flatMap(c =>
       [c.name, c.city, ...Object.entries(c.rooms).flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])]
     ).join(' ').toLowerCase();
     grid.appendChild(col);
-    colPos = (colPos + span) % 3;
   });
-  for (let i = colPos; colPos > 0 && i < 3; i++) { const f = document.createElement('div'); f.className='city-col grid-filler'; grid.appendChild(f); }
 
   document.getElementById(ids.cinema).textContent  = cinemas.length;
   document.getElementById(ids.devices).textContent = totalDevs;
@@ -1505,7 +1531,7 @@ function buildPopupHTML(c) {
   return `<div style="background:${color}0d;border-radius:13px;overflow:hidden">
     <div class="popup-rb" style="background:${color}"></div>
     <div class="popup-hdr" style="background:${color}12">
-      <div class="popup-ico" style="background:${color}20;border-color:${color}55">🎬</div>
+      <div class="popup-ico" style="background:${color}20;border-color:${color}55">${cinemaIcon(c)}</div>
       <div style="flex:1;min-width:0">
         <div class="popup-title">${esc(c.name)}</div>
         <div class="popup-city" style="color:${color}">📍 ${esc(c.city)}</div>
@@ -1565,7 +1591,7 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
     const [lat,lng]=c.coords||coords[c.city]||[43.5,11.2];
     const statusHtml = showStatus ? `<div class="cmarker-status" id="${cinemaId(cinemaKey(c))}"></div>` : '';
     const icon=L.divIcon({
-      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">🎬</div>${statusHtml}</div>`,
+      html:`<div class="cmarker" style="background:${color}20;border-color:${color};box-shadow:0 0 16px ${color}80"><div class="cmarker-inner">${cinemaIcon(c)}</div>${statusHtml}</div>`,
       className:'',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-46]
     });
     const marker=L.marker([lat,lng],{icon});
@@ -1604,6 +1630,71 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
     cluster.on('animationend spiderfied', refresh);
     refresh();
   }
+}
+
+// ── INDICE CITTÀ ──────────────────────────────────────────────
+// Elenco fisso nella fascia sinistra: resta fermo mentre si scorre, porta
+// alla città cliccata ed evidenzia quella che si sta guardando.
+function buildCityIndex(cinemas) {
+  const list = document.getElementById('cityIndexList');
+  if (!list) return;
+  const conteggio = new Map();
+  cinemas.forEach(c => conteggio.set(c.city, (conteggio.get(c.city) || 0) + 1));
+  list.innerHTML = '';
+  conteggio.forEach((n, city) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ci-item';
+    b.dataset.city = city;
+    b.title = `${city} — ${n} cinema`;
+    b.innerHTML = `<span class="ci-name">${esc(city)}</span><span class="ci-count">${n}</span>`;
+    list.appendChild(b);
+  });
+  spyCity();
+}
+
+function scrollToCity(city) {
+  const col = document.querySelector(
+    `#cinemasGrid .city-col[data-city="${CSS.escape(city)}"]`);
+  if (!col) return;
+  col.scrollIntoView({behavior:'smooth', block:'start'});
+  setActiveCity(city);
+}
+
+function setActiveCity(city) {
+  document.querySelectorAll('.ci-item').forEach(b => {
+    const attiva = b.dataset.city === city;
+    if (attiva && !b.classList.contains('active')) b.scrollIntoView({block:'nearest'});
+    b.classList.toggle('active', attiva);
+  });
+}
+
+// Evidenzia nell'indice la città in cima a quello che si sta guardando.
+let _spyPending = false;
+function spyCity() {
+  if (_spyPending) return;
+  _spyPending = true;
+  requestAnimationFrame(() => {
+    _spyPending = false;
+    const cols = [...document.querySelectorAll(
+      '#cinemasGrid .city-col[data-city]:not(.hidden)')];
+    if (!cols.length) return setActiveCity(null);
+    let corrente = cols[0];
+    for (const c of cols) {
+      if (c.getBoundingClientRect().top <= 140) corrente = c; else break;
+    }
+    setActiveCity(corrente.dataset.city);
+  });
+}
+
+// Nasconde dall'indice le città che la ricerca ha svuotato.
+function syncCityIndex() {
+  document.querySelectorAll('.ci-item').forEach(b => {
+    const col = document.querySelector(
+      `#cinemasGrid .city-col[data-city="${CSS.escape(b.dataset.city)}"]`);
+    b.classList.toggle('hidden', !col || col.classList.contains('hidden'));
+  });
+  spyCity();
 }
 
 // ── FILTER HELPERS ────────────────────────────────────────────
@@ -1692,9 +1783,11 @@ function setCinemaFilter(f) {
 }
 
 function buildCinema() {
-  buildCinemaGrid(getCinemasForFilter(_cFilter), 'cinemasGrid', {
+  const cinemas = getCinemasForFilter(_cFilter);
+  buildCinemaGrid(cinemas, 'cinemasGrid', {
     cinema:'statCinema', devices:'statDevices', rooms:'statRooms', lastUpdate:'lastUpdate'
   });
+  buildCityIndex(cinemas);
 }
 
 async function setMapFilter(f) {
@@ -1760,6 +1853,8 @@ function showToast(title,msg,type,duration){
 // informazioni nei data-attribute, così non si interpolano nomi di cinema
 // (che contengono apostrofi) dentro gli attributi onclick.
 document.addEventListener('click', e => {
+  const city = e.target.closest('.ci-item');
+  if (city) { scrollToCity(city.dataset.city); return; }
   const dot = e.target.closest('.ping-dot,.tc-ping');
   if (dot && dot.dataset.pk) { pingFromEl(dot); return; }
   const copy = e.target.closest('.ip-btn[data-ip]');
@@ -1781,6 +1876,8 @@ document.addEventListener('keydown', e => {
     e.preventDefault(); e.target.click();
   }
 });
+
+document.getElementById('view-cinema').addEventListener('scroll', spyCity, {passive:true});
 
 // ── INIT ──────────────────────────────────────────────────────
 const POLL_MS = 5 * 60 * 1000;
