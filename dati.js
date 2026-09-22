@@ -269,7 +269,19 @@ Teatro Ambra - Poggio a Caiano - Coord	43.8161,11.0542	GEO
 Teatro Ambra - Poggio a Caiano - Rete - MikroTik	10.58.92.1:161	SNMP
 Teatro Ambra - Poggio a Caiano - Sala 1 - Doremi ShowVault	10.58.92.10:161	SNMP
 Teatro Ambra - Poggio a Caiano - Sala 1 - Barco DP2K-15C	10.58.92.12:161	SNMP
-Teatro Ambra - Poggio a Caiano - Sala 1 - Dolby CP500	10.58.92.14:161	ICMP`,
+Teatro Ambra - Poggio a Caiano - Sala 1 - Dolby CP500	10.58.92.14:161	ICMP
+
+Cinema Garibaldi - Scarperia e San Piero - Coord	43.9950,11.3557	GEO
+Cinema Garibaldi - Scarperia e San Piero - Rete - MikroTik	10.58.91.1:161	SNMP
+Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Cinemeccanica CMC4	10.58.91.10:161	SNMP
+Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Barco DP2000	10.58.91.12:161	SNMP
+Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Dolby CP45	10.58.91.14:161	ICMP
+
+Artè - Capannori - Coord	43.8440,10.5760	GEO
+Artè - Capannori - Rete - MikroTik	10.58.93.1:161	SNMP
+Artè - Capannori - Sala 1 - Barco ICMP	10.58.93.10:161	SNMP
+Artè - Capannori - Sala 1 - Barco DP2K-10S	10.58.93.12:161	SNMP
+Artè - Capannori - Sala 1 - Dolby CP750	10.58.93.14:161	ICMP`,
   offline: `
 Teatro Bucci - San Giovanni in Valdarno - Coord	43.5610,11.5310	GEO
 Puccini - Altopascio - Coord	43.8138,10.6763	GEO
@@ -305,10 +317,6 @@ Borsalino - Camaiore - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
 Borsalino - Camaiore - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
 Borsalino - Camaiore - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
-Artè - Capannori - Coord	43.8440,10.5760	GEO
-Artè - Capannori - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
-Artè - Capannori - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
-Artè - Capannori - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Flamingo - Capoliveri - Coord	42.7456,10.3785	GEO
 Flamingo - Capoliveri - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
@@ -586,10 +594,6 @@ Cabiria - Scandicci - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
 Cabiria - Scandicci - Sala 2 - Barco DP2K-10S	192.168.1.22:161	ICMP
 Cabiria - Scandicci - Sala 2 - Dolby CP45	192.168.1.24:161	ICMP
 
-Cinema Garibaldi - Scarperia e San Piero - Coord	43.9950,11.3557	GEO
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Cinemeccanica CMC4	192.168.1.10:161	ICMP
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Barco DP2000	192.168.1.12:161	ICMP
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Dolby CP45	192.168.1.14:161	ICMP
 
 Scuderie Granducali - Seravezza - Coord	43.9940,10.2200	GEO
 Scuderie Granducali - Seravezza - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
