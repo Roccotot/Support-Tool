@@ -263,7 +263,13 @@ Cinema Marconi - Firenze - Sala Est - Proiettore	10.58.61.22:161	SNMP
 Cinema Marconi - Firenze - Sala Est - Dolby CP750	10.58.61.24:161	ICMP
 Cinema Marconi - Firenze - Sala Ovest - Qube XP-D	10.58.61.30:161	SNMP
 Cinema Marconi - Firenze - Sala Ovest - Proiettore	10.58.61.32:161	SNMP
-Cinema Marconi - Firenze - Sala Ovest - Dolby CP750	10.58.61.34:161	ICMP`,
+Cinema Marconi - Firenze - Sala Ovest - Dolby CP750	10.58.61.34:161	ICMP
+
+Teatro Ambra - Poggio a Caiano - Coord	43.8161,11.0542	GEO
+Teatro Ambra - Poggio a Caiano - Rete - MikroTik	10.58.92.1:161	SNMP
+Teatro Ambra - Poggio a Caiano - Sala 1 - Doremi ShowVault	10.58.92.10:161	SNMP
+Teatro Ambra - Poggio a Caiano - Sala 1 - Barco DP2K-15C	10.58.92.12:161	SNMP
+Teatro Ambra - Poggio a Caiano - Sala 1 - Dolby CP500	10.58.92.14:161	ICMP`,
   offline: `
 Teatro Bucci - San Giovanni in Valdarno - Coord	43.5610,11.5310	GEO
 Puccini - Altopascio - Coord	43.8138,10.6763	GEO
@@ -633,10 +639,6 @@ La Compagnia - Firenze - Sala 1 - Barco DP4K-B	192.168.1.10:161	ICMP
 La Compagnia - Firenze - Sala 1 - Barco Alchemy	192.168.1.12:161	ICMP
 La Compagnia - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
-Teatro Ambra - Poggio a Caiano - Coord	43.8161,11.0542	GEO
-Teatro Ambra - Poggio a Caiano - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Teatro Ambra - Poggio a Caiano - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
-Teatro Ambra - Poggio a Caiano - Sala 1 - Dolby CP500	192.168.1.14:161	ICMP
 
 `,
   estivi: `
