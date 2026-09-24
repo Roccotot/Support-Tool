@@ -141,7 +141,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .main{position:relative;z-index:1;padding:20px 28px 56px;max-width:calc(var(--col) + 56px);margin:0 auto;width:100%}
 .section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border2)}
 .section-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:#c0d8f0;text-transform:uppercase;white-space:nowrap}
-#lastUpdate{color:#fff !important}
+#lastUpdate{color:#fff !important;font-size:11px;letter-spacing:1.5px}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 
 /* ── CINEMA GRID ── */
@@ -184,6 +184,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .tms-btn:hover{background:#00bcd430;color:#00e5ff}
 .tag{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;
   background:rgba(0,0,0,0.3);border:1px solid var(--border);color:#c0d8f0;white-space:nowrap}
+.health{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;
+  white-space:nowrap;border:1px solid;display:none}
+.health.ok{display:inline-block;color:var(--lime);border-color:rgba(0,230,118,0.35);background:rgba(0,230,118,0.07)}
+.health.err{display:inline-block;color:var(--crimson);border-color:rgba(255,23,68,0.45);background:rgba(255,23,68,0.1)}
 .chevron{width:16px;height:16px;color:#c0d8f0;transition:transform 0.3s;flex-shrink:0}
 .cinema-card.collapsed .chevron{transform:rotate(-90deg)}
 .card-body{overflow:hidden;max-height:2000px;transition:max-height 0.42s cubic-bezier(0.4,0,0.2,1)}
@@ -347,7 +351,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   .dev-name{font-size:17px}
   .dev-type{font-size:13px;padding:4px 12px}
   .city-divider-label{font-size:20px}
-  .tag{font-size:13px;padding:5px 13px}
+  .tag,.health{font-size:13px;padding:5px 13px}
   .ip-btn{font-size:13px;padding:4px 10px}
   .proto-btn{font-size:12px;padding:4px 10px;letter-spacing:0.5px}
   .dev-btns{gap:6px}
@@ -385,6 +389,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .gs-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block}
 .gs-dot.ok{background:var(--lime);box-shadow:0 0 4px var(--lime)}
 .gs-dot.err{background:var(--crimson);box-shadow:0 0 4px var(--crimson)}
+.gs-toggle{background:none;border:1px solid transparent;border-radius:6px;padding:2px 7px;margin:0 -7px;
+  cursor:pointer;transition:all 0.2s}
+.gs-toggle:hover{color:var(--text);border-color:rgba(255,23,68,0.4)}
+.gs-toggle[aria-pressed="true"]{color:#fff;border-color:var(--crimson);background:rgba(255,23,68,0.14)}
 .gs-sep{color:rgba(255,255,255,0.12);font-family:'Share Tech Mono',monospace;font-size:10px}
 .gs-spacer{flex:1}
 .action-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
@@ -457,7 +465,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <div class="logo-wrap">
     <img src="data:image/png;base64,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" alt="Sigra Film">
     <div class="logo-div"></div>
-    <div class="logo-text">SUPPORT TOOL<br><b>di Rocco Totaro</b> — V3.1</div>
+    <div class="logo-text">SUPPORT TOOL<br><b>di Rocco Totaro</b> — V3.2</div>
   </div>
   <div class="search-wrap">
     <input type="text" class="search-input" id="searchInput" autocomplete="off" spellcheck="false"
@@ -531,7 +539,9 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   <div class="global-status-bar">
     <span class="gs-item"><span class="gs-dot ok"></span><span id="gs-online-count">—</span> online</span>
     <span class="gs-sep">|</span>
-    <span class="gs-item"><span class="gs-dot err"></span><span id="gs-offline-count">—</span> offline</span>
+    <button type="button" class="gs-item gs-toggle" id="problemsBtn" aria-pressed="false"
+      onclick="toggleProblems()" title="Mostra solo i cinema con dispositivi che non rispondono">
+      <span class="gs-dot err"></span><span id="gs-offline-count">—</span> offline</button>
     <span class="gs-sep">|</span>
     <span class="gs-item"><span id="gs-unknown-count">—</span> non verificati</span>
     <span class="gs-spacer"></span>
@@ -549,7 +559,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
       <div class="section-title" id="lastUpdate" style="white-space:nowrap">—</div>
     </div>
     <div class="cinemas-grid" id="cinemasGrid"></div>
-    <div class="no-results" id="noResults">Nessun risultato per "<span id="noResultsQuery"></span>"</div>
+    <div class="no-results" id="noResults"></div>
   </div>
 </div>
 
@@ -1022,16 +1032,35 @@ async function pingDevice(pk, ip, port) {
     ok ? `✓ Risponde — ${ms} ms` : `✗ Non risponde (timeout ${PING_TIMEOUT / 1000} s)`);
   if (prev === 'ok' && !ok) {
     const [nome, citta] = pk.split('|');
-    showToast('ALERT', `${nome} (${citta}) — ${ip} non risponde`, 'err');
+    queueDownAlert(`${nome} (${citta}) — ${ip}`);
   }
   return ok;
+}
+
+// Quando cade un'intera rete i dispositivi smettono di rispondere tutti
+// insieme: un toast per ciascuno si sovrascriveva e restava visibile solo
+// l'ultimo. Si raccolgono per un attimo e si avvisa una volta sola.
+let _downQueue = [], _downTimer;
+function queueDownAlert(msg) {
+  _downQueue.push(msg);
+  clearTimeout(_downTimer);
+  _downTimer = setTimeout(() => {
+    const q = _downQueue; _downQueue = [];
+    if (q.length === 1) return showToast('ALERT', q[0] + ' non risponde', 'err', 8000);
+    const altri = q.length > 3 ? ` e altri ${q.length - 3}` : '';
+    showToast('ALERT', `${q.length} dispositivi non rispondono più: ` +
+      q.slice(0, 3).join(' · ') + altri, 'err', 12000);
+  }, 800);
 }
 
 // Ping a partire da un pallino nel DOM: tutte le informazioni stanno nei
 // data-attribute, così non serve interpolare nomi di cinema negli onclick.
 function pingFromEl(el) {
   return pingDevice(el.dataset.pk, el.dataset.ip, el.dataset.port || '')
-    .then(ok => { if (el.dataset.ck) updateMapStatus(el.dataset.ck); return ok; });
+    .then(ok => {
+      if (el.dataset.ck) { updateMapStatus(el.dataset.ck); updateCardHealth(el.dataset.ck); }
+      return ok;
+    });
 }
 
 // ── RICERCA ───────────────────────────────────────────────────
@@ -1040,10 +1069,11 @@ function pingFromEl(el) {
 function filterDevices(q) {
   q = (q || '').toLowerCase().trim();
   const match = el => !q || el.dataset.search.includes(q);
+  const soloProblemi = problemsActive();
 
   let visibleCinema = 0;
   document.querySelectorAll('.cinema-card[data-search]').forEach(card => {
-    const show = match(card);
+    const show = match(card) && (!soloProblemi || !!card.querySelector('.card-body .ping-dot.err'));
     card.classList.toggle('hidden', !show);
     if (show) visibleCinema++;
   });
@@ -1069,10 +1099,14 @@ function filterDevices(q) {
     if (el) el.textContent = n + ' dispositivi';
   });
 
-  const noRes  = document.getElementById('noResults');
-  const noResQ = document.getElementById('noResultsQuery');
-  if (noRes)  noRes.style.display = q && visibleCinema === 0 ? '' : 'none';
-  if (noResQ) noResQ.textContent  = q;
+  const noRes = document.getElementById('noResults');
+  if (noRes) {
+    noRes.style.display = (q || soloProblemi) && visibleCinema === 0 ? '' : 'none';
+    noRes.textContent = soloProblemi
+      ? (q ? `Nessun dispositivo offline per "${q}"` : '✓ Nessun dispositivo offline')
+      : `Nessun risultato per "${q}"`;
+  }
+  filterMapMarkers(q);
 
   const clear = document.getElementById('searchClear');
   if (clear) clear.classList.toggle('show', !!q);
@@ -1094,6 +1128,44 @@ function clearSearch() {
   input.value = '';
   filterDevices('');
   input.focus();
+}
+
+// ── SOLO PROBLEMI ─────────────────────────────────────────────
+// Il contatore "offline" della barra di stato fa da interruttore: lascia
+// solo i cinema con almeno un dispositivo che non risponde. Vale solo dove
+// si pinga (VPN, al chiuso, tutti): sulle reti locali non c'è niente da
+// mostrare. L'elenco si riallinea a fine giro, non a ogni singolo ping,
+// così le card non saltano sotto il mouse.
+let _onlyProblems = false;
+function pingedFilter(f) { return f === 'vpn' || f === 'chiuso' || f === 'tutti'; }
+function problemsActive() { return _onlyProblems && pingedFilter(_cFilter); }
+
+function toggleProblems(force) {
+  _onlyProblems = force === undefined ? !_onlyProblems : !!force;
+  const b = document.getElementById('problemsBtn');
+  if (b) b.setAttribute('aria-pressed', String(_onlyProblems));
+  filterDevices(document.getElementById('searchInput').value);
+  if (_onlyProblems) {
+    const v = document.getElementById('view-cinema');
+    if (v) v.scrollTop = 0;
+  }
+}
+
+// ── SALUTE DELLA CARD ────────────────────────────────────────
+// Badge nell'intestazione: a card chiusa è l'unico modo di sapere se dentro
+// c'è qualcosa che non risponde. Contano solo i pallini del corpo: il
+// MikroTik compare anche nell'intestazione e verrebbe contato due volte.
+function updateCardHealth(ck) {
+  const card = document.querySelector(`#cinemasGrid .cinema-card[data-ck="${CSS.escape(ck)}"]`);
+  if (!card) return;
+  const badge = card.querySelector('.health');
+  if (!badge) return;
+  const dots = card.querySelectorAll('.card-body [data-pk]');
+  let ok = 0, err = 0;
+  dots.forEach(d => { if (d.classList.contains('ok')) ok++; else if (d.classList.contains('err')) err++; });
+  badge.className = 'health' + (err ? ' err' : ok === dots.length && ok ? ' ok' : '');
+  badge.textContent = err ? `✗ ${err} offline` : ok === dots.length && ok ? '✓ tutto ok' : '';
+  badge.title = `${ok} rispondono, ${err} non rispondono, ${dots.length - ok - err} non verificati`;
 }
 
 // ── EXPORT ────────────────────────────────────────────────────
@@ -1267,6 +1339,8 @@ async function autoPing() {
     _autoPinging = false;
     _lastAutoPing = Date.now();
     if (btn) { btn.classList.remove('busy'); btn.disabled = false; }
+    renderLastCheck();
+    if (problemsActive()) filterDevices(document.getElementById('searchInput').value);
   }
 }
 
@@ -1407,6 +1481,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
         </div>
         <div class="card-actions">
           ${tmsDev ? `<a class="proto-btn tms-web" href="http://${tmsDev.ip}:9000/?redirect=/tms/" target="_blank" rel="noopener" title="Apri TMS">TMS</a>` : ''}
+          <span class="health"></span>
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"/>
@@ -1443,11 +1518,20 @@ function buildCinemaGrid(cinemas, gridId, ids) {
   document.getElementById(ids.cinema).textContent  = cinemas.length;
   document.getElementById(ids.devices).textContent = totalDevs;
   document.getElementById(ids.rooms).textContent   = totalRooms;
-  if (ids.lastUpdate) {
-    const now = new Date();
-    document.getElementById(ids.lastUpdate).textContent =
-      now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  }
+  // Lo stato dei ping sopravvive alla ricostruzione della griglia
+  cinemas.forEach(c => updateCardHealth(cinemaKey(c)));
+}
+
+// L'orario in testata è quello dell'ultimo giro di ping: prima era l'ora
+// in cui era stata disegnata la griglia, che non diceva niente sullo stato.
+function renderLastCheck() {
+  const el = document.getElementById('lastUpdate');
+  if (!el) return;
+  if (!pingedFilter(_cFilter)) { el.textContent = 'rete locale · niente ping'; return; }
+  if (!_lastAutoPing) { el.textContent = 'controllo in corso…'; return; }
+  el.textContent = 'ultimo controllo ' +
+    new Date(_lastAutoPing).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+  el.title = new Date(_lastAutoPing).toLocaleString('it-IT');
 }
 
 // ── PER TIPO ──────────────────────────────────────────────────
@@ -1647,6 +1731,7 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
   // Niente raggruppamento a numeri: i marker si vedono tutti, anche quando
   // si sovrappongono. Chi cerca un cinema preciso ingrandisce e li separa.
   const marker_layer = L.layerGroup();
+  const voci = _mapMarkers[mapId] = {layer: marker_layer, cinemas, items: []};
 
   for (let i=0; i<cinemas.length; i++) {
     const c=cinemas[i], color=cinemaColor(c.name, c.city);
@@ -1682,10 +1767,43 @@ async function buildLeafletMap(cinemas, {mapId, windowKey, statCinema, statHost,
       {permanent:true,direction:'top',offset:[0,-42],opacity:1,className:'cinema-tooltip'}
     );
     marker_layer.addLayer(marker);
+    voci.items.push({marker, ck: cinemaKey(c), search: [c.name, c.city,
+      ...Object.entries(c.rooms).flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])
+    ].join(' ').toLowerCase()});
   }
   map.addLayer(marker_layer);
+  filterMapMarkers(document.getElementById('searchInput').value.toLowerCase().trim());
   // I pallini di stato esistono solo dopo che i marker sono nel DOM
   if (showStatus) cinemas.forEach(c => updateMapStatus(cinemaKey(c)));
+}
+
+// La ricerca vale anche sulla mappa: restano solo i marker dei cinema che
+// corrispondono e, se ne resta qualcuno, la mappa ci si centra sopra.
+const _mapMarkers = {};   // mapId → {layer, cinemas, items:[{marker, ck, search}]}
+function filterMapMarkers(q) {
+  Object.entries(_mapMarkers).forEach(([mapId, m]) => {
+    const visibili = [];
+    m.items.forEach(it => {
+      const show = !q || it.search.includes(q);
+      const presente = m.layer.hasLayer(it.marker);
+      if (show) visibili.push(it.marker);
+      if (show && !presente) {
+        m.layer.addLayer(it.marker);
+        // L'icona viene ricreata: il pallino di stato va ricalcolato
+        updateMapStatus(it.ck);
+      } else if (!show && presente) m.layer.removeLayer(it.marker);
+    });
+    if (mapId === 'map-' + _mFilter) {
+      const tot = m.items.length;
+      document.getElementById('msb-cinema').textContent = q ? `${visibili.length}/${tot}` : tot;
+      const map = window['_map_' + _mFilter];
+      // Solo a mappa visibile: nascosta, Leaflet non ne conosce le dimensioni
+      const aVista = document.getElementById('view-mappa').classList.contains('active');
+      if (q && visibili.length && map && aVista) {
+        map.fitBounds(L.featureGroup(visibili).getBounds().pad(0.3), {maxZoom: 13});
+      }
+    }
+  });
 }
 
 // ── INDICE CITTÀ ──────────────────────────────────────────────
@@ -1922,7 +2040,7 @@ function setCinemaFilter(f) {
     tutti:  'Tutti i Cinema'
   };
   const t = document.getElementById('cinemaTitle'); if(t) t.textContent = titles[f];
-  const sb = document.querySelector('.global-status-bar'); if(sb) sb.style.display = f==='vpn' ? '' : 'none';
+  const sb = document.querySelector('.global-status-bar'); if(sb) sb.style.display = pingedFilter(f) ? '' : 'none';
   saveUiState({cFilter: f});
   buildCinema();
   filterDevices(document.getElementById('searchInput').value);
@@ -1932,8 +2050,9 @@ function setCinemaFilter(f) {
 function buildCinema() {
   const cinemas = getCinemasForFilter(_cFilter);
   buildCinemaGrid(cinemas, 'cinemasGrid', {
-    cinema:'statCinema', devices:'statDevices', rooms:'statRooms', lastUpdate:'lastUpdate'
+    cinema:'statCinema', devices:'statDevices', rooms:'statRooms'
   });
+  renderLastCheck();
   buildCityIndex(cinemas);
 }
 
@@ -1964,6 +2083,7 @@ async function showMap() {
     const cinemas = getCinemasForFilter(f);
     document.getElementById('msb-cinema').textContent = cinemas.length;
     document.getElementById('msb-host').textContent = cinemas.reduce((s,c)=>s+Object.values(c.rooms).flat().length,0);
+    filterMapMarkers(document.getElementById('searchInput').value.toLowerCase().trim());
   }
 }
 

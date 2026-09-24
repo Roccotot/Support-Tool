@@ -31,8 +31,17 @@ senza internet. ExcelJS (~900 KB) viene caricato solo al primo click su
 - **Vista Per tipo** — dispositivi raggruppati per categoria e modello, ordinati
   per anno di uscita.
 - Filtri: VPN / Offline (rete locale) / Estivi / Al chiuso / Tutti.
+- **Salute a colpo d'occhio**: ogni card mostra un badge `✗ N offline` o
+  `✓ tutto ok`, visibile anche a card chiusa. Cliccando il contatore
+  "offline" della barra di stato restano **solo i cinema con dispositivi che
+  non rispondono** (l'elenco si riallinea a fine giro di ping).
+- In testata c'è l'orario dell'**ultimo giro di ping**, non quello del
+  caricamento della pagina.
+- Se in un giro cadono più dispositivi insieme arriva **un solo avviso**
+  riassuntivo invece di una raffica di toast che si sovrascrivono.
 - Ricerca per cinema, città, sala, dispositivo o IP: `/` o `Ctrl/Cmd+K` per
-  andarci, `Esc` per svuotarla.
+  andarci, `Esc` per svuotarla. Vale anche sulla **mappa**: restano solo i
+  marker che corrispondono e la mappa ci si centra sopra.
 - **Stato ricordato**: vista, filtri, ricerca e card chiuse si ritrovano al
   reload, e l'hash dell'URL è condivisibile
   (`…/index.html#view=cinema&f=offline&q=flora` apre esattamente quello).
