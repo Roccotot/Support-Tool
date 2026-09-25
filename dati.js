@@ -645,7 +645,7 @@ La Compagnia - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Cinema Comunale - Quarrata - Coord	43.8471,10.9768	GEO
 Cinema Comunale - Quarrata - Sala 1 - Christie IMB-S4	192.168.1.12:161	ICMP
-Cinema Comunale - Quarrata - Sala 1 - Christie CP2406-RBe	192.168.1.12:161	ICMP
+Cinema Comunale - Quarrata - Sala 1 - Christie CP2409-RBe	192.168.1.12:161	ICMP
 Cinema Comunale - Quarrata - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
 
