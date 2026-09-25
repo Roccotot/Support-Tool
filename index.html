@@ -876,6 +876,7 @@ const MODEL_YEAR = {
   'sp4k-':     2019,  // Barco Series 4 (laser) — SP4K-B
   'sp2k-':     2020,  // Cinionic SP2K Series 4 — SP2K-11S/9S/7S
   'cp2406':    2024,  // Christie CineLife+ RBe
+  'cp2409':    2024,
   'cp2411':    2024,
 };
 // Chiavi ordinate per lunghezza decrescente: la chiave più specifica vince
@@ -938,7 +939,8 @@ function getModelImage(label) {
   if (/ims3000/.test(l))            return MODEL_IMG.ims3000;
   if (/cinecloud/.test(l))          return MODEL_IMG.cinecloud;
   if (/cp2411-?rbe/i.test(l))        return MODEL_IMG.cp2411rbe;
-  if (/cp2406-?rbe/i.test(l))        return MODEL_IMG.cp2406rbe;
+  // CP2406 e CP2409 condividono lo stesso chassis: stessa foto
+  if (/cp240[69]-?rbe/i.test(l))     return MODEL_IMG.cp2406rbe;
   if (/imb-?s4/i.test(l))            return MODEL_IMG.imbs4;
   if (/christie|cp2210/i.test(l))    return MODEL_IMG.christie;
   if (/nec|nc2000/i.test(l))        return MODEL_IMG.nec_nc2000c;
