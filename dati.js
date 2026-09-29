@@ -648,6 +648,12 @@ Cinema Comunale - Quarrata - Sala 1 - Christie IMB-S4	192.168.1.12:161	ICMP
 Cinema Comunale - Quarrata - Sala 1 - Christie CP2409-RBe	192.168.1.12:161	ICMP
 Cinema Comunale - Quarrata - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
+// Modelli non ancora noti: dispositivi generici sugli IP standard della sala
+Nuovo Cinema l'Unione - Girone - Coord	43.7697,11.3409	GEO
+Nuovo Cinema l'Unione - Girone - Sala 1 - Server	192.168.1.10:161	ICMP
+Nuovo Cinema l'Unione - Girone - Sala 1 - Proiettore	192.168.1.12:161	ICMP
+Nuovo Cinema l'Unione - Girone - Sala 1 - Processore Audio	192.168.1.14:161	ICMP
+
 
 `,
   estivi: `
