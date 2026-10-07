@@ -273,8 +273,8 @@ Teatro Ambra - Poggio a Caiano - Sala 1 - Dolby CP500	10.58.92.14:161	ICMP
 
 Cinema Garibaldi - Scarperia e San Piero - Coord	43.9950,11.3557	GEO
 Cinema Garibaldi - Scarperia e San Piero - Rete - MikroTik	10.58.91.1:161	SNMP
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Cinemeccanica CMC4	10.58.91.10:161	SNMP
-Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Barco DP2000	10.58.91.12:161	SNMP
+Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Barco DP2K-20C	10.58.91.12:161	SNMP
+Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Barco ICMP	10.58.91.12:161	SNMP
 Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Dolby CP45	10.58.91.14:161	ICMP
 
 Artè - Capannori - Coord	43.8440,10.5760	GEO
