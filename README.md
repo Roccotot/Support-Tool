@@ -87,6 +87,10 @@ Una riga per dispositivo, separata da TAB:
 NomeCinema - Città - Sala - Dispositivo<TAB>IP:porta<TAB>PROTOCOLLO
 ```
 
+La porta scritta di solito è la 161 (SNMP) e non viene usata. Se è
+diversa, è la porta dell'interfaccia web: la usano il pulsante WEB e il
+ping (es. `Multisala Odeon - Pisa - Rete - TMS Giuli	10.55.76.86:8600	SNMP`).
+
 Ogni cinema ha anche una riga coordinate per la mappa:
 
 ```
