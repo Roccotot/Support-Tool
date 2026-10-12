@@ -97,6 +97,7 @@ Isola Verde - Pisa - Sala 03 - Dolby CP650\t10.58.70.34:161\tICMP
 Multisala Odeon - Pisa - Coord	43.7188,10.4038	GEO
 Multisala Odeon - Pisa - Rete - MikroTik\t10.55.76.1:161\tSNMP
 Multisala Odeon - Pisa - Rete - TMS\t10.55.76.2:161\tSNMP
+Multisala Odeon - Pisa - Rete - TMS Giuli	10.55.76.86:8600	SNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Dolby IMS3000\t10.55.76.10:161\tSNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Cinemeccanica DPC-80\t10.55.76.12:161\tSNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Dolby CP750\t10.55.76.14:161\tICMP

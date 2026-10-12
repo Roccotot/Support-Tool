@@ -758,8 +758,19 @@ function cinemaKey(c) { return c.name + '|' + c.city + (c.net ? '|' + c.net : ''
 function devKey(c, ip) { return cinemaKey(c) + '|' + ip; }
 
 // Porta su cui ha senso tentare il probe HTTP: i TMS espongono la loro UI
-// sulla 9000, tutto il resto sulla 80.
-function probePort(label) { return devType(label)[0] === 'tms' ? '9000' : ''; }
+// sulla 9000, tutto il resto sulla 80. Una porta diversa dalla 161 scritta
+// nei dati è quella dell'interfaccia web e vince (es. TMS Giuli sulla 8600).
+function probePort(dev) {
+  if (dev.webPort) return dev.webPort;
+  return devType(dev.label)[0] === 'tms' ? '9000' : '';
+}
+
+// Indirizzo dell'interfaccia web di un TMS: quello standard sta sulla 9000
+// con il redirect a /tms/, gli altri (Giuli) rispondono alla radice.
+function tmsUrl(dev) {
+  const port = probePort(dev);
+  return `http://${dev.ip}:${port}/` + (port === '9000' ? '?redirect=/tms/' : '');
+}
 
 function parseRaw(raw, net) {
   const cinemas = {};
@@ -799,6 +810,7 @@ function parseRaw(raw, net) {
     // La porta scritta nei dati è quella del monitoraggio SNMP (161/UDP):
     // la conserviamo solo come informazione, non ci si può fare un probe HTTP.
     const snmpPort = (ipPort.match(/:(\d+)$/) || [])[1] || '';
+    const webPort  = snmpPort && snmpPort !== '161' ? snmpPort : '';
     const parts = full.split(' - ');
     if (parts.length < 2) return;
     const name = parts[0].trim();
@@ -814,7 +826,7 @@ function parseRaw(raw, net) {
     visti.add(firma);
     if (!cinemas[key]) cinemas[key] = { name, city, net, rooms:{} };
     if (!cinemas[key].rooms[room]) cinemas[key].rooms[room] = [];
-    cinemas[key].rooms[room].push({ label:dev, ip, snmpPort, cinema:name, city });
+    cinemas[key].rooms[room].push({ label:dev, ip, snmpPort, webPort, cinema:name, city });
   });
   const result = Object.values(cinemas).sort((a,b) => a.city.localeCompare(b.city));
   result.forEach(c => Object.keys(c.rooms).forEach(r => {
@@ -1373,7 +1385,8 @@ function copyIP(ip, el) {
 }
 
 // ── COSTRUISCE PULSANTI DISPOSITIVO ──────────────────────────
-function devBtnsHTML(ip, label) {
+function devBtnsHTML(dev) {
+  const {ip, label} = dev;
   const [tc] = devType(label);
   const copyBtn = `<button class="ip-btn" type="button" data-ip="${ip}" title="Copia ${ip}">${ip}</button>`;
   // I Barco ICMP espongono la web UI in HTTPS sulla porta 43744
@@ -1389,8 +1402,9 @@ function devBtnsHTML(ip, label) {
   if (tc === 'aud') return (/cp950/i.test(label) ? webBtn : '') + copyBtn;
   if (tc === 'pc')  return `<a class="proto-btn vnc" href="vnc://${ip}" title="VNC">VNC</a>` + copyBtn;
   if (tc === 'tms') {
-    const tmsSsh = `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
-    const tmsWeb = `<a class="proto-btn tms-web" href="http://${ip}:9000/?redirect=/tms/" target="_blank" rel="noopener" title="Apri TMS porta 9000">WEB</a>`;
+    // SSH solo per il TMS standard: degli altri (Giuli) si conosce solo la web UI
+    const tmsSsh = dev.webPort ? '' : `<a class="proto-btn ssh" href="ssh://${ip}" title="SSH">SSH</a>`;
+    const tmsWeb = `<a class="proto-btn tms-web" href="${tmsUrl(dev)}" target="_blank" rel="noopener" title="Apri TMS porta ${probePort(dev)}">WEB</a>`;
     return tmsSsh + tmsWeb + copyBtn;
   }
   return vncBtn + sshBtn + webBtn + copyBtn;
@@ -1414,7 +1428,7 @@ function dotHTML(c, dev, cls) {
   const [tc]  = devType(dev.label);
   const pk    = devKey(c, dev.ip);
   const st    = pingState[pk] || '';
-  const port  = probePort(dev.label);
+  const port  = probePort(dev);
   const ms    = pingMs[pk];
   const title = st === 'ok'  ? `✓ Risponde${ms != null ? ' — ' + ms + ' ms' : ''}`
               : st === 'err' ? '✗ Non risponde'
@@ -1446,7 +1460,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
     totalDevs  += devCount;
     totalRooms += rooms.filter(([r]) => r !== 'Rete').length;
     const routerDev = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'rtr');
-    const tmsDev    = rooms.flatMap(([,devs]) => devs).find(d => devType(d.label)[0] === 'tms');
+    const tmsDevs   = rooms.flatMap(([,devs]) => devs).filter(d => devType(d.label)[0] === 'tms');
     let roomsHTML = '';
     rooms.forEach(([roomName, devices]) => {
       roomsHTML += `<div class="room-sep">
@@ -1458,7 +1472,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
         roomsHTML += `<div class="dev-row">
           ${dotHTML(c, d)}
           <div class="dev-name" title="${esc(d.label)}">${esc(d.label)}</div>
-          <div class="dev-btns">${devBtnsHTML(d.ip, d.label)}</div>
+          <div class="dev-btns">${devBtnsHTML(d)}</div>
         </div>`;
       });
     });
@@ -1482,7 +1496,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
           </div>
         </div>
         <div class="card-actions">
-          ${tmsDev ? `<a class="proto-btn tms-web" href="http://${tmsDev.ip}:9000/?redirect=/tms/" target="_blank" rel="noopener" title="Apri TMS">TMS</a>` : ''}
+          ${tmsDevs.map(t => `<a class="proto-btn tms-web" href="${tmsUrl(t)}" target="_blank" rel="noopener" title="Apri ${esc(t.label)}">${tmsDevs.length > 1 ? esc(t.label) : 'TMS'}</a>`).join('')}
           <span class="health"></span>
           <span class="tag" style="color:${color};border-color:${color}44">${devCount} host</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -1586,7 +1600,7 @@ function buildByType() {
             .trim() || d.label;
           buckets.forEach(b => {
             if (!modelMap[b][key]) modelMap[b][key] = [];
-            modelMap[b][key].push({cinema: c.name, city: c.city, net: c.net, room, ip: d.ip, label: d.label, novpn, estate});
+            modelMap[b][key].push({cinema: c.name, city: c.city, net: c.net, room, ip: d.ip, label: d.label, webPort: d.webPort, novpn, estate});
           });
         });
       });
@@ -1647,7 +1661,7 @@ function buildByType() {
           <div class="tc-name" title="${esc(e.room)}">${esc(e.room)}</div>
           <div class="tc-btns">
             ${dotHTML({name:e.cinema, city:e.city, net:e.net}, e, 'tc-ping')}
-            ${e.novpn ? '' : devBtnsHTML(e.ip, e.label)}
+            ${e.novpn ? '' : devBtnsHTML(e)}
           </div>`;
         card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip].join(' ').toLowerCase();
         cardsWrap.appendChild(card);
@@ -1678,7 +1692,7 @@ function buildPopupHTML(c) {
       devRows += `<div class="popup-dev-row">
         ${dotHTML(c, d)}
         <div class="pdev-name" title="${esc(d.label)}">${esc(d.label)}</div>
-        <div class="pdev-btns">${devBtnsHTML(d.ip, d.label)}</div>
+        <div class="pdev-btns">${devBtnsHTML(d)}</div>
       </div>`;
     });
   });
