@@ -46,7 +46,7 @@ senza internet. ExcelJS (~900 KB) viene caricato solo al primo click su
   reload, e l'hash dell'URL è condivisibile
   (`…/index.html#view=cinema&f=offline&q=flora` apre esattamente quello).
 - Export CSV ed Excel: stesse colonne (Cinema, Città, Rete, Sala, Dispositivo,
-  IP, Stato) e ciascuno esporta il filtro della propria vista.
+  IP, Software, Stato) e ciascuno esporta il filtro della propria vista.
 
 ## Come funziona il "ping"
 
@@ -130,5 +130,34 @@ Le coordinate di fallback per città stanno in `SIGRA_COORDS`, sempre in
   È idempotente: si può rilanciare per riprovare solo i download falliti.
   Finché un'immagine resta remota e il link muore, viene semplicemente
   nascosta (`onerror`).
+
+- `leggi_versioni.py` — legge la **versione software di server e
+  proiettori** e la salva in `versioni.js`; la dashboard la mostra sotto il
+  nome di ogni dispositivo (in arancione se la lettura ha più di 30 giorni),
+  la include nella ricerca (es. cerca `2.8.12`) e negli export CSV/Excel.
+  Il browser non può leggerla da solo (niente SNMP, risposte dei dispositivi
+  non leggibili), quindi va lanciato **da un PC collegato alla VPN**. Solo
+  libreria standard:
+
+  ```bash
+  python3 leggi_versioni.py                  # cinema in VPN
+  python3 leggi_versioni.py --solo odeon     # solo alcuni dispositivi
+  python3 leggi_versioni.py --tutti          # anche 192.168.x (sul posto)
+  # poi committare versioni.js
+  ```
+
+  Usa gli stessi metodi del TMS:
+
+  | Dispositivi | Metodo |
+  |---|---|
+  | Doremi / Dolby (DCP2000, DCP-2K4, ShowVault, IMS3000) | SNMP, MIB Doremi `1.3.6.1.4.1.24391.1.3.10.0` (software) e `.7.0` (firmware) |
+  | Barco ICMP / Alchemy | SOAP HTTPS porta 43758, `Login` + `GetProductInformation` |
+  | Proiettori e altri server | SNMP `sysDescr` (`1.3.6.1.2.1.1.1.0`) |
+
+  Le credenziali Barco si passano con le variabili d'ambiente
+  `BARCO_USER` e `BARCO_PASSWORD` (su Windows `set BARCO_PASSWORD=...`):
+  **non vanno mai scritte nel repository**. Community SNMP: `public`,
+  oppure `SNMP_COMMUNITY`. Un dispositivo che non risponde non cancella la
+  versione letta in precedenza.
 
 I file `.xlsx` generati non vanno committati (sono in `.gitignore`).
