@@ -15,6 +15,9 @@
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css"/>
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="dati.js"></script>
+<!-- Versioni software lette da leggi_versioni.py (facoltativo: se manca,
+     la dashboard funziona lo stesso, solo senza versioni) -->
+<script src="versioni.js"></script>
 <script src="basemap.js"></script>
 <style>
 :root {
@@ -215,6 +218,12 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .ping-dot.checking{background:var(--amber);box-shadow:0 0 6px var(--amber);border-color:var(--amber);animation:blinkdot 0.5s infinite}
 @keyframes blinkdot{0%,100%{opacity:1}50%{opacity:0.15}}
 
+.dev-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.dev-ver{font-family:'Share Tech Mono',monospace;font-size:9.5px;color:var(--text2);letter-spacing:0.3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.dev-ver b{color:#a5d6a7;font-weight:400}
+.dev-ver.vecchia b{color:var(--amber)}
+.tc-name + .dev-ver{margin:-6px 0 8px}
 .dev-name{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .dev-type{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0}
 .dev-type.proj{color:#b39ddb;border:1px solid rgba(179,157,219,0.3)}
@@ -349,6 +358,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   .card-city{font-size:14px}
   .room-sep-label{font-size:13px;letter-spacing:2.5px}
   .dev-name{font-size:17px}
+  .dev-ver{font-size:12px}
   .dev-type{font-size:13px;padding:4px 12px}
   .city-divider-label{font-size:20px}
   .tag,.health{font-size:13px;padding:5px 13px}
@@ -756,6 +766,28 @@ function cinemaKey(c) { return c.name + '|' + c.city + (c.net ? '|' + c.net : ''
 // compare in 77 cinema diversi). Chiave = cinema + città + IP, altrimenti
 // un ping colora i pallini di decine di cinema sbagliati.
 function devKey(c, ip) { return cinemaKey(c) + '|' + ip; }
+
+// ── VERSIONI SOFTWARE ─────────────────────────────────────────
+// Lette fuori dal browser da leggi_versioni.py e salvate in versioni.js.
+// Chiave = cinema + IP + nome del dispositivo: proiettore e ICMP spesso
+// condividono l'IP ma hanno software diversi.
+const VERSIONI = (typeof SIGRA_VERSIONI !== 'undefined' && SIGRA_VERSIONI.dispositivi) || {};
+const VERSIONE_VECCHIA_GG = 30;
+function versione(c, d) { return VERSIONI[cinemaKey(c) + '|' + d.ip + '|' + d.label] || null; }
+
+function verHTML(c, d) {
+  const v = versione(c, d);
+  if (!v) return '';
+  const quando = v.letto ? new Date(v.letto) : null;
+  const giorni = quando ? (Date.now() - quando) / 864e5 : 0;
+  const title = `Software ${v.sw}` + (v.fw ? ` · firmware ${v.fw}` : '')
+    + (v.seriale ? ` · S/N ${v.seriale}` : '')
+    + (quando ? ` — letto il ${quando.toLocaleDateString('it-IT')}` : '')
+    + (giorni > VERSIONE_VECCHIA_GG ? ' (lettura vecchia)' : '');
+  return `<div class="dev-ver${giorni > VERSIONE_VECCHIA_GG ? ' vecchia' : ''}" title="${esc(title)}">SW <b>${esc(v.sw)}</b>`
+    + (v.fw && v.fw !== v.sw ? ` · FW ${esc(v.fw)}` : '') + '</div>';
+}
+function verTesto(c, d) { const v = versione(c, d); return v ? v.sw : ''; }
 
 // Porta su cui ha senso tentare il probe HTTP: i TMS espongono la loro UI
 // sulla 9000, tutto il resto sulla 80. Una porta diversa dalla 161 scritta
@@ -1185,7 +1217,7 @@ function updateCardHealth(ck) {
 // ── EXPORT ────────────────────────────────────────────────────
 // CSV ed Excel esportano le stesse colonne e ciascuno rispetta il filtro
 // della propria vista: quello che scarichi è quello che vedi.
-const EXPORT_COLS = ['Cinema','Città','Rete','Sala','Dispositivo','IP','Stato'];
+const EXPORT_COLS = ['Cinema','Città','Rete','Sala','Dispositivo','IP','Software','Stato'];
 const NET_LABEL = {vpn:'VPN', offline:'Offline', estivi:'Estivo'};
 
 function exportRows(cinemas) {
@@ -1193,7 +1225,7 @@ function exportRows(cinemas) {
   cinemas.forEach(c => {
     Object.entries(c.rooms).forEach(([sala, devices]) => {
       devices.forEach(d => rows.push([
-        c.name, c.city, NET_LABEL[c.net] || c.net, sala, d.label, d.ip,
+        c.name, c.city, NET_LABEL[c.net] || c.net, sala, d.label, d.ip, verTesto(c, d),
         pingState[devKey(c, d.ip)] || 'non verificato',
       ]));
     });
@@ -1244,6 +1276,7 @@ async function downloadExcel() {
     {header:'Sala',        key:'sala',        width:16},
     {header:'Dispositivo', key:'dispositivo', width:32},
     {header:'IP',          key:'ip',          width:22},
+    {header:'Software',    key:'software',    width:22},
     {header:'Stato',       key:'stato',       width:16},
   ];
 
@@ -1255,7 +1288,7 @@ async function downloadExcel() {
   });
   ws.getRow(1).height = 20;
   ws.views = [{state:'frozen', ySplit:1}];
-  ws.autoFilter = {from:'A1', to:'G1'};
+  ws.autoFilter = {from:'A1', to:'H1'};
 
   // Colore per categoria di dispositivo, non per etichetta esatta
   const FILL = {proj:'FFFFB3B3', srv:'FFFFFF99', aud:'FFFFD580', tms:'FFD6E4FF', rtr:'FFE2E2E2'};
@@ -1471,7 +1504,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
       devices.forEach(d => {
         roomsHTML += `<div class="dev-row">
           ${dotHTML(c, d)}
-          <div class="dev-name" title="${esc(d.label)}">${esc(d.label)}</div>
+          <div class="dev-main"><div class="dev-name" title="${esc(d.label)}">${esc(d.label)}</div>${verHTML(c, d)}</div>
           <div class="dev-btns">${devBtnsHTML(d)}</div>
         </div>`;
       });
@@ -1506,7 +1539,7 @@ function buildCinemaGrid(cinemas, gridId, ids) {
       </div>
       <div class="card-body">${roomsHTML}</div>`;
     card.dataset.search = [c.name, c.city,
-      ...rooms.flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip)])
+      ...rooms.flatMap(([rn,devs]) => [rn, ...devs.map(d => d.label+' '+d.ip+' '+verTesto(c, d))])
     ].join(' ').toLowerCase();
     card.dataset.city = c.city;
     card.dataset.ck   = ck;
@@ -1659,11 +1692,13 @@ function buildByType() {
         card.innerHTML = `
           <div class="tc-cinema" title="${esc(e.cinema + ' — ' + e.city)}">${esc(e.cinema)}${e.estate ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· estate</span>' : e.novpn ? ' <span style="font-size:9px;opacity:.5;font-weight:400">· locale</span>' : ''}</div>
           <div class="tc-name" title="${esc(e.room)}">${esc(e.room)}</div>
+          ${verHTML({name:e.cinema, city:e.city, net:e.net}, e)}
           <div class="tc-btns">
             ${dotHTML({name:e.cinema, city:e.city, net:e.net}, e, 'tc-ping')}
             ${e.novpn ? '' : devBtnsHTML(e)}
           </div>`;
-        card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip].join(' ').toLowerCase();
+        card.dataset.search = [e.cinema, e.city, e.room, e.label, e.ip,
+          verTesto({name:e.cinema, city:e.city, net:e.net}, e)].join(' ').toLowerCase();
         cardsWrap.appendChild(card);
       });
       grid.appendChild(cardsWrap);
@@ -1691,7 +1726,7 @@ function buildPopupHTML(c) {
     devices.forEach(d => {
       devRows += `<div class="popup-dev-row">
         ${dotHTML(c, d)}
-        <div class="pdev-name" title="${esc(d.label)}">${esc(d.label)}</div>
+        <div class="dev-main"><div class="pdev-name" title="${esc(d.label)}">${esc(d.label)}</div>${verHTML(c, d)}</div>
         <div class="pdev-btns">${devBtnsHTML(d)}</div>
       </div>`;
     });
