@@ -280,13 +280,13 @@ Cinema Garibaldi - Scarperia e San Piero - Sala 1 - Dolby CP45	10.58.91.14:161	I
 
 Artè - Capannori - Coord	43.8440,10.5760	GEO
 Artè - Capannori - Rete - MikroTik	10.58.93.1:161	SNMP
-Artè - Capannori - Sala 1 - Barco ICMP	10.58.93.10:161	SNMP
-Artè - Capannori - Sala 1 - Barco DP2K-10S	10.58.93.12:161	SNMP
+Artè - Capannori - Sala 1 - Barco ICMP	10.58.93.12:161	SNMP
+Artè - Capannori - Sala 1 - Barco DP2K-8S	10.58.93.12:161	SNMP
 Artè - Capannori - Sala 1 - Dolby CP750	10.58.93.14:161	ICMP`,
   offline: `
 Teatro Bucci - San Giovanni in Valdarno - Coord	43.5610,11.5310	GEO
 Puccini - Altopascio - Coord	43.8138,10.6763	GEO
-Puccini - Altopascio - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Puccini - Altopascio - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Puccini - Altopascio - Sala 1 - Barco SP2K-11S	192.168.1.12:161	ICMP
 Puccini - Altopascio - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
@@ -314,13 +314,13 @@ Roma - Barga - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
 Roma - Barga - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
 
 Borsalino - Camaiore - Coord	43.9369,10.3010	GEO
-Borsalino - Camaiore - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Borsalino - Camaiore - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Borsalino - Camaiore - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
 Borsalino - Camaiore - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 
 Flamingo - Capoliveri - Coord	42.7456,10.3785	GEO
-Flamingo - Capoliveri - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Flamingo - Capoliveri - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Flamingo - Capoliveri - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
 Flamingo - Capoliveri - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
@@ -343,7 +343,7 @@ Teatro Signorelli - Cortona - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
 Teatro Signorelli - Cortona - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
 
 Astra - Firenze - Coord	43.7713,11.2715	GEO
-Astra - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Astra - Firenze - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Astra - Firenze - Sala 1 - Barco DP2K-10SLP	192.168.1.12:161	ICMP
 Astra - Firenze - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
@@ -357,12 +357,12 @@ Cinema Castello - Firenze - Sala 2 - Dolby CP65	192.168.1.24:161	ICMP
 
 
 Cinema Odeon - Firenze - Coord	43.7710,11.2525	GEO
-Cinema Odeon - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Cinema Odeon - Firenze - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Cinema Odeon - Firenze - Sala 1 - Barco DP4K-19B	192.168.1.12:161	ICMP
 Cinema Odeon - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Everest - Firenze - Coord	43.7363,11.2227	GEO
-Everest - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Everest - Firenze - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Everest - Firenze - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
 Everest - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
@@ -376,7 +376,7 @@ Fiamma - Firenze - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
 
 
 Il Portico - Firenze - Coord	43.7745,11.2780	GEO
-Il Portico - Firenze - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Il Portico - Firenze - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Il Portico - Firenze - Sala 1 - Barco SP4K-12B	192.168.1.12:161	ICMP
 Il Portico - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 Il Portico - Firenze - Sala 2 - Doremi DCP2000	192.168.1.20:161	ICMP
@@ -410,12 +410,12 @@ Nuovo Lido - Forte dei Marmi - Coord	43.9556,10.1695	GEO
 Nuovo Lido - Forte dei Marmi - Sala 1 - Doremi DCP2000	192.168.1.10:161	ICMP
 Nuovo Lido - Forte dei Marmi - Sala 1 - Barco DP2000	192.168.1.12:161	ICMP
 Nuovo Lido - Forte dei Marmi - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-Nuovo Lido - Forte dei Marmi - Sala 2 - Barco ICMP	192.168.1.20:161	ICMP
+Nuovo Lido - Forte dei Marmi - Sala 2 - Barco ICMP	192.168.1.22:161	ICMP
 Nuovo Lido - Forte dei Marmi - Sala 2 - Barco DP2K-15C	192.168.1.22:161	ICMP
 Nuovo Lido - Forte dei Marmi - Sala 2 - Dolby CP650	192.168.1.24:161	ICMP
 
 Teatro Pacini - Fucecchio - Coord	43.7263,10.8088	GEO
-Teatro Pacini - Fucecchio - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Teatro Pacini - Fucecchio - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Teatro Pacini - Fucecchio - Sala 1 - Barco SP2K-11S	192.168.1.12:161	ICMP
 Teatro Pacini - Fucecchio - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
@@ -430,15 +430,15 @@ Florentia - Larderello - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
 Florentia - Larderello - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 La Gran Guardia - Livorno - Coord	43.5513,10.3113	GEO
-La Gran Guardia - Livorno - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+La Gran Guardia - Livorno - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 La Gran Guardia - Livorno - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
 La Gran Guardia - Livorno - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-La Gran Guardia - Livorno - Sala 2 - Barco ICMP	192.168.1.20:161	ICMP
+La Gran Guardia - Livorno - Sala 2 - Barco ICMP	192.168.1.22:161	ICMP
 La Gran Guardia - Livorno - Sala 2 - Barco DP2K-20C	192.168.1.22:161	ICMP
 La Gran Guardia - Livorno - Sala 2 - Dolby CP750	192.168.1.24:161	ICMP
 
 Teatro dei Servi - Massa - Coord	44.0397,10.1426	GEO
-Teatro dei Servi - Massa - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Teatro dei Servi - Massa - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Teatro dei Servi - Massa - Sala 1 - Barco SP2K-9S	192.168.1.12:161	ICMP
 Teatro dei Servi - Massa - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
@@ -597,7 +597,7 @@ Cabiria - Scandicci - Sala 2 - Dolby CP45	192.168.1.24:161	ICMP
 
 
 Scuderie Granducali - Seravezza - Coord	43.9940,10.2200	GEO
-Scuderie Granducali - Seravezza - Sala 1 - Barco ICMP	192.168.1.10:161	ICMP
+Scuderie Granducali - Seravezza - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
 Scuderie Granducali - Seravezza - Sala 1 - Barco DP2K-6E	192.168.1.12:161	ICMP
 Scuderie Granducali - Seravezza - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
@@ -636,12 +636,12 @@ Teatro delle Arti - Lastra a Signa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 25hours Hotel - Firenze - Coord	43.7712,11.2490	GEO
 25hours Hotel - Firenze - Sala 1 - Barco DP2K-6E	192.168.1.10:161	ICMP
-25hours Hotel - Firenze - Sala 1 - Barco Alchemy	192.168.1.12:161	ICMP
+25hours Hotel - Firenze - Sala 1 - Barco Alchemy	192.168.1.10:161	ICMP
 25hours Hotel - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 La Compagnia - Firenze - Coord	43.7788,11.2591	GEO
 La Compagnia - Firenze - Sala 1 - Barco DP4K-B	192.168.1.10:161	ICMP
-La Compagnia - Firenze - Sala 1 - Barco Alchemy	192.168.1.12:161	ICMP
+La Compagnia - Firenze - Sala 1 - Barco Alchemy	192.168.1.10:161	ICMP
 La Compagnia - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Cinema Comunale - Quarrata - Coord	43.8471,10.9768	GEO
@@ -699,12 +699,12 @@ Castello dell'Imperatore - Prato - Arena - Dolby CP55	192.168.1.14:161	ICMP
 
 Cinema Castello - Castiglione della Pescaia - Coord	42.7610,10.8800	GEO
 Cinema Castello - Castiglione della Pescaia - Arena - Barco DP2K-10S	192.168.1.10:161	ICMP
-Cinema Castello - Castiglione della Pescaia - Arena - Barco ICMP	192.168.1.12:161	ICMP
+Cinema Castello - Castiglione della Pescaia - Arena - Barco ICMP	192.168.1.10:161	ICMP
 Cinema Castello - Castiglione della Pescaia - Arena - Mixer Amplificato	192.168.1.14:161	ICMP
 
 Cinema Estivo - Montespertoli - Coord	43.6426,11.0733	GEO
 Cinema Estivo - Montespertoli - Giardino - Barco DP2K-10S	192.168.1.10:161	ICMP
-Cinema Estivo - Montespertoli - Giardino - Barco ICMP	192.168.1.12:161	ICMP
+Cinema Estivo - Montespertoli - Giardino - Barco ICMP	192.168.1.10:161	ICMP
 Cinema Estivo - Montespertoli - Giardino - Mixer Amplificato	192.168.1.14:161	ICMP
 
 Arena Pitti - Firenze - Coord	43.7654,11.2497	GEO
@@ -735,7 +735,7 @@ Cinema nel Parco Villa Renatico Martini - Monsummano Terme - Arena - Doremi DCP2
 
 Cinema Estivo Cinquale - Montignoso - Coord	43.9790,10.1422	GEO
 Cinema Estivo Cinquale - Montignoso - Arena - Barco DP2K-10S	192.168.1.10:161	ICMP
-Cinema Estivo Cinquale - Montignoso - Arena - Barco ICMP	192.168.1.12:161	ICMP
+Cinema Estivo Cinquale - Montignoso - Arena - Barco ICMP	192.168.1.10:161	ICMP
 Cinema Estivo Cinquale - Montignoso - Arena - Mixer Amplificato	192.168.1.14:161	ICMP
 
 Cinema sotto le stelle - Pontedera - Coord	43.6614,10.6307	GEO
