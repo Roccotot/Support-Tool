@@ -282,7 +282,14 @@ Artè - Capannori - Coord	43.8440,10.5760	GEO
 Artè - Capannori - Rete - MikroTik	10.58.93.1:161	SNMP
 Artè - Capannori - Sala 1 - Barco ICMP	10.58.93.12:161	SNMP
 Artè - Capannori - Sala 1 - Barco DP2K-8S	10.58.93.12:161	SNMP
-Artè - Capannori - Sala 1 - Dolby CP750	10.58.93.14:161	ICMP`,
+Artè - Capannori - Sala 1 - Dolby CP750	10.58.93.14:161	ICMP
+
+// Era "Cinema Comunale" fra gli offline: ora in VPN con il suo nome
+Teatro Libero Grassi - Quarrata - Coord	43.8463,10.9769	GEO
+Teatro Libero Grassi - Quarrata - Rete - MikroTik	10.57.71.1:161	SNMP
+Teatro Libero Grassi - Quarrata - Sala 1 - Christie IMB-S4	10.57.71.12:161	SNMP
+Teatro Libero Grassi - Quarrata - Sala 1 - Christie CP2409-RBe	10.57.71.12:161	SNMP
+Teatro Libero Grassi - Quarrata - Sala 1 - Dolby CP950	10.57.71.14:161	ICMP`,
   offline: `
 Teatro Bucci - San Giovanni in Valdarno - Coord	43.5610,11.5310	GEO
 Puccini - Altopascio - Coord	43.8138,10.6763	GEO
@@ -643,11 +650,6 @@ La Compagnia - Firenze - Coord	43.7788,11.2591	GEO
 La Compagnia - Firenze - Sala 1 - Barco DP4K-B	192.168.1.10:161	ICMP
 La Compagnia - Firenze - Sala 1 - Barco Alchemy	192.168.1.10:161	ICMP
 La Compagnia - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Cinema Comunale - Quarrata - Coord	43.8471,10.9768	GEO
-Cinema Comunale - Quarrata - Sala 1 - Christie IMB-S4	192.168.1.12:161	ICMP
-Cinema Comunale - Quarrata - Sala 1 - Christie CP2409-RBe	192.168.1.12:161	ICMP
-Cinema Comunale - Quarrata - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
 Nuovo Cinema l'Unione - Girone - Coord	43.7697,11.3409	GEO
 Nuovo Cinema l'Unione - Girone - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
