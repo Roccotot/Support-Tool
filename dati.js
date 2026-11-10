@@ -618,6 +618,17 @@ Pendola - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Pendola - Siena - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
 Pendola - Siena - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
 
+Odeon - Siena - Coord	43.3197,11.3312	GEO
+Odeon - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
+Odeon - Siena - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
+Odeon - Siena - Sala 1 - Dolby CP65	192.168.1.14:161	ICMP
+
+// Coordinate approssimate: Piazza dell'Abbadia 5
+Alessandro VII - Siena - Coord	43.3220,11.3316	GEO
+Alessandro VII - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
+Alessandro VII - Siena - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
+Alessandro VII - Siena - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
+
 Cinema Centrale - Viareggio - Coord	43.8676,10.2487	GEO
 Cinema Centrale - Viareggio - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Cinema Centrale - Viareggio - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
