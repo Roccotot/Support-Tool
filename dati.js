@@ -623,8 +623,8 @@ Odeon - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Odeon - Siena - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
 Odeon - Siena - Sala 1 - Dolby CP65	192.168.1.14:161	ICMP
 
-// Coordinate approssimate: Piazza dell'Abbadia 5
-Alessandro VII - Siena - Coord	43.3220,11.3316	GEO
+// Via dell'Abbadia 5 (plus code 88CJ+RM)
+Alessandro VII - Siena - Coord	43.3221,11.3317	GEO
 Alessandro VII - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Alessandro VII - Siena - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
 Alessandro VII - Siena - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
