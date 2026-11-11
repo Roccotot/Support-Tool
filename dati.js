@@ -24,16 +24,16 @@ Italia - Soci - Sala 1 - Dolby CP500	10.58.85.14:161	ICMP
 Aurelia Antica - Grosseto - Coord	42.7429,11.1068	GEO
 Aurelia Antica - Grosseto - Rete - MikroTik	10.57.91.1:161	SNMP
 Aurelia Antica - Grosseto - Rete - TMS\t10.57.91.2:161\tSNMP
-Aurelia Antica - Grosseto - Sala 1 - Barco DP4K-19B\t10.57.91.12:161	SNMP
+Aurelia Antica - Grosseto - Sala 1 - Barco DP4K-19B + LLU\t10.57.91.12:161	SNMP
 Aurelia Antica - Grosseto - Sala 1 - Barco ICMP\t10.57.91.12:161	SNMP
 Aurelia Antica - Grosseto - Sala 1 - Dolby CP850\t10.57.91.14:161\tICMP
-Aurelia Antica - Grosseto - Sala 2 - Barco DP2K-10S\t10.57.91.22:161	SNMP
+Aurelia Antica - Grosseto - Sala 2 - Barco DP2K-10S + LLU\t10.57.91.22:161	SNMP
 Aurelia Antica - Grosseto - Sala 2 - Barco ICMP\t10.57.91.22:161	SNMP
 Aurelia Antica - Grosseto - Sala 2 - Dolby CP750\t10.57.91.24:161\tICMP
-Aurelia Antica - Grosseto - Sala 3 - Barco DP2K-10S\t10.57.91.32:161	SNMP
+Aurelia Antica - Grosseto - Sala 3 - Barco DP2K-10S + LLU\t10.57.91.32:161	SNMP
 Aurelia Antica - Grosseto - Sala 3 - Barco ICMP\t10.57.91.32:161	SNMP
 Aurelia Antica - Grosseto - Sala 3 - Dolby CP750\t10.57.91.34:161\tICMP
-Aurelia Antica - Grosseto - Sala 4 - Barco DP2K-10S\t10.57.91.42:161	SNMP
+Aurelia Antica - Grosseto - Sala 4 - Barco DP2K-10S + LLU\t10.57.91.42:161	SNMP
 Aurelia Antica - Grosseto - Sala 4 - Barco ICMP\t10.57.91.42:161	SNMP
 Aurelia Antica - Grosseto - Sala 4 - Dolby CP750\t10.57.91.44:161\tICMP
 
