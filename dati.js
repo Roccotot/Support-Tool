@@ -66,15 +66,15 @@ Imperiale - Montecatini Terme - Coord	43.8838,10.7725	GEO
 Imperiale - Montecatini Terme - Rete - MikroTik\t10.57.97.1:161\tSNMP
 Imperiale - Montecatini Terme - Rete - TMS\t10.57.97.2:161\tSNMP
 Imperiale - Montecatini Terme - Sala 1 - Dolby IMS3000\t10.57.97.10:161\tSNMP
-Imperiale - Montecatini Terme - Sala 1 - Cinemeccanica DPC-80\t10.57.97.12:161\tSNMP
+Imperiale - Montecatini Terme - Sala 1 - Cinemeccanica DPC-80 + LUCILLA\t10.57.97.12:161\tSNMP
 Imperiale - Montecatini Terme - Sala 1 - Dolby CP750\t10.57.97.14:161\tICMP
 Imperiale - Montecatini Terme - Sala 2 - Dolby IMS3000\t10.57.97.20:161\tSNMP
-Imperiale - Montecatini Terme - Sala 2 - Barco DP2K-20C\t10.57.97.22:161\tSNMP
+Imperiale - Montecatini Terme - Sala 2 - Barco DP2K-20C + LUCILLA\t10.57.97.22:161\tSNMP
 Imperiale - Montecatini Terme - Sala 2 - Dolby CP750\t10.57.97.24:161\tICMP
-Imperiale - Montecatini Terme - Sala 3 - Barco DP2K-6E\t10.57.97.32:161	SNMP
+Imperiale - Montecatini Terme - Sala 3 - Barco DP2K-6E + LLU\t10.57.97.32:161	SNMP
 Imperiale - Montecatini Terme - Sala 3 - Barco ICMP\t10.57.97.32:161	SNMP
 Imperiale - Montecatini Terme - Sala 3 - Dolby CP750\t10.57.97.34:161\tICMP
-Imperiale - Montecatini Terme - Sala 4 - Barco DP2K-6E\t10.57.97.42:161	SNMP
+Imperiale - Montecatini Terme - Sala 4 - Barco DP2K-6E + LLU\t10.57.97.42:161	SNMP
 Imperiale - Montecatini Terme - Sala 4 - Barco ICMP\t10.57.97.42:161	SNMP
 Imperiale - Montecatini Terme - Sala 4 - Dolby CP750\t10.57.97.44:161\tICMP
 
@@ -99,7 +99,7 @@ Multisala Odeon - Pisa - Rete - MikroTik\t10.55.76.1:161\tSNMP
 Multisala Odeon - Pisa - Rete - TMS\t10.55.76.2:161\tSNMP
 Multisala Odeon - Pisa - Rete - TMS Giuli	10.55.76.86:8600	SNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Dolby IMS3000\t10.55.76.10:161\tSNMP
-Multisala Odeon - Pisa - Sala 1 Venezia - Cinemeccanica DPC-80\t10.55.76.12:161\tSNMP
+Multisala Odeon - Pisa - Sala 1 Venezia - Cinemeccanica DPC-80 + LUCILLA\t10.55.76.12:161\tSNMP
 Multisala Odeon - Pisa - Sala 1 Venezia - Dolby CP750\t10.55.76.14:161\tICMP
 Multisala Odeon - Pisa - Sala 1 Venezia - PC Lucilla	10.55.76.209:161	SNMP
 Multisala Odeon - Pisa - Sala 2 Amalfi - Dolby IMS3000\t10.55.76.20:161\tSNMP
@@ -213,7 +213,7 @@ Teatro Giotto - Borgo San Lorenzo - Sala 1 - Dolby CP650\t10.58.82.14:161\tICMP
 
 Centro Pecci - Prato - Coord	43.8613,11.1095	GEO
 Centro Pecci - Prato - Rete - MikroTik\t10.58.81.1:161\tSNMP
-Centro Pecci - Prato - Sala 1 - Barco DP2K-6E\t10.58.81.12:161	SNMP
+Centro Pecci - Prato - Sala 1 - Barco DP2K-6E + LLU\t10.58.81.12:161	SNMP
 Centro Pecci - Prato - Sala 1 - Barco ICMP\t10.58.81.12:161	SNMP
 Centro Pecci - Prato - Sala 1 - Dolby CP750\t10.58.81.14:161\tICMP
 
@@ -620,7 +620,7 @@ Pendola - Siena - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
 
 Odeon - Siena - Coord	43.3197,11.3312	GEO
 Odeon - Siena - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Odeon - Siena - Sala 1 - Barco DP2K-10S	192.168.1.12:161	ICMP
+Odeon - Siena - Sala 1 - Barco DP2K-10S + LLU	192.168.1.12:161	ICMP
 Odeon - Siena - Sala 1 - Dolby CP65	192.168.1.14:161	ICMP
 
 // Via dell'Abbadia 5 (plus code 88CJ+RM)
@@ -631,7 +631,7 @@ Alessandro VII - Siena - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
 
 Cinema Centrale - Viareggio - Coord	43.8676,10.2487	GEO
 Cinema Centrale - Viareggio - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Cinema Centrale - Viareggio - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
+Cinema Centrale - Viareggio - Sala 1 - Barco DP2K-20C + LLU	192.168.1.12:161	ICMP
 Cinema Centrale - Viareggio - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 Città di Villafranca - Villafranca in Lunigiana - Coord	44.2940,9.9490	GEO
@@ -658,7 +658,7 @@ Teatro delle Arti - Lastra a Signa - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 25hours Hotel - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 La Compagnia - Firenze - Coord	43.7788,11.2591	GEO
-La Compagnia - Firenze - Sala 1 - Barco DP4K-B	192.168.1.10:161	ICMP
+La Compagnia - Firenze - Sala 1 - Barco DP4K-B + LUCILLA	192.168.1.10:161	ICMP
 La Compagnia - Firenze - Sala 1 - Barco Alchemy	192.168.1.10:161	ICMP
 La Compagnia - Firenze - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
