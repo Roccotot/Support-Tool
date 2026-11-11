@@ -599,7 +599,7 @@ Cabiria - Scandicci - Sala 1 - Doremi DCP-2K4	192.168.1.10:161	ICMP
 Cabiria - Scandicci - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
 Cabiria - Scandicci - Sala 1 - JBL CPI2000	192.168.1.14:161	ICMP
 Cabiria - Scandicci - Sala 2 - Doremi ShowVault	192.168.1.20:161	ICMP
-Cabiria - Scandicci - Sala 2 - Barco DP2K-10S	192.168.1.22:161	ICMP
+Cabiria - Scandicci - Sala 2 - Barco DP2K-10S + LLU	192.168.1.22:161	ICMP
 Cabiria - Scandicci - Sala 2 - Dolby CP45	192.168.1.24:161	ICMP
 
 
