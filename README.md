@@ -57,6 +57,14 @@ senza internet. ExcelJS (~900 KB) viene caricato solo al primo click su
 Il browser non può fare ICMP: lo stato viene dedotto da una richiesta
 `fetch` HTTP in modalità `no-cors` verso l'IP del dispositivo (timeout 3 s).
 Il tempo di risposta viene misurato e mostrato nel tooltip del pallino.
+Molti dispositivi accesi però non offrono una pagina web sulla porta del
+controllo (porta chiusa, oppure solo HTTPS con certificato non valido, come
+i Barco Series 4 SP2K/SP4K e gli ICMP): la richiesta fallisce **subito**,
+mentre verso un dispositivo spento va in timeout. Un errore immediato conta
+quindi come "acceso" — tooltip *Acceso — rifiuta la pagina web* — ma solo
+se nello stesso momento il **MikroTik del cinema risponde davvero**: così
+una VPN scollegata o un browser che blocca le richieste (che fanno fallire
+tutto subito, MikroTik compreso) non accendono di verde niente.
 Lo stato è tenuto **per cinema + IP**, non per IP: le reti locali dei cinema
 offline riusano gli stessi indirizzi (192.168.1.10 compare in decine di
 cinema) e un solo ping non deve colorare i pallini di tutti gli altri.
