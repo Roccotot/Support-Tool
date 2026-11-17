@@ -30,7 +30,12 @@ senza internet. ExcelJS (~900 KB) viene caricato solo al primo click su
   (verde = tutto online, arancione = parziale, rosso = solo router online).
 - **Vista Per tipo** — dispositivi raggruppati per categoria e modello, ordinati
   per anno di uscita.
-- Filtri: VPN / Offline (rete locale) / Estivi / Al chiuso / Tutti.
+- Filtri: VPN / Online / Offline (rete locale) / Estivi / Al chiuso / Tutti.
+  **Online** mostra i cinema in VPN ma, di ognuno, solo i dispositivi che
+  hanno risposto al controllo (se risponde solo il MikroTik, si vede solo
+  quello); spariscono le sale e i cinema senza niente di raggiungibile, e
+  i riquadri in alto contano solo quello che risponde. Anche l'export CSV
+  da questa vista contiene solo i dispositivi online.
 - **Salute a colpo d'occhio**: ogni card mostra un badge `✗ N offline` o
   `✓ tutto ok`, visibile anche a card chiusa. Cliccando il contatore
   "offline" della barra di stato restano **solo i cinema con dispositivi che

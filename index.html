@@ -286,6 +286,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .model-group-cards{grid-column:1/-1;display:grid;grid-template-columns:1fr;gap:10px;overflow:hidden;transition:opacity .2s}
 .model-group-cards.hidden{display:none}
 /* .hidden = nascosto dalla ricerca, .filtered-out = gruppo rimasto vuoto */
+.dev-row.spento,.room-sep.spento{display:none}
 .cinema-card.hidden,.city-col.hidden,.type-card.hidden,
 .model-group-cards.filtered-out,.model-group-header.filtered-out{display:none}
 
@@ -528,6 +529,11 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
     <button id="cf-vpn" class="cf-btn active" onclick="setCinemaFilter('vpn')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       VPN
+    </button>
+    <button id="cf-online" class="cf-btn" onclick="setCinemaFilter('online')"
+      title="Solo i dispositivi in VPN che rispondono in questo momento">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M5 12.55a11 11 0 0 1 14 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      ONLINE
     </button>
     <button id="cf-offline" class="cf-btn" onclick="setCinemaFilter('offline')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
@@ -1109,6 +1115,7 @@ function pingFromEl(el) {
   return pingDevice(el.dataset.pk, el.dataset.ip, el.dataset.port || '')
     .then(ok => {
       if (el.dataset.ck) { updateMapStatus(el.dataset.ck); updateCardHealth(el.dataset.ck); }
+      if (_cFilter === 'online') scheduleOnlineRefresh();
       return ok;
     });
 }
@@ -1120,16 +1127,29 @@ function filterDevices(q) {
   q = (q || '').toLowerCase().trim();
   const match = el => !q || el.dataset.search.includes(q);
   const soloProblemi = problemsActive();
+  const soloOnline = _cFilter === 'online';
+  applyOnlineRows(soloOnline);
 
   let visibleCinema = 0;
   document.querySelectorAll('.cinema-card[data-search]').forEach(card => {
-    const show = match(card) && (!soloProblemi || !!card.querySelector('.card-body .ping-dot.err'));
+    const show = match(card) && (!soloProblemi || !!card.querySelector('.card-body .ping-dot.err'))
+      && (!soloOnline || !!card.querySelector('.card-body .ping-dot.ok'));
     card.classList.toggle('hidden', !show);
     if (show) visibleCinema++;
   });
   document.querySelectorAll('.city-col[data-city]').forEach(col => {
     col.classList.toggle('hidden', !col.querySelector('.cinema-card:not(.hidden)'));
   });
+  // In vista ONLINE i riquadri in alto contano solo quello che risponde
+  if (soloOnline) {
+    const card = '#cinemasGrid .cinema-card:not(.hidden)';
+    document.getElementById('statCinema').textContent  = visibleCinema;
+    document.getElementById('statDevices').textContent =
+      document.querySelectorAll(card + ' .dev-row:not(.spento)').length;
+    document.getElementById('statRooms').textContent   =
+      [...document.querySelectorAll(card + ' .room-sep:not(.spento)')]
+        .filter(sep => sep.textContent.trim() !== 'Rete').length;
+  }
 
   // Vista Per tipo: nascondi anche le intestazioni rimaste senza card e
   // ricalcola i contatori di sezione su quello che si vede davvero.
@@ -1151,8 +1171,11 @@ function filterDevices(q) {
 
   const noRes = document.getElementById('noResults');
   if (noRes) {
-    noRes.style.display = (q || soloProblemi) && visibleCinema === 0 ? '' : 'none';
-    noRes.textContent = soloProblemi
+    noRes.style.display = (q || soloProblemi || soloOnline) && visibleCinema === 0 ? '' : 'none';
+    noRes.textContent = soloOnline
+      ? (_autoPinging || !_lastAutoPing ? 'Verifica dei dispositivi in corso…'
+         : q ? `Nessun dispositivo online per "${q}"` : 'Nessun dispositivo risponde (sei nella VPN?)')
+      : soloProblemi
       ? (q ? `Nessun dispositivo offline per "${q}"` : '✓ Nessun dispositivo offline')
       : `Nessun risultato per "${q}"`;
   }
@@ -1187,8 +1210,35 @@ function clearSearch() {
 // mostrare. L'elenco si riallinea a fine giro, non a ogni singolo ping,
 // così le card non saltano sotto il mouse.
 let _onlyProblems = false;
-function pingedFilter(f) { return f === 'vpn' || f === 'chiuso' || f === 'tutti'; }
-function problemsActive() { return _onlyProblems && pingedFilter(_cFilter); }
+function pingedFilter(f) { return f === 'vpn' || f === 'online' || f === 'chiuso' || f === 'tutti'; }
+function problemsActive() { return _onlyProblems && pingedFilter(_cFilter) && _cFilter !== 'online'; }
+
+// ── SOLO ONLINE ───────────────────────────────────────────────
+// Filtro ONLINE: cinema in VPN, ma di ogni cinema restano visibili solo i
+// dispositivi che hanno risposto all'ultimo controllo (se risponde solo il
+// MikroTik, si vede solo il MikroTik). Spariscono anche le intestazioni di
+// sala rimaste vuote e i cinema senza niente di raggiungibile.
+function applyOnlineRows(attivo) {
+  document.querySelectorAll('#cinemasGrid .card-body').forEach(body => {
+    let sep = null, visibili = 0;
+    const chiudi = () => { if (sep) sep.classList.toggle('spento', attivo && !visibili); };
+    [...body.children].forEach(el => {
+      if (el.classList.contains('room-sep')) { chiudi(); sep = el; visibili = 0; return; }
+      const on = !attivo || !!el.querySelector('.ping-dot.ok');
+      el.classList.toggle('spento', !on);
+      if (on) visibili++;
+    });
+    chiudi();
+  });
+}
+
+// Le risposte arrivano una alla volta: si riallinea l'elenco a piccoli
+// gruppi invece che a ogni singolo ping.
+let _onlineTimer;
+function scheduleOnlineRefresh() {
+  clearTimeout(_onlineTimer);
+  _onlineTimer = setTimeout(() => filterDevices(document.getElementById('searchInput').value), 400);
+}
 
 function toggleProblems(force) {
   _onlyProblems = force === undefined ? !_onlyProblems : !!force;
@@ -1309,7 +1359,9 @@ async function downloadExcel() {
 }
 
 function exportCSV() {
-  const rows = [EXPORT_COLS, ...exportRows(getCinemasForFilter(_cFilter))];
+  let dati = exportRows(getCinemasForFilter(_cFilter));
+  if (_cFilter === 'online') dati = dati.filter(r => r[r.length - 1] === 'ok');
+  const rows = [EXPORT_COLS, ...dati];
   const csv  = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\r\n');
   saveBlob(new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'}), `dispositivi-${_cFilter}.csv`);
 }
@@ -1375,7 +1427,7 @@ async function autoPing() {
       if (seen.has(d.dataset.pk)) return false;
       const card = d.closest('.cinema-card');
       const isRouter = d.dataset.router === '1';
-      if (card && card.classList.contains('collapsed') && !isRouter) return false;
+      if (card && card.classList.contains('collapsed') && !isRouter && _cFilter !== 'online') return false;
       seen.add(d.dataset.pk);
       return true;
     });
@@ -1391,7 +1443,7 @@ async function autoPing() {
     _lastAutoPing = Date.now();
     if (btn) { btn.classList.remove('busy'); btn.disabled = false; }
     renderLastCheck();
-    if (problemsActive()) filterDevices(document.getElementById('searchInput').value);
+    if (problemsActive() || _cFilter === 'online') filterDevices(document.getElementById('searchInput').value);
   }
 }
 
@@ -2018,7 +2070,7 @@ function syncTypeIndex() {
 }
 
 // ── FILTER HELPERS ────────────────────────────────────────────
-const FILTERS = ['vpn','offline','estivi','chiuso','tutti'];
+const FILTERS = ['vpn','online','offline','estivi','chiuso','tutti'];
 const _VIEWS  = ['cinema','mappa','bytype'];
 const _VIEW_LABELS = {cinema:'Cinema', mappa:'Mappa', bytype:'Per tipo'};
 
@@ -2043,8 +2095,9 @@ function loadUiState() {
   if (!Array.isArray(_state.collapsed)) _state.collapsed = [];
   if (!_VIEWS.includes(_state.view)) _state.view = 'cinema';
   if (!FILTERS.includes(_state.cFilter)) _state.cFilter = 'vpn';
-  if (!FILTERS.includes(_state.mFilter)) _state.mFilter = 'vpn';
-  if (!FILTERS.includes(_state.tFilter)) _state.tFilter = 'tutti';
+  // ONLINE esiste solo nella vista Cinema
+  if (!FILTERS.includes(_state.mFilter) || _state.mFilter === 'online') _state.mFilter = 'vpn';
+  if (!FILTERS.includes(_state.tFilter) || _state.tFilter === 'online') _state.tFilter = 'tutti';
   if (typeof _state.q !== 'string') _state.q = '';
 }
 
@@ -2077,7 +2130,7 @@ function setActiveBtn(prefix, f) {
 }
 
 function getCinemasForFilter(f) {
-  if (f === 'vpn')     return DATA.vpn;
+  if (f === 'vpn' || f === 'online') return DATA.vpn;
   if (f === 'offline') return DATA.offline;
   if (f === 'estivi')  return DATA.estivi;
   if (f === 'chiuso')  return [...DATA.vpn, ...DATA.offline].sort((a,b) => a.city.localeCompare(b.city));
@@ -2089,6 +2142,7 @@ function setCinemaFilter(f) {
   setActiveBtn('cf-', f);
   const titles = {
     vpn:    'Cinema VPN — Dispositivi Monitorati',
+    online: 'Cinema VPN — Solo Dispositivi Online',
     offline:'Cinema Offline — Rete Locale',
     estivi: 'Cinema Estivi ☀️',
     chiuso: 'Tutti i Cinema al Chiuso',
