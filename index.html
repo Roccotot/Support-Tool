@@ -286,7 +286,7 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 .model-group-cards{grid-column:1/-1;display:grid;grid-template-columns:1fr;gap:10px;overflow:hidden;transition:opacity .2s}
 .model-group-cards.hidden{display:none}
 /* .hidden = nascosto dalla ricerca, .filtered-out = gruppo rimasto vuoto */
-.dev-row.spento,.room-sep.spento{display:none}
+.dev-row.spento,.room-sep.spento,.solo-online .card-rtr{display:none}
 .cinema-card.hidden,.city-col.hidden,.type-card.hidden,
 .model-group-cards.filtered-out,.model-group-header.filtered-out{display:none}
 
@@ -1133,7 +1133,7 @@ function filterDevices(q) {
   let visibleCinema = 0;
   document.querySelectorAll('.cinema-card[data-search]').forEach(card => {
     const show = match(card) && (!soloProblemi || !!card.querySelector('.card-body .ping-dot.err'))
-      && (!soloOnline || !!card.querySelector('.card-body .ping-dot.ok'));
+      && (!soloOnline || !!card.querySelector('.card-body .ping-dot.ok:not([data-rtr])'));
     card.classList.toggle('hidden', !show);
     if (show) visibleCinema++;
   });
@@ -1215,16 +1215,19 @@ function problemsActive() { return _onlyProblems && pingedFilter(_cFilter) && _c
 
 // ── SOLO ONLINE ───────────────────────────────────────────────
 // Filtro ONLINE: cinema in VPN, ma di ogni cinema restano visibili solo i
-// dispositivi che hanno risposto all'ultimo controllo (se risponde solo il
-// MikroTik, si vede solo il MikroTik). Spariscono anche le intestazioni di
-// sala rimaste vuote e i cinema senza niente di raggiungibile.
+// dispositivi che hanno risposto all'ultimo controllo. I MikroTik non si
+// mostrano: si vedono solo le macchine di sala raggiungibili. Spariscono
+// anche le intestazioni di sala rimaste vuote e i cinema senza niente di
+// raggiungibile.
 function applyOnlineRows(attivo) {
+  const grid = document.getElementById('cinemasGrid');
+  if (grid) grid.classList.toggle('solo-online', attivo);
   document.querySelectorAll('#cinemasGrid .card-body').forEach(body => {
     let sep = null, visibili = 0;
     const chiudi = () => { if (sep) sep.classList.toggle('spento', attivo && !visibili); };
     [...body.children].forEach(el => {
       if (el.classList.contains('room-sep')) { chiudi(); sep = el; visibili = 0; return; }
-      const on = !attivo || !!el.querySelector('.ping-dot.ok');
+      const on = !attivo || !!el.querySelector('.ping-dot.ok:not([data-rtr])');
       el.classList.toggle('spento', !on);
       if (on) visibili++;
     });
@@ -1360,7 +1363,7 @@ async function downloadExcel() {
 
 function exportCSV() {
   let dati = exportRows(getCinemasForFilter(_cFilter));
-  if (_cFilter === 'online') dati = dati.filter(r => r[r.length - 1] === 'ok');
+  if (_cFilter === 'online') dati = dati.filter(r => r[r.length - 1] === 'ok' && devType(r[4])[0] !== 'rtr');
   const rows = [EXPORT_COLS, ...dati];
   const csv  = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\r\n');
   saveBlob(new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'}), `dispositivi-${_cFilter}.csv`);
