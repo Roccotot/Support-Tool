@@ -463,7 +463,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
 /* ONLINE: tasto verde pieno, più acceso quando è selezionato */
 #cf-online{color:#04140a;background:#1db954;border-color:#1db954;font-weight:700}
 #cf-online:hover{background:#25d366;border-color:#25d366;color:#04140a}
-#cf-online.active{background:var(--lime);border-color:var(--lime);color:#04140a;box-shadow:0 0 14px rgba(0,230,118,0.55)}
+#cf-online.active{background:var(--lime);color:#04140a}
+/* Tasto attivo: bordo rosso, che si vede anche sul verde di ONLINE.
+   Fatto con box-shadow per non cambiare le dimensioni del tasto. */
+.cf-btn.active,.mf-btn.active,#cf-online.active{border-color:var(--crimson);box-shadow:0 0 0 1px var(--crimson)}
 
 /* ── MAP FILTER BAR ── */
 .map-filter-bar{position:absolute;top:16px;right:16px;z-index:200;display:flex;gap:6px}
