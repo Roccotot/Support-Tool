@@ -1065,27 +1065,70 @@ function setDotState(pk, state, title) {
 
 const PING_TIMEOUT = 3000;
 
-async function pingDevice(pk, ip, port) {
-  if (!pk || !ip) return false;
+// Un dispositivo acceso che non offre una pagina web sulla porta del
+// controllo (porta chiusa, solo HTTPS con certificato non valido, come i
+// Barco Series 4 e gli ICMP) fa fallire la richiesta SUBITO; uno spento la
+// lascia andare in timeout. Un errore rapido però può avere anche altre
+// cause (VPN giù, browser che blocca): vale come "acceso" solo se nello
+// stesso momento il MikroTik del cinema risponde davvero.
+const FAST_FAIL_MS     = 1500;
+const ROUTER_FRESH_MS  = 60 * 1000;
+const ROUTER_OF = {};      // chiave cinema → {pk, ip} del suo MikroTik
+ALL_CINEMAS.forEach(c => {
+  const r = Object.values(c.rooms).flat().find(d => devType(d.label)[0] === 'rtr');
+  if (r) ROUTER_OF[cinemaKey(c)] = {pk: devKey(c, r.ip), ip: r.ip};
+});
+const _inFlight = {};      // pk → ping in corso
+const _pingAt   = {};      // pk → quando è arrivato l'ultimo esito
+
+function isRouterPk(pk) {
+  const r = ROUTER_OF[pk.slice(0, pk.lastIndexOf('|'))];
+  return !!r && r.pk === pk;
+}
+
+async function routerConfirms(pk) {
+  const r = ROUTER_OF[pk.slice(0, pk.lastIndexOf('|'))];
+  if (!r || r.pk === pk) return false;
+  if (_inFlight[r.pk]) await _inFlight[r.pk];
+  else if (!(pingState[r.pk] === 'ok' && Date.now() - (_pingAt[r.pk] || 0) < ROUTER_FRESH_MS))
+    await pingDevice(r.pk, r.ip, '');
+  return pingState[r.pk] === 'ok';
+}
+
+function pingDevice(pk, ip, port) {
+  if (!pk || !ip) return Promise.resolve(false);
+  if (_inFlight[pk]) return _inFlight[pk];
+  const p = _pingDevice(pk, ip, port).finally(() => { delete _inFlight[pk]; });
+  _inFlight[pk] = p;
+  return p;
+}
+
+async function _pingDevice(pk, ip, port) {
   const prev = pingState[pk];
   pingState[pk] = 'checking';
   updateGlobalStatus();
   setDotState(pk, 'checking', 'Verifica in corso…');
   const t0 = performance.now();
-  const ok = await new Promise(res => {
+  const esito = await new Promise(res => {
     const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); res(false); }, PING_TIMEOUT);
+    const t = setTimeout(() => { c.abort(); res('timeout'); }, PING_TIMEOUT);
     const path = port == 9000 ? '/?redirect=/tms/' : '';
     fetch('http://' + ip + (port ? ':' + port : '') + path, { signal:c.signal, mode:'no-cors', cache:'no-store' })
-      .then(() => { clearTimeout(t); res(true); })
-      .catch(() => { clearTimeout(t); res(false); });
+      .then(() => { clearTimeout(t); res('ok'); })
+      .catch(() => { clearTimeout(t); res(performance.now() - t0 < FAST_FAIL_MS ? 'rifiuta' : 'timeout'); });
   });
   const ms = Math.round(performance.now() - t0);
+  const ok = esito === 'ok' || (esito === 'rifiuta' && await routerConfirms(pk));
   pingState[pk] = ok ? 'ok' : 'err';
+  _pingAt[pk] = Date.now();
   if (ok) pingMs[pk] = ms; else delete pingMs[pk];
   updateGlobalStatus();
   setDotState(pk, ok ? 'ok' : 'err',
-    ok ? `✓ Risponde — ${ms} ms` : `✗ Non risponde (timeout ${PING_TIMEOUT / 1000} s)`);
+    esito === 'ok' ? `✓ Risponde — ${ms} ms`
+    : ok ? `✓ Acceso — rifiuta la pagina web ma risponde in ${ms} ms`
+    : esito === 'rifiuta' && !isRouterPk(pk) ? '✗ Non verificabile: anche il MikroTik non risponde'
+    : esito === 'rifiuta' ? '✗ Non risponde (connessione rifiutata o bloccata)'
+    : `✗ Non risponde (timeout ${PING_TIMEOUT / 1000} s)`);
   if (prev === 'ok' && !ok) {
     const [nome, citta] = pk.split('|');
     queueDownAlert(`${nome} (${citta}) — ${ip}`);
