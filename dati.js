@@ -289,7 +289,21 @@ Teatro Libero Grassi - Quarrata - Coord	43.8463,10.9769	GEO
 Teatro Libero Grassi - Quarrata - Rete - MikroTik	10.57.71.1:161	SNMP
 Teatro Libero Grassi - Quarrata - Sala 1 - Christie IMB-S4	10.57.71.12:161	SNMP
 Teatro Libero Grassi - Quarrata - Sala 1 - Christie CP2409-RBe	10.57.71.12:161	SNMP
-Teatro Libero Grassi - Quarrata - Sala 1 - Dolby CP950	10.57.71.14:161	ICMP`,
+Teatro Libero Grassi - Quarrata - Sala 1 - Dolby CP950	10.57.71.14:161	ICMP
+
+// Rete Auditorium (ETH 5) 10.58.99.x; rete Theatre (ETH 4) 10.58.199.x
+Astra - Firenze - Coord	43.7713,11.2715	GEO
+Astra - Firenze - Rete - MikroTik	10.58.99.1:161	SNMP
+Astra - Firenze - Sala 1 - Barco DP2K-10SLP	10.58.99.12:161	SNMP
+Astra - Firenze - Sala 1 - Barco ICMP	10.58.99.12:161	SNMP
+Astra - Firenze - Sala 1 - Dolby CP950	10.58.99.14:161	ICMP
+
+// Rete Auditorium (ETH 5) 10.59.1.x; rete Theatre (ETH 4) 10.59.101.x
+Florentia - Larderello - Coord	43.2394,10.8875	GEO
+Florentia - Larderello - Rete - MikroTik	10.59.1.1:161	SNMP
+Florentia - Larderello - Sala 1 - Doremi ShowVault	10.59.1.10:161	SNMP
+Florentia - Larderello - Sala 1 - Barco DP2K-20C	10.59.1.12:161	SNMP
+Florentia - Larderello - Sala 1 - Dolby CP750	10.59.1.14:161	ICMP`,
   offline: `
 Teatro Bucci - San Giovanni in Valdarno - Coord	43.5610,11.5310	GEO
 Puccini - Altopascio - Coord	43.8138,10.6763	GEO
@@ -348,11 +362,6 @@ Teatro Signorelli - Cortona - Coord	43.2754,11.9853	GEO
 Teatro Signorelli - Cortona - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Teatro Signorelli - Cortona - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
 Teatro Signorelli - Cortona - Sala 1 - Dolby CP650	192.168.1.14:161	ICMP
-
-Astra - Firenze - Coord	43.7713,11.2715	GEO
-Astra - Firenze - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
-Astra - Firenze - Sala 1 - Barco DP2K-10SLP	192.168.1.12:161	ICMP
-Astra - Firenze - Sala 1 - Dolby CP950	192.168.1.14:161	ICMP
 
 Cinema Castello - Firenze - Coord	43.8080,11.2200	GEO
 Cinema Castello - Firenze - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
@@ -430,11 +439,6 @@ Teatro Boito - Greve in Chianti - Coord	43.5831,11.3189	GEO
 Teatro Boito - Greve in Chianti - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
 Teatro Boito - Greve in Chianti - Sala 1 - Barco DP2K-15C	192.168.1.12:161	ICMP
 Teatro Boito - Greve in Chianti - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
-
-Florentia - Larderello - Coord	43.2394,10.8875	GEO
-Florentia - Larderello - Sala 1 - Doremi ShowVault	192.168.1.10:161	ICMP
-Florentia - Larderello - Sala 1 - Barco DP2K-20C	192.168.1.12:161	ICMP
-Florentia - Larderello - Sala 1 - Dolby CP750	192.168.1.14:161	ICMP
 
 La Gran Guardia - Livorno - Coord	43.5513,10.3113	GEO
 La Gran Guardia - Livorno - Sala 1 - Barco ICMP	192.168.1.12:161	ICMP
