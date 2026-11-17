@@ -460,6 +460,10 @@ header{position:relative;z-index:200;flex-shrink:0;background:rgba(7,9,14,0.97);
   color:var(--text2);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
 .cf-btn:hover{color:var(--text);border-color:rgba(41,121,255,0.4)}
 .cf-btn.active{color:#fff;border-color:var(--accent);background:rgba(41,121,255,0.15)}
+/* ONLINE: tasto verde pieno, più acceso quando è selezionato */
+#cf-online{color:#04140a;background:#1db954;border-color:#1db954;font-weight:700}
+#cf-online:hover{background:#25d366;border-color:#25d366;color:#04140a}
+#cf-online.active{background:var(--lime);border-color:var(--lime);color:#04140a;box-shadow:0 0 14px rgba(0,230,118,0.55)}
 
 /* ── MAP FILTER BAR ── */
 .map-filter-bar{position:absolute;top:16px;right:16px;z-index:200;display:flex;gap:6px}
@@ -1278,12 +1282,17 @@ function applyOnlineRows(attivo) {
   });
 }
 
-// Le risposte arrivano una alla volta: si riallinea l'elenco a piccoli
-// gruppi invece che a ogni singolo ping.
-let _onlineTimer;
+// Le risposte arrivano una alla volta (una ogni ~80 ms durante il giro):
+// l'elenco si riallinea al massimo ogni 200 ms, così i dispositivi
+// compaiono man mano che rispondono. Prima il timer ripartiva a ogni
+// risposta e non scattava finché il giro non era finito.
+let _onlineTimer = null;
 function scheduleOnlineRefresh() {
-  clearTimeout(_onlineTimer);
-  _onlineTimer = setTimeout(() => filterDevices(document.getElementById('searchInput').value), 400);
+  if (_onlineTimer) return;
+  _onlineTimer = setTimeout(() => {
+    _onlineTimer = null;
+    filterDevices(document.getElementById('searchInput').value);
+  }, 200);
 }
 
 function toggleProblems(force) {
